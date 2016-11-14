@@ -7,11 +7,11 @@ import org.springframework.util.Log4jConfigurer;
 
 public class Provider {
 
-    public static void main(String[] args) throws Exception {
-        URL url = Provider.class.getClassLoader().getSystemResource("log4j.properties");
+    public static void main(final String[] args) throws Exception {
+        final URL url = Provider.class.getClassLoader().getSystemResource("log4j.properties");
         System.out.println(url.toString());
         Log4jConfigurer.initLogging(url.getFile());
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { "spring-context-scf-dubbo-provider.xml" });
+        final ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { "spring-context-workflow-dubbo-provider.xml" });
         context.start();
 
         System.in.read();

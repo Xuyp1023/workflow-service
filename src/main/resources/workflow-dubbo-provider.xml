@@ -9,7 +9,7 @@
     http://code.alibabatech.com/schema/dubbo        
     http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 	<!-- 扫描dubbo注解 -->
-	<dubbo:annotation package="" />
+	<dubbo:annotation package="com.betterjr.modules.workflow" />
 
 	<!-- 提供方应用信息，用于计算依赖关系 -->
 	<dubbo:application name="${dubbo.application}" />

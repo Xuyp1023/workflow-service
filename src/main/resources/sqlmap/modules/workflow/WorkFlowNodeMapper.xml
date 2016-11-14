@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.betterjr.modules.workflow.dao.WorkFlowNodeMapper" >
+  <resultMap id="BaseResultMap" type="com.betterjr.modules.workflow.entity.WorkFlowNode" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="L_BASE_ID" property="baseId" jdbcType="INTEGER" />
+    <result column="N_SEQ" property="seq" jdbcType="INTEGER" />
+    <result column="C_NAME" property="name" jdbcType="VARCHAR" />
+    <result column="C_NICKNAME" property="nickname" jdbcType="VARCHAR" />
+    <result column="C_IS_DISABLED" property="isDisabled" jdbcType="VARCHAR" />
+    <result column="C_HANDLER" property="handler" jdbcType="VARCHAR" />
+    <result column="C_FORM" property="form" jdbcType="VARCHAR" />
+    <result column="C_TYPE" property="type" jdbcType="CHAR" />
+    <result column="C_OPERROLE" property="operRole" jdbcType="VARCHAR" />
+    <result column="C_MONEY_VARIABLE" property="moneyVariable" jdbcType="VARCHAR" />
+    <result column="L_REG_OPERID" property="regOperId" jdbcType="INTEGER" />
+    <result column="C_REG_OPERNAME" property="regOperName" jdbcType="VARCHAR" />
+    <result column="D_REG_DATE" property="regDate" jdbcType="VARCHAR" />
+    <result column="T_REG_TIME" property="regTime" jdbcType="VARCHAR" />
+    <result column="L_MODI_OPERID" property="modiOperId" jdbcType="INTEGER" />
+    <result column="C_MODI_OPERNAME" property="modiOperName" jdbcType="VARCHAR" />
+    <result column="D_MODI_DATE" property="modiDate" jdbcType="VARCHAR" />
+    <result column="T_MODI_TIME" property="modiTime" jdbcType="VARCHAR" />
+    <result column="C_BUSIN_STATUS" property="businStatus" jdbcType="VARCHAR" />
+    <result column="C_LAST_STATUS" property="lastStatus" jdbcType="VARCHAR" />
+  </resultMap>
+</mapper>
