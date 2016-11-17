@@ -18,8 +18,8 @@ public class WorkFlowApprover implements BetterjrEntity {
     @Column(name = "L_PARENT_ID",  columnDefinition="INTEGER" )
     private Long parentId;
 
-    @Column(name = "L_OPERID",  columnDefinition="VARCHAR" )
-    private String operId;
+    @Column(name = "L_OPERID",  columnDefinition="INTEGER" )
+    private Long operId;
 
     @Column(name = "L_MONEY_ID",  columnDefinition="INTEGER" )
     private Long moneyId;
@@ -57,7 +57,7 @@ public class WorkFlowApprover implements BetterjrEntity {
     @Column(name = "C_LAST_STATUS",  columnDefinition="VARCHAR" )
     private String lastStatus;
 
-    private static final long serialVersionUID = 1479109319218L;
+    private static final long serialVersionUID = 1479349929432L;
 
     public Long getId() {
         return id;
@@ -83,11 +83,11 @@ public class WorkFlowApprover implements BetterjrEntity {
         this.parentId = parentId;
     }
 
-    public String getOperId() {
+    public Long getOperId() {
         return operId;
     }
 
-    public void setOperId(String operId) {
+    public void setOperId(Long operId) {
         this.operId = operId;
     }
 

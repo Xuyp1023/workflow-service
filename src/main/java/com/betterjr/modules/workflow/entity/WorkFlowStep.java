@@ -60,7 +60,7 @@ public class WorkFlowStep implements BetterjrEntity {
     @Column(name = "C_LAST_STATUS",  columnDefinition="VARCHAR" )
     private String lastStatus;
 
-    private static final long serialVersionUID = 1479109319217L;
+    private static final long serialVersionUID = 1479349929431L;
 
     public Long getId() {
         return id;
