@@ -7,6 +7,10 @@
 // ============================================================================
 package com.betterjr.modules.workflow.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.modules.workflow.dao.WorkFlowCategoryMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowCategory;
@@ -16,5 +20,14 @@ import com.betterjr.modules.workflow.entity.WorkFlowCategory;
  *
  */
 public class WorkFlowCategoryService extends BaseService<WorkFlowCategoryMapper, WorkFlowCategory> {
-
+    /**
+     * 查询流程分类
+     *
+     * @return
+     */
+    public List<SimpleDataEntity> queryWorkFlowCategory() {
+        // 查询分类
+        return this.selectAll().stream().map(category -> new SimpleDataEntity(String.valueOf(category.getId()), category.getName()))
+                .collect(Collectors.toList());
+    }
 }

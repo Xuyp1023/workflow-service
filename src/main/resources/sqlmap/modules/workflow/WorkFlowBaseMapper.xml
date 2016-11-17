@@ -1,33 +1,34 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.betterjr.modules.workflow.dao.WorkFlowBaseMapper" >
-  <resultMap id="BaseResultMap" type="com.betterjr.modules.workflow.entity.WorkFlowBase" >
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.betterjr.modules.workflow.dao.WorkFlowBaseMapper">
+  <resultMap id="BaseResultMap" type="com.betterjr.modules.workflow.entity.WorkFlowBase">
     <!--
       WARNING - @mbggenerated
     -->
-    <id column="ID" property="id" jdbcType="INTEGER" />
-    <result column="L_CATEGORY_ID" property="categoryId" jdbcType="INTEGER" />
-    <result column="C_NAME" property="name" jdbcType="VARCHAR" />
-    <result column="C_NICKNAME" property="nickname" jdbcType="VARCHAR" />
-    <result column="C_OPERROLE" property="operRole" jdbcType="VARCHAR" />
-    <result column="C_OPERORG" property="operOrg" jdbcType="VARCHAR" />
-    <result column="L_CUSTNO" property="custNo" jdbcType="INTEGER" />
-    <result column="C_CUSTNAME" property="custName" jdbcType="VARCHAR" />
-    <result column="N_VERSION" property="version" jdbcType="INTEGER" />
-    <result column="C_IS_LAST" property="isLast" jdbcType="CHAR" />
-    <result column="C_IS_PUBLISHED" property="isPublished" jdbcType="CHAR" />
-    <result column="C_IS_DEFAULT" property="isDefault" jdbcType="CHAR" />
-    <result column="C_PROCESS_ID" property="processId" jdbcType="VARCHAR" />
-    <result column="C_MONEY_VARIABLE" property="moneyVariable" jdbcType="VARCHAR" />
-    <result column="L_REG_OPERID" property="regOperId" jdbcType="INTEGER" />
-    <result column="C_REG_OPERNAME" property="regOperName" jdbcType="VARCHAR" />
-    <result column="D_REG_DATE" property="regDate" jdbcType="VARCHAR" />
-    <result column="T_REG_TIME" property="regTime" jdbcType="VARCHAR" />
-    <result column="L_MODI_OPERID" property="modiOperId" jdbcType="INTEGER" />
-    <result column="C_MODI_OPERNAME" property="modiOperName" jdbcType="VARCHAR" />
-    <result column="D_MODI_DATE" property="modiDate" jdbcType="VARCHAR" />
-    <result column="T_MODI_TIME" property="modiTime" jdbcType="VARCHAR" />
-    <result column="C_BUSIN_STATUS" property="businStatus" jdbcType="VARCHAR" />
-    <result column="C_LAST_STATUS" property="lastStatus" jdbcType="VARCHAR" />
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="L_CATEGORY_ID" jdbcType="INTEGER" property="categoryId" />
+    <result column="C_NAME" jdbcType="VARCHAR" property="name" />
+    <result column="C_NICKNAME" jdbcType="VARCHAR" property="nickname" />
+    <result column="C_OPERROLE" jdbcType="VARCHAR" property="operRole" />
+    <result column="C_OPERORG" jdbcType="VARCHAR" property="operOrg" />
+    <result column="L_CUSTNO" jdbcType="INTEGER" property="custNo" />
+    <result column="C_CUSTNAME" jdbcType="VARCHAR" property="custName" />
+    <result column="N_VERSION" jdbcType="INTEGER" property="version" />
+    <result column="C_IS_LAST" jdbcType="CHAR" property="isLast" />
+    <result column="C_IS_PUBLISHED" jdbcType="CHAR" property="isPublished" />
+    <result column="C_IS_DEFAULT" jdbcType="CHAR" property="isDefault" />
+    <result column="C_IS_DISABLED" jdbcType="CHAR" property="isDisabled" />
+    <result column="C_PROCESS_ID" jdbcType="VARCHAR" property="processId" />
+    <result column="C_MONEY_VARIABLE" jdbcType="VARCHAR" property="moneyVariable" />
+    <result column="L_REG_OPERID" jdbcType="INTEGER" property="regOperId" />
+    <result column="C_REG_OPERNAME" jdbcType="VARCHAR" property="regOperName" />
+    <result column="D_REG_DATE" jdbcType="VARCHAR" property="regDate" />
+    <result column="T_REG_TIME" jdbcType="VARCHAR" property="regTime" />
+    <result column="L_MODI_OPERID" jdbcType="INTEGER" property="modiOperId" />
+    <result column="C_MODI_OPERNAME" jdbcType="VARCHAR" property="modiOperName" />
+    <result column="D_MODI_DATE" jdbcType="VARCHAR" property="modiDate" />
+    <result column="T_MODI_TIME" jdbcType="VARCHAR" property="modiTime" />
+    <result column="C_BUSIN_STATUS" jdbcType="VARCHAR" property="businStatus" />
+    <result column="C_LAST_STATUS" jdbcType="VARCHAR" property="lastStatus" />
   </resultMap>
 </mapper>

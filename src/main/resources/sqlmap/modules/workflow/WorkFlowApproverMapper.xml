@@ -1,25 +1,25 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.betterjr.modules.workflow.dao.WorkFlowApproverMapper" >
-  <resultMap id="BaseResultMap" type="com.betterjr.modules.workflow.entity.WorkFlowApprover" >
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.betterjr.modules.workflow.dao.WorkFlowApproverMapper">
+  <resultMap id="BaseResultMap" type="com.betterjr.modules.workflow.entity.WorkFlowApprover">
     <!--
       WARNING - @mbggenerated
     -->
-    <id column="ID" property="id" jdbcType="INTEGER" />
-    <result column="C_PARENT_TYPE" property="parentType" jdbcType="CHAR" />
-    <result column="L_PARENT_ID" property="parentId" jdbcType="INTEGER" />
-    <result column="L_OPERID" property="operId" jdbcType="VARCHAR" />
-    <result column="L_MONEY_ID" property="moneyId" jdbcType="INTEGER" />
-    <result column="N_WEIGHT" property="weight" jdbcType="INTEGER" />
-    <result column="L_REG_OPERID" property="regOperId" jdbcType="INTEGER" />
-    <result column="C_REG_OPERNAME" property="regOperName" jdbcType="VARCHAR" />
-    <result column="D_REG_DATE" property="regDate" jdbcType="VARCHAR" />
-    <result column="T_REG_TIME" property="regTime" jdbcType="VARCHAR" />
-    <result column="L_MODI_OPERID" property="modiOperId" jdbcType="INTEGER" />
-    <result column="C_MODI_OPERNAME" property="modiOperName" jdbcType="VARCHAR" />
-    <result column="D_MODI_DATE" property="modiDate" jdbcType="VARCHAR" />
-    <result column="T_MODI_TIME" property="modiTime" jdbcType="VARCHAR" />
-    <result column="C_BUSIN_STATUS" property="businStatus" jdbcType="VARCHAR" />
-    <result column="C_LAST_STATUS" property="lastStatus" jdbcType="VARCHAR" />
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="C_PARENT_TYPE" jdbcType="CHAR" property="parentType" />
+    <result column="L_PARENT_ID" jdbcType="INTEGER" property="parentId" />
+    <result column="L_OPERID" jdbcType="INTEGER" property="operId" />
+    <result column="L_MONEY_ID" jdbcType="INTEGER" property="moneyId" />
+    <result column="N_WEIGHT" jdbcType="INTEGER" property="weight" />
+    <result column="L_REG_OPERID" jdbcType="INTEGER" property="regOperId" />
+    <result column="C_REG_OPERNAME" jdbcType="VARCHAR" property="regOperName" />
+    <result column="D_REG_DATE" jdbcType="VARCHAR" property="regDate" />
+    <result column="T_REG_TIME" jdbcType="VARCHAR" property="regTime" />
+    <result column="L_MODI_OPERID" jdbcType="INTEGER" property="modiOperId" />
+    <result column="C_MODI_OPERNAME" jdbcType="VARCHAR" property="modiOperName" />
+    <result column="D_MODI_DATE" jdbcType="VARCHAR" property="modiDate" />
+    <result column="T_MODI_TIME" jdbcType="VARCHAR" property="modiTime" />
+    <result column="C_BUSIN_STATUS" jdbcType="VARCHAR" property="businStatus" />
+    <result column="C_LAST_STATUS" jdbcType="VARCHAR" property="lastStatus" />
   </resultMap>
 </mapper>

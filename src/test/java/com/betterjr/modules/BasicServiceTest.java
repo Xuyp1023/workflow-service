@@ -16,16 +16,16 @@ public abstract class BasicServiceTest<T> {
     public static void startSpring() {
 
         try {
-            URL url = BasicServiceTest.class.getClassLoader().getSystemResource("log4j-test.properties");
+            final URL url = BasicServiceTest.class.getClassLoader().getSystemResource("log4j-test.properties");
             System.out.println(url.toString());
             Log4jConfigurer.initLogging(url.getFile());
         }
-        catch (FileNotFoundException e) {
+        catch (final FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        String[] configFiles = new String[] { "spring-context-scf-dubbo-provider-test.xml" };
+        final String[] configFiles = new String[] { "spring-context-workflow-dubbo-provider-test.xml" };
         ctx = new ClassPathXmlApplicationContext(configFiles);
 
         ctx.start();
@@ -39,7 +39,7 @@ public abstract class BasicServiceTest<T> {
     }
 
     public T getServiceObject() {
-        T service = (T) this.getCtx().getBean(this.getTargetServiceClass());
+        final T service = this.getCtx().getBean(this.getTargetServiceClass());
         return service;
     }
 

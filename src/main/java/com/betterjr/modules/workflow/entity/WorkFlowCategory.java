@@ -18,7 +18,7 @@ public class WorkFlowCategory implements BetterjrEntity {
     @Column(name = "C_DESCRIPTION",  columnDefinition="VARCHAR" )
     private String description;
 
-    private static final long serialVersionUID = 5126326491889251893L;
+    private static final long serialVersionUID = -1596462149444904028L;
 
     public Long getId() {
         return id;

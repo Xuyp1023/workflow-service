@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -18,6 +20,9 @@ public class WorkFlowMoney implements BetterjrEntity {
     @Id
     @Column(name = "ID",  columnDefinition="INTEGER" )
     private Long id;
+
+    @Column(name = "N_SEQ",  columnDefinition="INTEGER" )
+    private Integer seq;
 
     @Column(name = "L_BASE_ID",  columnDefinition="INTEGER" )
     private Long baseId;
@@ -58,7 +63,7 @@ public class WorkFlowMoney implements BetterjrEntity {
     @Column(name = "C_LAST_STATUS",  columnDefinition="VARCHAR" )
     private String lastStatus;
 
-    private static final long serialVersionUID = 1479109319219L;
+    private static final long serialVersionUID = 77218450107816652L;
 
     public Long getId() {
         return id;
@@ -66,6 +71,14 @@ public class WorkFlowMoney implements BetterjrEntity {
 
     public void setId(final Long id) {
         this.id = id;
+    }
+
+    public Integer getSeq() {
+        return seq;
+    }
+
+    public void setSeq(final Integer seq) {
+        this.seq = seq;
     }
 
     public Long getBaseId() {
@@ -179,6 +192,7 @@ public class WorkFlowMoney implements BetterjrEntity {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", seq=").append(seq);
         sb.append(", baseId=").append(baseId);
         sb.append(", beginMoney=").append(beginMoney);
         sb.append(", endMoney=").append(endMoney);
@@ -210,6 +224,7 @@ public class WorkFlowMoney implements BetterjrEntity {
         }
         final WorkFlowMoney other = (WorkFlowMoney) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+                && (this.getSeq() == null ? other.getSeq() == null : this.getSeq().equals(other.getSeq()))
                 && (this.getBaseId() == null ? other.getBaseId() == null : this.getBaseId().equals(other.getBaseId()))
                 && (this.getBeginMoney() == null ? other.getBeginMoney() == null : this.getBeginMoney().equals(other.getBeginMoney()))
                 && (this.getEndMoney() == null ? other.getEndMoney() == null : this.getEndMoney().equals(other.getEndMoney()))
@@ -230,6 +245,7 @@ public class WorkFlowMoney implements BetterjrEntity {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getSeq() == null) ? 0 : getSeq().hashCode());
         result = prime * result + ((getBaseId() == null) ? 0 : getBaseId().hashCode());
         result = prime * result + ((getBeginMoney() == null) ? 0 : getBeginMoney().hashCode());
         result = prime * result + ((getEndMoney() == null) ? 0 : getEndMoney().hashCode());
@@ -244,5 +260,22 @@ public class WorkFlowMoney implements BetterjrEntity {
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         return result;
+    }
+
+    /**
+     * @param anBaseId
+     */
+    public void initAddValue(final Long anBaseId) {
+        this.baseId = anBaseId;
+
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        this.regOperId = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getId() : 0L;
+        this.regOperName = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getName() : "";
+
+        this.modiOperId = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getId() : 0L;
+        this.modiOperName = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getName() : "";
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
     }
 }

@@ -18,7 +18,7 @@
 			<property name="suppressAllComments" value="false" />
 		</commentGenerator>
 		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
-			connectionURL="jdbc:mysql://192.168.2.49:3306/liuwl_wf" userId="finance"
+			connectionURL="jdbc:mysql://192.168.2.49:3306/scfdev" userId="finance"
 			password="1" />
 		<javaTypeResolver>
 			<property name="forceBigDecimals" value="false" />
@@ -34,14 +34,14 @@
 			implementationPackage="com.betterjr.modules.workflow.dao.impl"
 			targetProject="E:\new\workflow-service\src\main\java\" type="XMLMAPPER" />
 
-		<!-- 流程分类 -->
+	<!-- 	
 		<table schema="" tableName="t_sys_wf_category" domainObjectName="WorkFlowCategory">
 			<columnOverride column="ID" jdbcType="INTEGER" javaType="Long" property="id" />
 			<columnOverride column="C_NAME" jdbcType="VARCHAR" javaType="String" property="name" />
 			<columnOverride column="C_DESCRIPTION" jdbcType="VARCHAR" javaType="String" property="description" />
 		</table>
 
-		<!-- 流程基础表-->
+		流程基础表
 		<table schema="" tableName="t_sys_wf_base" domainObjectName="WorkFlowBase">
 			<columnOverride column="ID" jdbcType="INTEGER" javaType="Long" property="id" />
 			<columnOverride column="L_CATEGORY_ID" jdbcType="INTEGER" javaType="Long" property="categoryId" />
@@ -55,6 +55,7 @@
 			<columnOverride column="C_IS_LAST" jdbcType="CHAR" javaType="String" property="isLast" />
 			<columnOverride column="C_IS_PUBLISHED" jdbcType="CHAR" javaType="String" property="isPublished" />
 			<columnOverride column="C_IS_DEFAULT" jdbcType="CHAR" javaType="String" property="isDefault" />
+			<columnOverride column="C_IS_DISABLED" jdbcType="CHAR" javaType="String" property="isDisabled" />
 			<columnOverride column="C_PROCESS_ID" jdbcType="VARCHAR" javaType="String" property="processId" />
 			<columnOverride column="C_MONEY_VARIABLE" jdbcType="VARCHAR" javaType="String" property="moneyVariable" />
 			<columnOverride column="L_REG_OPERID" jdbcType="INTEGER" javaType="Long" property="regOperId" />
@@ -69,7 +70,7 @@
 		   <columnOverride column="C_LAST_STATUS" jdbcType="VARCHAR" property="lastStatus" />
 		</table>
 		
-		<!-- 流程节点表-->
+		流程节点表
         <table schema="" tableName="t_sys_wf_node" domainObjectName="WorkFlowNode">
             <columnOverride column="ID" jdbcType="INTEGER" javaType="Long" property="id" />
             <columnOverride column="L_BASE_ID" jdbcType="INTEGER" javaType="Long" property="baseId" />
@@ -94,7 +95,7 @@
            <columnOverride column="C_LAST_STATUS" jdbcType="VARCHAR" property="lastStatus" />
         </table>
         
-            <!-- 流程步骤表-->
+            流程步骤表
         <table schema="" tableName="t_sys_wf_step" domainObjectName="WorkFlowStep">
             <columnOverride column="ID" jdbcType="INTEGER" javaType="Long" property="id" />
             <columnOverride column="L_NODE_ID" jdbcType="INTEGER" javaType="Long" property="nodeId" />
@@ -115,12 +116,12 @@
            <columnOverride column="C_LAST_STATUS" jdbcType="VARCHAR" property="lastStatus" />
         </table>
         
-        <!-- 流程审批人-->
+        流程审批人
         <table schema="" tableName="t_sys_wf_approver" domainObjectName="WorkFlowApprover">
             <columnOverride column="ID" jdbcType="INTEGER" javaType="Long" property="id" />
             <columnOverride column="C_PARENT_TYPE" jdbcType="CHAR" javaType="String" property="parentType" />
             <columnOverride column="L_PARENT_ID" jdbcType="INTEGER" javaType="Long" property="parentId" />
-            <columnOverride column="L_OPERID" jdbcType="VARCHAR" javaType="String" property="operId" />
+            <columnOverride column="L_OPERID" jdbcType="INTEGER" javaType="Long" property="operId" />
             <columnOverride column="L_MONEY_ID" jdbcType="INTEGER" javaType="Long" property="moneyId" />
             <columnOverride column="N_WEIGHT" jdbcType="INTEGER" javaType="Integer" property="weight" />
             <columnOverride column="L_REG_OPERID" jdbcType="INTEGER" javaType="Long" property="regOperId" />
@@ -134,10 +135,11 @@
            <columnOverride column="C_BUSIN_STATUS" jdbcType="VARCHAR" property="businStatus" />
            <columnOverride column="C_LAST_STATUS" jdbcType="VARCHAR" property="lastStatus" />
         </table>
-        
+         -->
         <!-- 流程金额段-->
         <table schema="" tableName="t_sys_wf_money" domainObjectName="WorkFlowMoney">
             <columnOverride column="ID" jdbcType="INTEGER" javaType="Long" property="id" />
+            <columnOverride column="N_SEQ" jdbcType="INTEGER" javaType="Integer" property="seq" />
             <columnOverride column="L_BASE_ID" jdbcType="INTEGER" javaType="Long" property="baseId" />
             <columnOverride column="N_BEGIN_MONEY" jdbcType="DECIMAL" javaType="BigDecimal" property="beginMoney" />
             <columnOverride column="N_END_MONEY" jdbcType="DECIMAL" javaType="BigDecimal" property="endMoney" />
@@ -153,7 +155,7 @@
            <columnOverride column="C_LAST_STATUS" jdbcType="VARCHAR" property="lastStatus" />
         </table>
         
-                <!-- 流程业务表-->
+ <!--                流程业务表
         <table schema="" tableName="t_sys_wf_business" domainObjectName="WorkFlowBusiness">
             <columnOverride column="ID" jdbcType="INTEGER" javaType="Long" property="id" />
             <columnOverride column="L_BUSINESS_ID" jdbcType="INTEGER" javaType="Long" property="businessId" />
@@ -172,7 +174,7 @@
            <columnOverride column="C_LAST_STATUS" jdbcType="VARCHAR" property="lastStatus" />
         </table>
         
-        <!-- 流程审批表-->
+        流程审批表
         <table schema="" tableName="t_sys_wf_audit" domainObjectName="WorkFlowAudit">
             <columnOverride column="ID" jdbcType="INTEGER" javaType="Long" property="id" />
             <columnOverride column="L_BASE_ID" jdbcType="INTEGER" javaType="Long" property="baseId" />
@@ -199,6 +201,6 @@
            <columnOverride column="T_MODI_TIME" jdbcType="VARCHAR" property="modiTime" />
            <columnOverride column="C_BUSIN_STATUS" jdbcType="VARCHAR" property="businStatus" />
            <columnOverride column="C_LAST_STATUS" jdbcType="VARCHAR" property="lastStatus" />
-        </table>
+        </table> -->
 	</context>
 </generatorConfiguration>
