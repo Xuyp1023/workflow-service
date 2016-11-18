@@ -7,6 +7,8 @@
 // ============================================================================
 package com.betterjr.modules.workflow.service;
 
+import org.springframework.stereotype.Service;
+
 import com.betterjr.common.service.BaseService;
 import com.betterjr.modules.workflow.dao.WorkFlowAuditMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowAudit;
@@ -15,6 +17,7 @@ import com.betterjr.modules.workflow.entity.WorkFlowAudit;
  * @author liuwl
  *
  */
+@Service
 public class WorkFlowAuditService extends BaseService<WorkFlowAuditMapper, WorkFlowAudit> {
 
 }

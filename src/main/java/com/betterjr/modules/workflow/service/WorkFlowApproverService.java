@@ -13,16 +13,21 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.springframework.stereotype.Service;
+
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.workflow.constant.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowApproverMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowApprover;
+import com.betterjr.modules.workflow.entity.WorkFlowNode;
+import com.betterjr.modules.workflow.entity.WorkFlowStep;
 
 /**
  * @author liuwl
  *
  */
+@Service
 public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper, WorkFlowApprover> {
     @Inject
     private WorkFlowBaseService workFlowBaseService;
@@ -33,9 +38,9 @@ public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper,
     @Inject
     private WorkFlowStepService workFlowStepService;
 
-
     /**
      * 添加分配的经办人
+     *
      * @return
      */
     public WorkFlowApprover addApproverByNode(final Long anNodeId, final WorkFlowApprover anApprover) {
@@ -48,9 +53,9 @@ public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper,
         return null;
     }
 
-
     /**
      * 添加分配的经办人
+     *
      * @return
      */
     public WorkFlowApprover addApproverByStep(final Long anNodeId, final WorkFlowApprover anApprover) {
@@ -65,6 +70,7 @@ public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper,
 
     /**
      * 删除所有经办人
+     *
      * @param anParentType
      * @param anParentId
      */
@@ -114,5 +120,26 @@ public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper,
 
         // 通过节点编号 与 类型 查找相应的审批员
         return this.selectByProperty(conditionMap);
+    }
+
+    /**
+     * copy到新的流程上
+     *
+     * @param anWorkFlowNode
+     * @param anTempWorkFlowNode
+     */
+    public void saveCopyWorkFlowApproverByNode(final WorkFlowNode anSourceNode, final WorkFlowNode anTargetNode) {
+
+    }
+
+    /**
+     * copy到新的流程上
+     *
+     * @param anWorkFlowNode
+     * @param anTempWorkFlowNode
+     */
+    public void saveCopyWorkFlowApproverByStep(final WorkFlowStep anSourceStep, final WorkFlowStep anTargetStep,
+            final Map<Long, Long> anWorkFlowMoneyMapping) {
+
     }
 }

@@ -1,0 +1,41 @@
+// Copyright (c) 2014-2016 Bytter. All rights reserved.
+// ============================================================================
+// CURRENT VERSION
+// ============================================================================
+// CHANGE LOG
+// V2.0 : 2016年11月18日, liuwl, creation
+// ============================================================================
+package com.betterjr.modules.workflow;
+
+import java.util.List;
+
+import org.junit.Test;
+
+import com.betterjr.modules.BasicServiceTest;
+import com.betterjr.modules.workflow.entity.WorkFlowNode;
+import com.betterjr.modules.workflow.service.WorkFlowNodeService;
+
+/**
+ * @author liuwl
+ *
+ */
+public class WorkFlowNodeServiceTestCase extends BasicServiceTest<WorkFlowNodeService> {
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see com.betterjr.modules.BasicServiceTest#getTargetServiceClass()
+     */
+    @Override
+    public Class<WorkFlowNodeService> getTargetServiceClass() {
+        return WorkFlowNodeService.class;
+    }
+
+    @Test
+    public void testQueryNode() {
+        final WorkFlowNodeService flowNodeService = getServiceObject();
+        final List<WorkFlowNode> flowNodes = flowNodeService.queryWorkFlowNode(-20000L);
+
+        flowNodes.forEach(System.out::println);
+    }
+}

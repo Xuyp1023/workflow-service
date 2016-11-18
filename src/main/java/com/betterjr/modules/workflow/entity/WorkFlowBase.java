@@ -57,6 +57,9 @@ public class WorkFlowBase implements BetterjrEntity {
     @Column(name = "C_IS_DISABLED", columnDefinition = "CHAR")
     private String isDisabled;
 
+    @Column(name = "C_IS_SUBPROCESS", columnDefinition = "CHAR")
+    private String isSubprocess;
+
     @Column(name = "C_PROCESS_ID", columnDefinition = "VARCHAR")
     private String processId;
 
@@ -198,6 +201,13 @@ public class WorkFlowBase implements BetterjrEntity {
     public void setIsDisabled(final String isDisabled) {
         this.isDisabled = isDisabled;
     }
+    public String getIsSubprocess() {
+        return isSubprocess;
+    }
+
+    public void setIsSubprocess(final String isSubprocess) {
+        this.isSubprocess = isSubprocess;
+    }
 
     public String getProcessId() {
         return processId;
@@ -314,6 +324,7 @@ public class WorkFlowBase implements BetterjrEntity {
         sb.append(", isPublished=").append(isPublished);
         sb.append(", isDefault=").append(isDefault);
         sb.append(", isDisabled=").append(isDisabled);
+        sb.append(", isSubprocess=").append(isSubprocess);
         sb.append(", processId=").append(processId);
         sb.append(", moneyVariable=").append(moneyVariable);
         sb.append(", regOperId=").append(regOperId);
@@ -356,6 +367,7 @@ public class WorkFlowBase implements BetterjrEntity {
                 && (this.getIsPublished() == null ? other.getIsPublished() == null : this.getIsPublished().equals(other.getIsPublished()))
                 && (this.getIsDefault() == null ? other.getIsDefault() == null : this.getIsDefault().equals(other.getIsDefault()))
                 && (this.getIsDisabled() == null ? other.getIsDisabled() == null : this.getIsDisabled().equals(other.getIsDisabled()))
+                && (this.getIsSubprocess() == null ? other.getIsSubprocess() == null : this.getIsSubprocess().equals(other.getIsSubprocess()))
                 && (this.getProcessId() == null ? other.getProcessId() == null : this.getProcessId().equals(other.getProcessId()))
                 && (this.getMoneyVariable() == null ? other.getMoneyVariable() == null : this.getMoneyVariable().equals(other.getMoneyVariable()))
                 && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
@@ -387,6 +399,7 @@ public class WorkFlowBase implements BetterjrEntity {
         result = prime * result + ((getIsPublished() == null) ? 0 : getIsPublished().hashCode());
         result = prime * result + ((getIsDefault() == null) ? 0 : getIsDefault().hashCode());
         result = prime * result + ((getIsDisabled() == null) ? 0 : getIsDisabled().hashCode());
+        result = prime * result + ((getIsSubprocess() == null) ? 0 : getIsSubprocess().hashCode());
         result = prime * result + ((getProcessId() == null) ? 0 : getProcessId().hashCode());
         result = prime * result + ((getMoneyVariable() == null) ? 0 : getMoneyVariable().hashCode());
         result = prime * result + ((getRegOperId() == null) ? 0 : getRegOperId().hashCode());
@@ -409,7 +422,8 @@ public class WorkFlowBase implements BetterjrEntity {
     public void initAddValue(final WorkFlowBase anWorkFlowBaseDefault) {
         this.id = SerialGenerator.getLongValue("WorkFlowBase.id");
 
-        this.setName(anWorkFlowBaseDefault.getName());
+        this.name = anWorkFlowBaseDefault.getName();
+        this.isSubprocess = anWorkFlowBaseDefault.getIsSubprocess();
 
         this.isDefault = WorkFlowConstants.NOT_DEFAULT;
         this.isPublished = WorkFlowConstants.NOT_PUBLISHED;

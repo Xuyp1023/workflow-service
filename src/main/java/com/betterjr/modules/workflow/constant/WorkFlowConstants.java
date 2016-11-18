@@ -28,12 +28,17 @@ public interface WorkFlowConstants {
     String IS_DISABLED = "1";
     String NOT_DISABLED = "0";
 
+    // 起始
+    String NODE_TYPE_START = "0";
+    // 结束
+    String NODE_TYPE_END = "1";
     //经办节点
-    String NODE_TYPE_OPER = "0";
+    String NODE_TYPE_OPER = "2";
     //审批节点
-    String NODE_TYPE_APP = "1";
+    String NODE_TYPE_APP = "3";
     //子流程
-    String NODE_TYPE_SUB = "2";
+    String NODE_TYPE_SUB = "4";
+
 
     // 节点类型
     String PARENT_TYPE_NODE = "0";

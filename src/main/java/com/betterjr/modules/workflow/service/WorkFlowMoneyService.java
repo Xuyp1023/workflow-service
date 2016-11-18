@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.springframework.stereotype.Service;
+
 import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
@@ -31,6 +33,7 @@ import com.betterjr.modules.workflow.entity.WorkFlowMoney;
  * @author liuwl
  *
  */
+@Service
 public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkFlowMoney> {
     private final static String MONEY_SECTION_PATTERN_STR = "^0,[\\d,]+-1$";
     private final static Pattern MONEY_SECTION_PATTERN = Pattern.compile(MONEY_SECTION_PATTERN_STR);
@@ -178,5 +181,23 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
                 .map(workFlowMoney -> new SimpleDataEntity(String.valueOf(workFlowMoney.getId()),
                         workFlowMoney.getBeginMoney() + " - " + workFlowMoney.getEndMoney()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * copy到新的流程上 并且将copy关系映射 保留下来
+     * @param anTargetBase
+     * @param anSourceBase
+     * @param anWorkFlowMoneyMapping
+     */
+    public void saveCopyWorkFlowMoney(final WorkFlowBase anSourceBase, final WorkFlowBase anTargetBase,
+            final Map<Long, Long> anWorkFlowMoneyMapping) {
+        queryWorkFlowMoneyByBaseId(anSourceBase.getId()).forEach(tempWorkFlowMoney -> {
+            final WorkFlowMoney workFlowMoney = new WorkFlowMoney();
+            workFlowMoney.initCopyMoney(tempWorkFlowMoney);
+            workFlowMoney.setBaseId(anTargetBase.getId());
+
+            this.insert(workFlowMoney);
+            anWorkFlowMoneyMapping.put(tempWorkFlowMoney.getId(), workFlowMoney.getId());
+        });
     }
 }
