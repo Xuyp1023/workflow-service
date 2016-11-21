@@ -44,4 +44,11 @@ public interface WorkFlowConstants {
     String PARENT_TYPE_NODE = "0";
     // 步骤类型
     String PARENT_TYPE_STEP = "1";
+
+
+    String AUDIT_TYPE_PARALLEL = "1";
+    String AUDIT_TYPE_SERIAL = "0";
+
+    String IS_MONEY_TRUE = "1";
+    String IS_MONEY_FALSE = "0";
 }

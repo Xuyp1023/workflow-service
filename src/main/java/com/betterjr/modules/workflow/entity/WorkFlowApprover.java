@@ -1,8 +1,16 @@
 package com.betterjr.modules.workflow.entity;
 
-import com.betterjr.common.annotation.*;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import com.betterjr.common.entity.BetterjrEntity;
-import javax.persistence.*;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -63,7 +71,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -71,7 +79,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return parentType;
     }
 
-    public void setParentType(String parentType) {
+    public void setParentType(final String parentType) {
         this.parentType = parentType;
     }
 
@@ -79,7 +87,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return parentId;
     }
 
-    public void setParentId(Long parentId) {
+    public void setParentId(final Long parentId) {
         this.parentId = parentId;
     }
 
@@ -87,7 +95,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return operId;
     }
 
-    public void setOperId(Long operId) {
+    public void setOperId(final Long operId) {
         this.operId = operId;
     }
 
@@ -95,7 +103,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return moneyId;
     }
 
-    public void setMoneyId(Long moneyId) {
+    public void setMoneyId(final Long moneyId) {
         this.moneyId = moneyId;
     }
 
@@ -103,7 +111,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return weight;
     }
 
-    public void setWeight(Integer weight) {
+    public void setWeight(final Integer weight) {
         this.weight = weight;
     }
 
@@ -111,7 +119,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return regOperId;
     }
 
-    public void setRegOperId(Long regOperId) {
+    public void setRegOperId(final Long regOperId) {
         this.regOperId = regOperId;
     }
 
@@ -119,7 +127,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return regOperName;
     }
 
-    public void setRegOperName(String regOperName) {
+    public void setRegOperName(final String regOperName) {
         this.regOperName = regOperName == null ? null : regOperName.trim();
     }
 
@@ -127,7 +135,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return regDate;
     }
 
-    public void setRegDate(String regDate) {
+    public void setRegDate(final String regDate) {
         this.regDate = regDate == null ? null : regDate.trim();
     }
 
@@ -135,7 +143,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return regTime;
     }
 
-    public void setRegTime(String regTime) {
+    public void setRegTime(final String regTime) {
         this.regTime = regTime == null ? null : regTime.trim();
     }
 
@@ -143,7 +151,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return modiOperId;
     }
 
-    public void setModiOperId(Long modiOperId) {
+    public void setModiOperId(final Long modiOperId) {
         this.modiOperId = modiOperId;
     }
 
@@ -151,7 +159,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return modiOperName;
     }
 
-    public void setModiOperName(String modiOperName) {
+    public void setModiOperName(final String modiOperName) {
         this.modiOperName = modiOperName == null ? null : modiOperName.trim();
     }
 
@@ -159,7 +167,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return modiDate;
     }
 
-    public void setModiDate(String modiDate) {
+    public void setModiDate(final String modiDate) {
         this.modiDate = modiDate == null ? null : modiDate.trim();
     }
 
@@ -167,7 +175,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return modiTime;
     }
 
-    public void setModiTime(String modiTime) {
+    public void setModiTime(final String modiTime) {
         this.modiTime = modiTime == null ? null : modiTime.trim();
     }
 
@@ -175,7 +183,7 @@ public class WorkFlowApprover implements BetterjrEntity {
         return businStatus;
     }
 
-    public void setBusinStatus(String businStatus) {
+    public void setBusinStatus(final String businStatus) {
         this.businStatus = businStatus == null ? null : businStatus.trim();
     }
 
@@ -183,13 +191,13 @@ public class WorkFlowApprover implements BetterjrEntity {
         return lastStatus;
     }
 
-    public void setLastStatus(String lastStatus) {
+    public void setLastStatus(final String lastStatus) {
         this.lastStatus = lastStatus == null ? null : lastStatus.trim();
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
@@ -215,7 +223,7 @@ public class WorkFlowApprover implements BetterjrEntity {
     }
 
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(final Object that) {
         if (this == that) {
             return true;
         }
@@ -225,23 +233,23 @@ public class WorkFlowApprover implements BetterjrEntity {
         if (getClass() != that.getClass()) {
             return false;
         }
-        WorkFlowApprover other = (WorkFlowApprover) that;
+        final WorkFlowApprover other = (WorkFlowApprover) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getParentType() == null ? other.getParentType() == null : this.getParentType().equals(other.getParentType()))
-            && (this.getParentId() == null ? other.getParentId() == null : this.getParentId().equals(other.getParentId()))
-            && (this.getOperId() == null ? other.getOperId() == null : this.getOperId().equals(other.getOperId()))
-            && (this.getMoneyId() == null ? other.getMoneyId() == null : this.getMoneyId().equals(other.getMoneyId()))
-            && (this.getWeight() == null ? other.getWeight() == null : this.getWeight().equals(other.getWeight()))
-            && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-            && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-            && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-            && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-            && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-            && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-            && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-            && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-            && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-            && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()));
+                && (this.getParentType() == null ? other.getParentType() == null : this.getParentType().equals(other.getParentType()))
+                && (this.getParentId() == null ? other.getParentId() == null : this.getParentId().equals(other.getParentId()))
+                && (this.getOperId() == null ? other.getOperId() == null : this.getOperId().equals(other.getOperId()))
+                && (this.getMoneyId() == null ? other.getMoneyId() == null : this.getMoneyId().equals(other.getMoneyId()))
+                && (this.getWeight() == null ? other.getWeight() == null : this.getWeight().equals(other.getWeight()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()));
     }
 
     @Override
@@ -265,5 +273,22 @@ public class WorkFlowApprover implements BetterjrEntity {
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         return result;
+    }
+
+    /**
+     * 初始化
+     */
+    public void initAddValue() {
+        this.id = SerialGenerator.getLongValue("WorkFlowApprover.id");
+
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        this.regOperId = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getId() : 0L;
+        this.regOperName = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getName() : "";
+
+        this.modiOperId = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getId() : 0L;
+        this.modiOperName = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getName() : "";
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
     }
 }

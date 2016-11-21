@@ -185,7 +185,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
             anWorkFlowBase.initAddValue(workFlowBaseDefault);
 
             this.insert(anWorkFlowBase);
-            // 找default流程 TODO 做 COPY
+
             workFlowNodeService.saveCopyWorkFlowNode(workFlowBaseLast, anWorkFlowBase);
         }
         else { // 版本+1 查找，如果已经有了一个未发布的流程，不允许修改
@@ -197,7 +197,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
                 anWorkFlowBase.initAddValue(workFlowBaseLast);
 
                 this.insert(anWorkFlowBase);
-                // 基于最后版本 TODO 做 COPY 基于最新节点来做 COPY 然后合并 最后发布节点
+
                 workFlowNodeService.saveCopyWorkFlowNode(workFlowBase, anWorkFlowBase);
             }
             else { // 如果已有一个未发布的流程，则不允许新增，只允许修改
