@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
 
@@ -266,7 +267,29 @@ public class WorkFlowMoney implements BetterjrEntity {
      * @param anBaseId
      */
     public void initAddValue(final Long anBaseId) {
+        this.id = SerialGenerator.getLongValue("WorkFlowMoney.id");
         this.baseId = anBaseId;
+
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        this.regOperId = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getId() : 0L;
+        this.regOperName = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getName() : "";
+
+        this.modiOperId = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getId() : 0L;
+        this.modiOperName = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getName() : "";
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+    }
+
+    /**
+     * @param anTempWorkFlowMoney
+     */
+    public void initCopyMoney(final WorkFlowMoney anTempWorkFlowMoney) {
+        this.id = SerialGenerator.getLongValue("WorkFlowMoney.id");
+
+        this.seq = anTempWorkFlowMoney.getSeq();
+        this.beginMoney = anTempWorkFlowMoney.getBeginMoney();
+        this.endMoney = anTempWorkFlowMoney.getEndMoney();
 
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();

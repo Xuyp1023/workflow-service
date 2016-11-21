@@ -13,10 +13,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.springframework.stereotype.Service;
+
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.workflow.constant.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowNodeMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowApprover;
@@ -27,10 +30,17 @@ import com.betterjr.modules.workflow.entity.WorkFlowNode;
  * @author liuwl
  *
  */
+@Service
 public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlowNode> {
 
     @Inject
     private WorkFlowBaseService workFlowBaseService;
+
+    @Inject
+    private WorkFlowStepService workFlowStepService;
+
+    @Inject
+    private WorkFlowMoneyService workFlowMoneyService;
 
     @Inject
     private WorkFlowApproverService workFlowApproverService;
@@ -65,6 +75,43 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
     }
 
     /**
+     * 通过节点name + baseId 查询流程结点
+     *
+     * @param anName
+     * @param anBaseId
+     * @return
+     */
+    private WorkFlowNode findWorkFlowNodeByNameAndBaseId(final String anName, final Long anBaseId) {
+        final Map<String, Object> conditionMap = new HashMap<>();
+
+        conditionMap.put("name", anName);
+        conditionMap.put("baseId", anBaseId);
+
+        return Collections3.getFirst(this.selectByProperty(conditionMap));
+    }
+
+    /**
+     * 检查节点是否可操作
+     *
+     * @param anBaseId
+     * @param anNodeId
+     */
+    public WorkFlowNode checkWorkFlowNode(final Long anBaseId, final Long anNodeId) {
+        workFlowBaseService.checkWorkFlowBase(anBaseId);
+
+        final WorkFlowNode workFlowNode = findWorkFlowNodeById(anNodeId);
+        // 检查节点是否存在
+        BTAssert.notNull(workFlowNode, "没有找到对应节点");
+
+        if (BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_OPER)
+                || BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_APP)
+                || BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_SUB)) {
+            return workFlowNode;
+        }
+        throw new BytterException("当前节点不允许修改");
+    }
+
+    /**
      * 停用流程节点
      *
      * @param anBaseId
@@ -73,16 +120,7 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
      */
     public WorkFlowNode saveDiableWorkFlowNode(final Long anBaseId, final Long anNodeId) {
         // 检查流程是否存在
-        final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseById(anBaseId);
-        BTAssert.notNull(workFlowBase, "没有找到流程");
-        // 检查是否为未发布流程 (不能修改已发布的流程)
-        if (BetterStringUtils.equals(workFlowBase.getIsPublished(), WorkFlowConstants.IS_PUBLISHED)) {
-            throw new BytterException("已发布流程不允许修改！");
-        }
-
-        final WorkFlowNode workFlowNode = findWorkFlowNodeById(anNodeId);
-        // 检查节点是否存在
-        BTAssert.notNull(workFlowNode, "没有找到对应节点");
+        final WorkFlowNode workFlowNode = checkWorkFlowNode(anBaseId, anNodeId);
 
         // 如果为未发布流程则修改为停用
         workFlowNode.setIsDisabled(WorkFlowConstants.IS_DISABLED);
@@ -129,5 +167,56 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
         // 指定经办人 WorkFlowApprover
         workFlowApproverService.addApproverByNode(anNodeId, approver);
         return workFlowNode;
+    }
+
+    /**
+     * copy到新的流程上
+     *
+     * @param anWorkFlowBase
+     * @param anWorkFlowBase2
+     */
+    public void saveCopyWorkFlowNode(final WorkFlowBase anSourceBase, final WorkFlowBase anTargetBase) {
+        if (BetterStringUtils.equals(anSourceBase.getIsDefault(), WorkFlowConstants.IS_DEFAULT)) { // 从default copy过来
+            queryWorkFlowNode(anSourceBase.getId()).forEach(tempWorkFlowNode -> {
+                final WorkFlowNode workFlowNode = new WorkFlowNode();
+                workFlowNode.initCopyValue(tempWorkFlowNode);
+                workFlowNode.setBaseId(anTargetBase.getId());
+                this.insert(workFlowNode); // 不会有经办人，不会有金额段，故不考虑
+            });
+        }
+        else { // 从上一版本copy过来
+            // 先copy 金额段，并将新旧金额段的 id映射保存
+            final Map<Long, Long> workFlowMoneyMapping = new HashMap<>();
+            workFlowMoneyService.saveCopyWorkFlowMoney(anSourceBase, anTargetBase, workFlowMoneyMapping);
+
+            final WorkFlowBase workFlowBaseDefault = workFlowBaseService.findDefaultWorkFlowBaseByName(anSourceBase.getName());
+            BTAssert.notNull(workFlowBaseDefault, "找不到相应的默认流程");
+            // 找到此流程对应的 default 流程 节点以 default 流程为准，然后叠加 最后一版的分配情况
+            queryWorkFlowNode(workFlowBaseDefault.getId()).forEach(tempWorkFlowNodeDefault -> {
+                final WorkFlowNode tempWorkFlowNode = findWorkFlowNodeByNameAndBaseId(tempWorkFlowNodeDefault.getName(), anSourceBase.getId());
+
+                final WorkFlowNode workFlowNode = new WorkFlowNode();
+                if (tempWorkFlowNode != null) { // 有对应节点 需要做深度copy
+                    workFlowNode.initCopyValue(tempWorkFlowNode);
+
+                    if (BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_OPER)) {
+                        // 处理经办人
+                        workFlowApproverService.saveCopyWorkFlowApproverByNode(tempWorkFlowNode, workFlowNode);
+                    }
+                    else if (BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_APP)) {
+                        // copy 步骤
+                        workFlowStepService.saveCopyWorkFlowStep(tempWorkFlowNode, workFlowNode, workFlowMoneyMapping);
+                    }
+
+                }
+                else {
+                    workFlowNode.initCopyValue(tempWorkFlowNodeDefault);
+                }
+
+                workFlowNode.setBaseId(anTargetBase.getId());
+                this.insert(workFlowNode);
+            });
+
+        }
     }
 }

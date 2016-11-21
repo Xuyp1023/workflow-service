@@ -10,6 +10,8 @@ package com.betterjr.modules.workflow.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+
 import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.modules.workflow.dao.WorkFlowCategoryMapper;
@@ -19,6 +21,7 @@ import com.betterjr.modules.workflow.entity.WorkFlowCategory;
  * @author liuwl
  *
  */
+@Service
 public class WorkFlowCategoryService extends BaseService<WorkFlowCategoryMapper, WorkFlowCategory> {
     /**
      * 查询流程分类

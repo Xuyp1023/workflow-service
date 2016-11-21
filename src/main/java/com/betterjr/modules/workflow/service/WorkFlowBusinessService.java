@@ -7,6 +7,8 @@
 // ============================================================================
 package com.betterjr.modules.workflow.service;
 
+import org.springframework.stereotype.Service;
+
 import com.betterjr.common.service.BaseService;
 import com.betterjr.modules.workflow.dao.WorkFlowBusinessMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
@@ -15,6 +17,7 @@ import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
  * @author liuwl
  *
  */
+@Service
 public class WorkFlowBusinessService extends BaseService<WorkFlowBusinessMapper, WorkFlowBusiness> {
 
 }

@@ -11,60 +11,57 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import org.springframework.stereotype.Service;
 
+import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.workflow.constant.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowApproverMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowApprover;
+import com.betterjr.modules.workflow.entity.WorkFlowNode;
+import com.betterjr.modules.workflow.entity.WorkFlowStep;
 
 /**
  * @author liuwl
  *
  */
+@Service
 public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper, WorkFlowApprover> {
-    @Inject
-    private WorkFlowBaseService workFlowBaseService;
-
-    @Inject
-    private WorkFlowNodeService workFlowNodeService;
-
-    @Inject
-    private WorkFlowStepService workFlowStepService;
-
 
     /**
      * 添加分配的经办人
+     *
      * @return
      */
     public WorkFlowApprover addApproverByNode(final Long anNodeId, final WorkFlowApprover anApprover) {
-        // 检查步骤是否存在
+        anApprover.setParentType(WorkFlowConstants.PARENT_TYPE_NODE);
+        anApprover.setParentId(anNodeId);
 
-        // 检查当前流程是否为未发布流程
+        anApprover.initAddValue();
 
-        // 添加审批人
-
-        return null;
+        this.insert(anApprover);
+        return anApprover;
     }
-
 
     /**
      * 添加分配的经办人
+     *
      * @return
      */
-    public WorkFlowApprover addApproverByStep(final Long anNodeId, final WorkFlowApprover anApprover) {
-        // 检查步骤是否存在
+    public WorkFlowApprover addApproverByStep(final Long anStepId, final WorkFlowApprover anApprover) {
+        anApprover.setParentType(WorkFlowConstants.PARENT_TYPE_STEP);
+        anApprover.setParentId(anStepId);
 
-        // 检查当前流程是否为未发布流程
+        anApprover.initAddValue();
 
-        // 添加审批人
-
-        return null;
+        this.insert(anApprover);
+        return anApprover;
     }
 
     /**
      * 删除所有经办人
+     *
      * @param anParentType
      * @param anParentId
      */
@@ -114,5 +111,49 @@ public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper,
 
         // 通过节点编号 与 类型 查找相应的审批员
         return this.selectByProperty(conditionMap);
+    }
+
+    /**
+     * copy到新的流程上
+     *
+     * @param anWorkFlowNode
+     * @param anTempWorkFlowNode
+     */
+    public void saveCopyWorkFlowApproverByNode(final WorkFlowNode anSourceNode, final WorkFlowNode anTargetNode) {
+        final WorkFlowApprover workFlowApprover = findApproverByNode(anSourceNode.getId());
+        if (workFlowApprover != null) { // 有指定经办人的情况下需要copy
+            final WorkFlowApprover approver = new WorkFlowApprover();
+            approver.setOperId(workFlowApprover.getOperId());
+            this.addApproverByNode(anTargetNode.getId(), approver);
+        }
+    }
+
+    /**
+     * copy到新的流程上
+     *
+     * @param anWorkFlowNode
+     * @param anTempWorkFlowNode
+     */
+    public void saveCopyWorkFlowApproverByStep(final WorkFlowStep anSourceStep, final WorkFlowStep anTargetStep,
+            final Map<Long, Long> anWorkFlowMoneyMapping) {
+        final List<WorkFlowApprover> workFlowApprovers = queryApproverByStep(anSourceStep.getId());
+        if (Collections3.isEmpty(workFlowApprovers) == false) {
+            for (final WorkFlowApprover workFlowApprover: workFlowApprovers) {
+                final WorkFlowApprover approver = new WorkFlowApprover();
+
+                final Long moneyId = workFlowApprover.getMoneyId();
+                if (moneyId != null) {
+                    final Long targetMoneyId = anWorkFlowMoneyMapping.get(moneyId);
+                    if (targetMoneyId != null) {
+                        approver.setMoneyId(targetMoneyId);
+                    } else {
+                        throw new BytterException("复制金额段关系发生错误！");
+                    }
+                }
+                approver.setOperId(workFlowApprover.getOperId());
+                approver.setWeight(workFlowApprover.getWeight());
+                this.addApproverByStep(anTargetStep.getId(), approver);
+            }
+        }
     }
 }

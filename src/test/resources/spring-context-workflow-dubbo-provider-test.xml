@@ -18,7 +18,6 @@
     <context:component-scan
         base-package="com.betterjr.modules.workflow;
         com.betterjr.modules.rule.service;
-        com.betterjr.modules.rule.validator;
         com.betterjr.common" />
 
     <bean class="com.betterjr.common.config.BetterPropertyPlaceholderConfigurer">
@@ -204,15 +203,6 @@
 
     <bean id="serialGenerator" class="com.betterjr.common.selectkey.SerialGenerator"
         init-method="init" scope="singleton" lazy-init="false" />
-        
-    <bean id="qlExpressUtil" class="com.betterjr.modules.rule.service.QlExpressUtil" init-method="initRunner">
-     <property name="defPackages">
-      <list>
-       <value>com.betterjr.common.utils</value>
-       <value>com.betterjr.common.config</value>
-      </list>
-     </property>
-    </bean>
         
     <import resource="workflow-dubbo-provider.xml" />
     <import resource="workflow-snaker.xml"/>
