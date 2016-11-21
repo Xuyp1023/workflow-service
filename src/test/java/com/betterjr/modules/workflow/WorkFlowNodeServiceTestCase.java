@@ -34,8 +34,24 @@ public class WorkFlowNodeServiceTestCase extends BasicServiceTest<WorkFlowNodeSe
     @Test
     public void testQueryNode() {
         final WorkFlowNodeService flowNodeService = getServiceObject();
-        final List<WorkFlowNode> flowNodes = flowNodeService.queryWorkFlowNode(-20000L);
+        final List<WorkFlowNode> flowNodes = flowNodeService.queryWorkFlowNode(6L);
 
         flowNodes.forEach(System.out::println);
+    }
+
+    @Test
+    public void testDisableNode() {
+        final WorkFlowNodeService flowNodeService = getServiceObject();
+
+        //        flowNodeService.saveDiableWorkFlowNode(2l, 3l);
+        flowNodeService.saveDiableWorkFlowNode(6l, 34l);
+    }
+
+    @Test
+    public void testEnableNode() {
+        final WorkFlowNodeService flowNodeService = getServiceObject();
+
+        //        flowNodeService.saveDiableWorkFlowNode(2l, 3l);
+        flowNodeService.saveEnableWorkFlowNode(6l, 34l);
     }
 }

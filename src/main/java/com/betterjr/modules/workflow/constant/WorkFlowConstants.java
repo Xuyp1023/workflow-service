@@ -13,8 +13,8 @@ package com.betterjr.modules.workflow.constant;
  */
 public interface WorkFlowConstants {
     //最新版本
-    String IS_LAST = "1";
-    String NOT_LAST = "0";
+    String IS_LATEST = "1";
+    String NOT_LATEST = "0";
 
     //默认流程:开发阶段预置
     String IS_DEFAULT = "1";
@@ -51,4 +51,11 @@ public interface WorkFlowConstants {
 
     String IS_MONEY_TRUE = "1";
     String IS_MONEY_FALSE = "0";
+
+    // 角色
+    String SUPPLIER_USER = "SUPPLIER_USER";
+    String CORE_USER = "CORE_USER";
+    String FACTOR_USER = "FACTOR_USER";
+    String SELLER_USER = "SELLER_USER";
+    String PLATFORM_USER = "PLATFORM_USER";
 }

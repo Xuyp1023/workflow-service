@@ -104,7 +104,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
             if (i == values.length - 1) {
                 workFlowMoney.setBeginMoney(new BigDecimal(previous));
                 workFlowMoney.setEndMoney(new BigDecimal(-1));
-                workFlowMoney.setSeq(i);
+                workFlowMoney.setSeq(i - 1);
                 workFlowMoneys.add(workFlowMoney);
                 break;
             }
@@ -122,7 +122,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
                 }
                 workFlowMoney.setBeginMoney(new BigDecimal(previous));
                 workFlowMoney.setEndMoney(new BigDecimal(current));
-                workFlowMoney.setSeq(i);
+                workFlowMoney.setSeq(i - 1);
                 workFlowMoneys.add(workFlowMoney);
                 previous = current;
             }
@@ -146,7 +146,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
         conditionMap.put("baseId", anBaseId);
 
         // 将读取到的金额段 组成 金额段字符串
-        final List<WorkFlowMoney> workFlowMoneys = this.selectByProperty(conditionMap, "seq,ASC");
+        final List<WorkFlowMoney> workFlowMoneys = this.selectByProperty(conditionMap, "seq ASC");
 
         return workFlowMoneys;
     }

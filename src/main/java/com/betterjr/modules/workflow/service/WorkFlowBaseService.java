@@ -40,23 +40,6 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
     private WorkFlowNodeService workFlowNodeService;
 
     /**
-     * 布署流程
-     *
-     * @param anId
-     * @return
-     */
-    public WorkFlowBase saveDeploy(final Long anId) {
-        // 检查是入参是否正确
-
-        // 检查是否为待发布状态
-
-        // 置为已发布
-
-        // 回写已发布的流程id
-        return null;
-    }
-
-    /**
      * 查询基础流程列表(未创建的)
      *
      * @return
@@ -90,6 +73,24 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
     }
 
     /**
+     *
+     * @param anName
+     * @param anCustNo
+     * @return
+     */
+    public WorkFlowBase findWorkFlowBaseLatestByName(final String anName, final Long anCustNo) {
+        final Map<String, Object> conditionMap = new HashMap<>();
+
+        conditionMap.put("name", anName);
+        conditionMap.put("custNo", anCustNo);
+        conditionMap.put("isLatest", WorkFlowConstants.IS_LATEST);
+
+        final Collection<WorkFlowBase> workFlowBases = this.selectByProperty(conditionMap);
+
+        return Collections3.getFirst(workFlowBases);
+    }
+
+    /**
      * 根据流程名称和公司编号查找流程定义
      *
      * @param anName
@@ -98,14 +99,13 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      *            公司编号
      * @return
      */
-    public WorkFlowBase findWorkFlowBaseByName(final String anName, final Long anCustNo) {
+    public WorkFlowBase findWorkFlowBaseLastByName(final String anName, final Long anCustNo) {
         final Map<String, Object> conditionMap = new HashMap<>();
 
         conditionMap.put("name", anName);
         conditionMap.put("custNo", anCustNo);
-        conditionMap.put("isLast", WorkFlowConstants.IS_LAST);
 
-        final Collection<WorkFlowBase> workFlowBases = this.selectByProperty(conditionMap);
+        final Collection<WorkFlowBase> workFlowBases = this.selectByProperty(conditionMap, "version DESC");
 
         return Collections3.getFirst(workFlowBases);
     }
@@ -176,8 +176,14 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
         final WorkFlowBase workFlowBaseDefault = findWorkFlowBaseById(anDefaultBaseId);
         BTAssert.notNull(workFlowBaseDefault, "模板流程没有找到！");
 
+        anWorkFlowBase.setName(workFlowBaseDefault.getName());// 这个不允许改变 保持与默认模板一致
+        anWorkFlowBase.setCustNo(anCustNo);
+        anWorkFlowBase.setIsDefault(WorkFlowConstants.NOT_DEFAULT);
+        anWorkFlowBase.setIsDisabled(WorkFlowConstants.NOT_DISABLED);
+        anWorkFlowBase.setIsLatest(WorkFlowConstants.NOT_LATEST);
+
         // 检查是否已经存在已有版本
-        final WorkFlowBase workFlowBaseLast = findWorkFlowBaseByName(anWorkFlowBase.getName(), anCustNo);
+        final WorkFlowBase workFlowBaseLast = findWorkFlowBaseLastByName(anWorkFlowBase.getName(), anCustNo);
         // 如果有表明此流程已经存在自定义版本
         if (workFlowBaseLast == null) { // 初始版本 新增 version 0
             anWorkFlowBase.setVersion(0L);
@@ -186,23 +192,23 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
 
             this.insert(anWorkFlowBase);
 
-            workFlowNodeService.saveCopyWorkFlowNode(workFlowBaseLast, anWorkFlowBase);
+            workFlowNodeService.saveCopyWorkFlowNode(workFlowBaseDefault, anWorkFlowBase);
         }
-        else { // 版本+1 查找，如果已经有了一个未发布的流程，不允许修改
-            final Long version = workFlowBaseLast.getVersion() + 1;
-            final WorkFlowBase workFlowBase = findWorkFlowBaseByVersion(anWorkFlowBase.getName(), anCustNo, version);
-            if (workFlowBase == null) { // 如果已有使用最后版本+1 新增
+        else {
+            if (BetterStringUtils.equals(workFlowBaseLast.getIsLatest(), WorkFlowConstants.IS_LATEST)) { // 如果已存在最后版本 则为增加版本
+                final Long version = workFlowBaseLast.getVersion() + 1;
                 anWorkFlowBase.setVersion(version);
 
                 anWorkFlowBase.initAddValue(workFlowBaseLast);
 
                 this.insert(anWorkFlowBase);
 
-                workFlowNodeService.saveCopyWorkFlowNode(workFlowBase, anWorkFlowBase);
+                workFlowNodeService.saveCopyWorkFlowNode(workFlowBaseLast, anWorkFlowBase);
             }
-            else { // 如果已有一个未发布的流程，则不允许新增，只允许修改
+            else {
                 throw new BytterException("已经存在未发布流程，不允许继续添加！");
             }
+
         }
         return anWorkFlowBase;
     }
@@ -213,7 +219,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      * @param anWorkFlowBase
      */
     private void checkWorkFlowBase(final WorkFlowBase anWorkFlowBase) {
-        BTAssert.notNull(anWorkFlowBase.getName());
+        BTAssert.notNull(anWorkFlowBase.getNickname());
         BTAssert.notNull(anWorkFlowBase.getOperRole());
         BTAssert.notNull(anWorkFlowBase.getCategoryId());
     }
@@ -231,7 +237,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
         // 如果已有一个未发布的流程，则修改它
 
         if (BetterStringUtils.equals(workFlowBase.getIsPublished(), WorkFlowConstants.NOT_PUBLISHED)
-                && BetterStringUtils.equals(workFlowBase.getIsLast(), WorkFlowConstants.NOT_LAST)
+                && BetterStringUtils.equals(workFlowBase.getIsLatest(), WorkFlowConstants.NOT_LATEST)
                 && BetterStringUtils.equals(workFlowBase.getIsDefault(), WorkFlowConstants.NOT_DEFAULT)) {
             return workFlowBase;
         }
@@ -275,7 +281,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
         final WorkFlowBase workFlowBase = checkWorkFlowBase(anBaseId);
 
         // 修改为已发布流程
-        workFlowBase.setIsLast(WorkFlowConstants.IS_LAST);
+        workFlowBase.setIsLatest(WorkFlowConstants.IS_LATEST);
         workFlowBase.setIsPublished(WorkFlowConstants.IS_PUBLISHED);
         workFlowBase.initModifyValue();
 
@@ -287,7 +293,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
                     workFlowBase.getVersion() - 1L);// 获取上一版本
             BTAssert.notNull(workFlowBasePrevious, "没有找到上一版本流程！");
 
-            workFlowBasePrevious.setIsLast(WorkFlowConstants.NOT_LAST);
+            workFlowBasePrevious.setIsLatest(WorkFlowConstants.NOT_LATEST);
             workFlowBasePrevious.initModifyValue();
 
             this.updateByPrimaryKeySelective(workFlowBasePrevious);
@@ -313,7 +319,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
         BTAssert.notNull(workFlowBase, "没有找到相应流程");
         // 如果已有一个未发布的流程，则修改它
 
-        if (BetterStringUtils.equals(workFlowBase.getIsLast(), WorkFlowConstants.IS_LAST)
+        if (BetterStringUtils.equals(workFlowBase.getIsLatest(), WorkFlowConstants.IS_LATEST)
                 && BetterStringUtils.equals(workFlowBase.getIsPublished(), WorkFlowConstants.IS_PUBLISHED)
                 && BetterStringUtils.equals(workFlowBase.getIsDisabled(), WorkFlowConstants.NOT_DISABLED)) {
             // 修改流程为停用状态

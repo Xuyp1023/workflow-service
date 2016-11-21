@@ -122,8 +122,33 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
         // 检查流程是否存在
         final WorkFlowNode workFlowNode = checkWorkFlowNode(anBaseId, anNodeId);
 
+        if (BetterStringUtils.equals(WorkFlowConstants.NOT_DISABLED, workFlowNode.getIsDisabled())) {
+            throw new BytterException("当前节点已是禁用状态");
+        }
+
         // 如果为未发布流程则修改为停用
-        workFlowNode.setIsDisabled(WorkFlowConstants.IS_DISABLED);
+        workFlowNode.setIsDisabled(WorkFlowConstants.NOT_DISABLED);
+        this.updateByPrimaryKeySelective(workFlowNode);
+
+        return workFlowNode;
+    }
+
+    /**
+     * 启用流程节点
+     *
+     * @param anBaseId
+     * @param anNodeId
+     * @return
+     */
+    public WorkFlowNode saveEnableWorkFlowNode(final Long anBaseId, final Long anNodeId) {
+        // 检查流程是否存在
+        final WorkFlowNode workFlowNode = checkWorkFlowNode(anBaseId, anNodeId);
+
+        if (BetterStringUtils.equals(WorkFlowConstants.NOT_DISABLED, workFlowNode.getIsDisabled())) {
+            throw new BytterException("当前节点已是启用状态");
+        }
+        // 如果为未发布流程则修改为启用
+        workFlowNode.setIsDisabled(WorkFlowConstants.NOT_DISABLED);
         this.updateByPrimaryKeySelective(workFlowNode);
 
         return workFlowNode;
@@ -181,6 +206,7 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
                 final WorkFlowNode workFlowNode = new WorkFlowNode();
                 workFlowNode.initCopyValue(tempWorkFlowNode);
                 workFlowNode.setBaseId(anTargetBase.getId());
+                workFlowNode.setIsDisabled(WorkFlowConstants.NOT_DISABLED);
                 this.insert(workFlowNode); // 不会有经办人，不会有金额段，故不考虑
             });
         }
@@ -207,7 +233,6 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
                         // copy 步骤
                         workFlowStepService.saveCopyWorkFlowStep(tempWorkFlowNode, workFlowNode, workFlowMoneyMapping);
                     }
-
                 }
                 else {
                     workFlowNode.initCopyValue(tempWorkFlowNodeDefault);
