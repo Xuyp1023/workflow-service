@@ -52,7 +52,9 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      */
     public WorkFlowStep checkWorkFlowStep(final Long anBaseId, final Long anNodeId, final Long anStepId) {
         // 先检查节点是可修改
-        workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
+        final WorkFlowNode workFlowNode = workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
+
+        BTAssert.isTrue(BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_APP), "只允许审批节点删除步骤");
 
         final WorkFlowStep workFlowStep = findWorkFlowStep(anNodeId, anStepId);
 
@@ -83,7 +85,9 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      */
     public WorkFlowStep addWorkFlowStep(final Long anBaseId, final Long anNodeId, final WorkFlowStep anStep) {
         // 检查当前步骤对应的流程是否有操作权限
-        workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
+        final WorkFlowNode workFlowNode = workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
+
+        BTAssert.isTrue(BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_APP), "只允许审批节点创建步骤");
 
         anStep.setNodeId(anNodeId);
         anStep.initAddValue();
@@ -104,7 +108,7 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("nodeId", anNodeId);
 
-        return this.selectByProperty(conditionMap, "seq,ASC");
+        return this.selectByProperty(conditionMap, "seq ASC");
     }
 
     /**
@@ -131,7 +135,7 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      */
     private void saveAdjustStep(final Long anBaseId, final Long anNodeId) {
         // 先检查节点是可修改
-        workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
+        final WorkFlowNode workFlowNode = workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
 
         final List<WorkFlowStep> flowSteps = queryWorkFlowStepByNodeId(anNodeId);
 
@@ -147,7 +151,7 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      *
      * @param anStepId
      */
-    public void saveSetUpStep(final Long anBaseId, final Long anNodeId, final Long anStepId) {
+    public void saveMoveUpStep(final Long anBaseId, final Long anNodeId, final Long anStepId) {
         // 检查当前步骤对应的流程是否有操作权限
         final WorkFlowStep workFlowStep = checkWorkFlowStep(anBaseId, anNodeId, anStepId);
 
@@ -187,7 +191,7 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      *
      * @param anStepId
      */
-    public void saveSetDownStep(final Long anBaseId, final Long anNodeId, final Long anStepId) {
+    public void saveMoveDownStep(final Long anBaseId, final Long anNodeId, final Long anStepId) {
         // 检查当前步骤对应的流程是否有操作权限
         final WorkFlowStep workFlowStep = checkWorkFlowStep(anBaseId, anNodeId, anStepId);
 
@@ -215,7 +219,8 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      * @param anDefMap
      */
     /**
-     * 格式定义 { auditType: 0串行 1并行 审批方式 isMoney: 0未启用 1启用 金额段
+     * 格式定义 {
+     * auditType: 0串行 1并行 审批方式 isMoney: 0未启用 1启用 金额段
      *
      * 0,0串行审批未启用金额段
      * approver:operId
@@ -299,8 +304,8 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
                 final Map<String, Object>[] opers = (Map<String, Object>[]) tempApprover.get("opers");
 
                 for (final Map<String, Object> oper : opers) {
-                    final Long operId = (Long) tempApprover.get("operId");
-                    final Integer weight = (Integer) tempApprover.get("weight");
+                    final Long operId = (Long) oper.get("operId");
+                    final Integer weight = (Integer) oper.get("weight");
 
                     final WorkFlowApprover approver = new WorkFlowApprover();
                     approver.setMoneyId(moneyId);
@@ -314,6 +319,8 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
         else {
             throw new BytterException("审批方式和金额段标识不正确！");
         }
+
+        this.updateByPrimaryKeySelective(workFlowStep);
     }
 
     /**

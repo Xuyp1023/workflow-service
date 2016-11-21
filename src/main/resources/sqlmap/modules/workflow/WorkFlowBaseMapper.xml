@@ -14,7 +14,7 @@
     <result column="L_CUSTNO" jdbcType="INTEGER" property="custNo" />
     <result column="C_CUSTNAME" jdbcType="VARCHAR" property="custName" />
     <result column="N_VERSION" jdbcType="INTEGER" property="version" />
-    <result column="C_IS_LAST" jdbcType="CHAR" property="isLast" />
+    <result column="C_IS_LATEST" jdbcType="CHAR" property="isLatest" />
     <result column="C_IS_PUBLISHED" jdbcType="CHAR" property="isPublished" />
     <result column="C_IS_DEFAULT" jdbcType="CHAR" property="isDefault" />
     <result column="C_IS_DISABLED" jdbcType="CHAR" property="isDisabled" />

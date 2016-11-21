@@ -358,6 +358,7 @@ public class WorkFlowNode implements BetterjrEntity {
         this.name = anTempWorkFlowNode.getName();
         this.nickname = anTempWorkFlowNode.getNickname();
         this.operRole = anTempWorkFlowNode.getOperRole();
+        this.isDisabled = anTempWorkFlowNode.getIsDisabled();
         this.moneyVariable = anTempWorkFlowNode.getMoneyVariable();
 
         this.regDate = BetterDateUtils.getNumDate();

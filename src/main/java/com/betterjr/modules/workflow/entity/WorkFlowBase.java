@@ -45,8 +45,8 @@ public class WorkFlowBase implements BetterjrEntity {
     @Column(name = "N_VERSION", columnDefinition = "INTEGER")
     private Long version;
 
-    @Column(name = "C_IS_LAST", columnDefinition = "CHAR")
-    private String isLast;
+    @Column(name = "C_IS_LATEST", columnDefinition = "CHAR")
+    private String isLatest;
 
     @Column(name = "C_IS_PUBLISHED", columnDefinition = "CHAR")
     private String isPublished;
@@ -170,12 +170,12 @@ public class WorkFlowBase implements BetterjrEntity {
         this.version = version;
     }
 
-    public String getIsLast() {
-        return isLast;
+    public String getIsLatest() {
+        return isLatest;
     }
 
-    public void setIsLast(final String isLast) {
-        this.isLast = isLast;
+    public void setIsLatest(final String isLatest) {
+        this.isLatest = isLatest;
     }
 
     public String getIsPublished() {
@@ -320,7 +320,7 @@ public class WorkFlowBase implements BetterjrEntity {
         sb.append(", custNo=").append(custNo);
         sb.append(", custName=").append(custName);
         sb.append(", version=").append(version);
-        sb.append(", isLast=").append(isLast);
+        sb.append(", isLatest=").append(isLatest);
         sb.append(", isPublished=").append(isPublished);
         sb.append(", isDefault=").append(isDefault);
         sb.append(", isDisabled=").append(isDisabled);
@@ -363,7 +363,7 @@ public class WorkFlowBase implements BetterjrEntity {
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
                 && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
                 && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-                && (this.getIsLast() == null ? other.getIsLast() == null : this.getIsLast().equals(other.getIsLast()))
+                && (this.getIsLatest() == null ? other.getIsLatest() == null : this.getIsLatest().equals(other.getIsLatest()))
                 && (this.getIsPublished() == null ? other.getIsPublished() == null : this.getIsPublished().equals(other.getIsPublished()))
                 && (this.getIsDefault() == null ? other.getIsDefault() == null : this.getIsDefault().equals(other.getIsDefault()))
                 && (this.getIsDisabled() == null ? other.getIsDisabled() == null : this.getIsDisabled().equals(other.getIsDisabled()))
@@ -395,7 +395,7 @@ public class WorkFlowBase implements BetterjrEntity {
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
-        result = prime * result + ((getIsLast() == null) ? 0 : getIsLast().hashCode());
+        result = prime * result + ((getIsLatest() == null) ? 0 : getIsLatest().hashCode());
         result = prime * result + ((getIsPublished() == null) ? 0 : getIsPublished().hashCode());
         result = prime * result + ((getIsDefault() == null) ? 0 : getIsDefault().hashCode());
         result = prime * result + ((getIsDisabled() == null) ? 0 : getIsDisabled().hashCode());
@@ -427,7 +427,7 @@ public class WorkFlowBase implements BetterjrEntity {
 
         this.isDefault = WorkFlowConstants.NOT_DEFAULT;
         this.isPublished = WorkFlowConstants.NOT_PUBLISHED;
-        this.isLast = WorkFlowConstants.NOT_LAST;
+        this.isLatest = WorkFlowConstants.NOT_LATEST;
 
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();

@@ -7,6 +7,8 @@
 // ============================================================================
 package com.betterjr.modules.workflow;
 
+import org.junit.Test;
+
 import com.betterjr.modules.BasicServiceTest;
 import com.betterjr.modules.workflow.service.WorkFlowMoneyService;
 
@@ -23,5 +25,14 @@ public class WorkFlowMoneyServiceTestCase extends BasicServiceTest<WorkFlowMoney
     public Class<WorkFlowMoneyService> getTargetServiceClass() {
         return WorkFlowMoneyService.class;
     }
+
+    @Test
+    public void testAddWorkFlowMoney() {
+        final WorkFlowMoneyService flowMoneyService = this.getServiceObject();
+        final String moneySection = "0,20000,50000,100000,-1";
+
+        flowMoneyService.saveWorkFlowMoney(2L, moneySection);
+    }
+
 
 }
