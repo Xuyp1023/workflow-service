@@ -64,7 +64,7 @@ public class WorkFlowBaseServiceTestCase extends BasicServiceTest<WorkFlowBaseSe
     @Test
     public void testPublishWorkFlowBase() {
         final WorkFlowBaseService baseService = this.getServiceObject();
-        baseService.savePublishWorkFlow(2l);
+        baseService.savePublishWorkFlow(2l, "");
     }
 
 }

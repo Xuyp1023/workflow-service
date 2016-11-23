@@ -301,4 +301,15 @@ public class WorkFlowMoney implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
     }
+
+    /**
+     * 组装 expr
+     * @return
+     */
+    public String getSpelExpr() {
+        if (this.endMoney.equals(-1)) {
+
+        }
+        return null;
+    }
 }
