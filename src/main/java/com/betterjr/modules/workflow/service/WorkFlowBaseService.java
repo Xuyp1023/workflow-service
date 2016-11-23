@@ -161,6 +161,20 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
     }
 
     /**
+     * 通过 processId 查找流程定义
+     *
+     * @param anProcessId
+     * @return
+     */
+    public WorkFlowBase findWorkFlowBaseByProcessId(final String anProcessId) {
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(anProcessId), "processId 不允许为空！");
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("processId", anProcessId);
+
+        return Collections3.getFirst(this.selectByProperty(conditionMap));
+    }
+
+    /**
      * 添加一个基础流程
      *
      * @param anWorkFlowBase
@@ -265,7 +279,26 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
         this.updateByPrimaryKeySelective(workFlowBase);
 
         return workFlowBase;
+    }
 
+    /**
+     * 检查流程是否可操作
+     *
+     * @param anBaseId
+     */
+    public WorkFlowBase checkWorkFlowBaseByPublish(final Long anBaseId) {
+        // 检查是否已经存在已有版本
+        BTAssert.notNull(anBaseId, "流程定义编号不允许为空");
+
+        final WorkFlowBase workFlowBase = findWorkFlowBaseById(anBaseId);
+        // 如果已有一个未发布的流程，则修改它
+
+        if (BetterStringUtils.equals(workFlowBase.getIsPublished(), WorkFlowConstants.NOT_PUBLISHED)
+                && BetterStringUtils.equals(workFlowBase.getIsLatest(), WorkFlowConstants.NOT_LATEST)
+                && BetterStringUtils.equals(workFlowBase.getIsDefault(), WorkFlowConstants.NOT_DEFAULT)) {
+            return workFlowBase;
+        }
+        throw new BytterException("流程状态不允许修改！");
     }
 
     /**
@@ -275,7 +308,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      *            待发布流程编号
      * @return
      */
-    public WorkFlowBase savePublishWorkFlow(final Long anBaseId) {
+    public WorkFlowBase savePublishWorkFlow(final Long anBaseId, final String anProcessId) {
         // 检查是否是已经存在的未发布流程
         // 检查是否已经存在已有版本
         final WorkFlowBase workFlowBase = checkWorkFlowBase(anBaseId);
@@ -284,8 +317,6 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
         workFlowBase.setIsLatest(WorkFlowConstants.IS_LATEST);
         workFlowBase.setIsPublished(WorkFlowConstants.IS_PUBLISHED);
         workFlowBase.initModifyValue();
-
-        this.updateByPrimaryKeySelective(workFlowBase);
 
         // 将上一版本 is_last 改为 false
         if (workFlowBase.getVersion().equals(0L) == false) {
@@ -299,9 +330,24 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
             this.updateByPrimaryKeySelective(workFlowBasePrevious);
         }
 
-        // TODO 发布到 snaker中
+        workFlowBase.setProcessId(anProcessId);
+
+        this.updateByPrimaryKeySelective(workFlowBase);
 
         return workFlowBase;
+    }
+
+    /**
+     * 停用一个流程 通过 processId
+     *
+     * @param anProcessId
+     * @return
+     */
+    public WorkFlowBase saveDisableWorkFlow(final String anProcessId) {
+        final WorkFlowBase workFlowBase = this.findWorkFlowBaseByProcessId(anProcessId);
+        BTAssert.notNull(workFlowBase, "流程定义未找到!");
+
+        return saveDisableWorkFlow(workFlowBase.getId());
     }
 
     /**

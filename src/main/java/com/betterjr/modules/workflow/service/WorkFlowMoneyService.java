@@ -64,7 +64,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
         saveDelWorkFlowMoneyByBaseId(anBaseId);
 
         // 将当前金额段添加保存
-        for (final WorkFlowMoney workFlowMoney: workFlowMoneys) {
+        for (final WorkFlowMoney workFlowMoney : workFlowMoneys) {
             workFlowMoney.initAddValue(anBaseId);
             this.insert(workFlowMoney);
         }
@@ -75,6 +75,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
 
     /**
      * 删除金额段
+     *
      * @param anBaseId
      */
     private void saveDelWorkFlowMoneyByBaseId(final Long anBaseId) {
@@ -170,6 +171,17 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
     }
 
     /**
+     * 查询某一金额段
+     *
+     * @param anId
+     * @return
+     */
+    public WorkFlowMoney findWorkFlowMoney(final Long anId) {
+        BTAssert.notNull(anId, "金额段编号不允许为空！");
+        return this.selectByPrimaryKey(anId);
+    }
+
+    /**
      * 查询流程金额段 以 SimpleDataEntity形式返回
      *
      * @param anBaseId
@@ -177,14 +189,13 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
      */
     public List<SimpleDataEntity> queryWorkFlowMoney(final Long anBaseId) {
         // 读取当前流程金额段
-        return queryWorkFlowMoneyByBaseId(anBaseId).stream()
-                .map(workFlowMoney -> new SimpleDataEntity(String.valueOf(workFlowMoney.getId()),
-                        workFlowMoney.getBeginMoney() + " - " + workFlowMoney.getEndMoney()))
-                .collect(Collectors.toList());
+        return queryWorkFlowMoneyByBaseId(anBaseId).stream().map(workFlowMoney -> new SimpleDataEntity(String.valueOf(workFlowMoney.getId()),
+                workFlowMoney.getBeginMoney() + " - " + workFlowMoney.getEndMoney())).collect(Collectors.toList());
     }
 
     /**
      * copy到新的流程上 并且将copy关系映射 保留下来
+     *
      * @param anTargetBase
      * @param anSourceBase
      * @param anWorkFlowMoneyMapping
