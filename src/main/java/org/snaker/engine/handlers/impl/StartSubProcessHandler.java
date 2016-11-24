@@ -31,6 +31,10 @@ import org.snaker.engine.handlers.IHandler;
 import org.snaker.engine.helper.AssertHelper;
 import org.snaker.engine.model.SubProcessModel;
 
+import com.betterjr.common.exception.BytterException;
+import com.betterjr.common.utils.BTAssert;
+import com.betterjr.modules.workflow.data.WorkFlowInput;
+
 /**
  * 启动子流程的处理器
  *
@@ -38,105 +42,127 @@ import org.snaker.engine.model.SubProcessModel;
  * @since 1.0
  */
 public class StartSubProcessHandler implements IHandler {
-	private SubProcessModel model;
-	/**
-	 * 是否以future方式执行启动子流程任务
-	 */
-	private boolean isFutureRunning = false;
+    private final SubProcessModel model;
+    /**
+     * 是否以future方式执行启动子流程任务
+     */
+    private boolean isFutureRunning = false;
 
-	public StartSubProcessHandler(SubProcessModel model) {
-		this.model = model;
-	}
+    public StartSubProcessHandler(final SubProcessModel model) {
+        this.model = model;
+    }
 
-	public StartSubProcessHandler(SubProcessModel model, boolean isFutureRunning) {
-		this.model = model;
-		this.isFutureRunning = isFutureRunning;
-	}
+    public StartSubProcessHandler(final SubProcessModel model, final boolean isFutureRunning) {
+        this.model = model;
+        this.isFutureRunning = isFutureRunning;
+    }
 
-	/**
-	 * 子流程执行的处理
-	 */
-	public void handle(Execution execution) {
-		//根据子流程模型名称获取子流程定义对象
-		SnakerEngine engine = execution.getEngine();
+    /**
+     * 子流程执行的处理
+     */
+    @Override
+    public void handle(final Execution execution) {
+        //根据子流程模型名称获取子流程定义对象
+        final SnakerEngine engine = execution.getEngine();
 
-		Long custNo = findCustNo(model, execution.getArgs());
+        final Long custNo = findCustNo(model, execution.getArgs());
 
-		// TODO 这里需要解决输入 具体公司的问题 不能按version
-		Process process = engine.process().getProcessByName(model.getProcessName(), custNo);
+        // TODO 这里需要解决输入 具体公司的问题 不能按version
+        final Process process = engine.process().getProcessByName(model.getProcessName(), custNo);
 
-		Execution child = execution.createSubExecution(execution, process, model.getName());
-		Order order = null;
-		if (isFutureRunning) {
-			//创建单个线程执行器来执行启动子流程的任务
-			ExecutorService es = Executors.newSingleThreadExecutor();
-			//提交执行任务，并返回future
-			Future<Order> future = es.submit(new ExecuteTask(execution, process, model.getName()));
-			try {
-				es.shutdown();
-				order = future.get();
-			} catch (InterruptedException e) {
-				throw new SnakerException("创建子流程线程被强制终止执行", e.getCause());
-			} catch (ExecutionException e) {
-				throw new SnakerException("创建子流程线程执行异常.", e.getCause());
-			}
-		} else {
-			order = engine.startInstanceByExecution(child);
-		}
-		AssertHelper.notNull(order, "子流程创建失败");
-		execution.addTasks(engine.query().getActiveTasks(new QueryFilter().setOrderId(order.getId())));
-	}
+        final Execution child = execution.createSubExecution(execution, process, model.getName());
+        Order order = null;
+        if (isFutureRunning) {
+            //创建单个线程执行器来执行启动子流程的任务
+            final ExecutorService es = Executors.newSingleThreadExecutor();
+            //提交执行任务，并返回future
+            final Future<Order> future = es.submit(new ExecuteTask(execution, process, model.getName()));
+            try {
+                es.shutdown();
+                order = future.get();
+            } catch (final InterruptedException e) {
+                throw new SnakerException("创建子流程线程被强制终止执行", e.getCause());
+            } catch (final ExecutionException e) {
+                throw new SnakerException("创建子流程线程执行异常.", e.getCause());
+            }
+        } else {
+            order = engine.startInstanceByExecution(child);
+        }
+        AssertHelper.notNull(order, "子流程创建失败");
+        execution.addTasks(engine.query().getActiveTasks(new QueryFilter().setOrderId(order.getId())));
+    }
 
-	private Long findCustNo(SubProcessModel model, Map<String, Object> args) {
-		String operRole = model.getOperRole();
-		AssertHelper.notEmpty(operRole);
+    private Long findCustNo(final SubProcessModel model, final Map<String, Object> args) {
+        final String operRole = model.getOperRole();
+        AssertHelper.notEmpty(operRole);
 
-		Long custNo = null;
-		switch (operRole) { //CORE_USER 、PLATFORM_USER、FACTOR_USER、SUPPLIER_USER、SELLER_USER
-			case "CORE_USER":
-				custNo = (Long) args.get("CORE_USER");
-				break;
-			case "PLATFORM_USER":
-				custNo = (Long) args.get("PLATFORM_USER");
-				break;
-			case "FACTOR_USER":
-				custNo = (Long) args.get("FACTOR_USER");
-				break;
-			case "SUPPLIER_USER":
-				custNo = (Long) args.get("SUPPLIER_USER");
-				break;
-			case "SELLER_USER":
-				custNo = (Long) args.get("SELLER_USER");
-				break;
-		}
-		AssertHelper.notNull(custNo);
-		return custNo;
-	}
+        Long custNo = null;
+        switch (operRole) { //CORE_USER 、PLATFORM_USER、FACTOR_USER、SUPPLIER_USER、SELLER_USER
+        case "CORE_USER":
+            custNo = getCustNo(args, WorkFlowInput.CORE_CUSTNO);
+            break;
+        case "PLATFORM_USER":
+            custNo = getCustNo(args, WorkFlowInput.PLATFORM_CUSTNO);
+            break;
+        case "FACTOR_USER":
+            custNo = getCustNo(args, WorkFlowInput.FACTOR_CUSTNO);
+            break;
+        case "SUPPLIER_USER":
+            custNo = getCustNo(args, WorkFlowInput.SUPPLIER_CUSTNO);
+            break;
+        case "SELLER_USER":
+            custNo = getCustNo(args, WorkFlowInput.SELLER_CUSTNO);
+            break;
+        }
+        AssertHelper.notNull(custNo);
+        return custNo;
+    }
 
-	/**
-	 * Future模式的任务执行。通过call返回任务结果集
-	 *
-	 * @author yuqs
-	 * @since 1.0
-	 */
-	class ExecuteTask implements Callable<Order> {
-		private SnakerEngine engine;
-		private Execution child;
+    /**
+     *
+     * @param anArgs
+     * @param anCoreCustno
+     * @return
+     */
+    private Long getCustNo(final Map<String, Object> anArgs, final String anCustType) {
+        final Object object = anArgs.get(anCustType);
+        BTAssert.notNull(object, "没有找到相应的公司编号");
 
-		/**
-		 * 构造函数
-		 *
-		 * @param execution
-		 * @param process
-		 * @param parentNodeName
-		 */
-		public ExecuteTask(Execution execution, Process process, String parentNodeName) {
-			this.engine = execution.getEngine();
-			child = execution.createSubExecution(execution, process, parentNodeName);
-		}
+        if (object instanceof Long) {
+            return (Long) object;
+        } else if (object instanceof Integer) {
+            final Integer temp = (Integer) object;
+            return temp.longValue();
+        } else {
+            throw new BytterException("公司编号数值类型不正确");
+        }
+    }
 
-		public Order call() throws Exception {
-			return engine.startInstanceByExecution(child);
-		}
-	}
+    /**
+     * Future模式的任务执行。通过call返回任务结果集
+     *
+     * @author yuqs
+     * @since 1.0
+     */
+    class ExecuteTask implements Callable<Order> {
+        private final SnakerEngine engine;
+        private final Execution child;
+
+        /**
+         * 构造函数
+         *
+         * @param execution
+         * @param process
+         * @param parentNodeName
+         */
+        public ExecuteTask(final Execution execution, final Process process, final String parentNodeName) {
+            this.engine = execution.getEngine();
+            child = execution.createSubExecution(execution, process, parentNodeName);
+        }
+
+        @Override
+        public Order call() throws Exception {
+            return engine.startInstanceByExecution(child);
+        }
+    }
 }

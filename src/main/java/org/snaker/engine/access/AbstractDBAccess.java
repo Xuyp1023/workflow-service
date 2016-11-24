@@ -596,7 +596,7 @@ public abstract class AbstractDBAccess implements DBAccess {
             sql.append(") ");
         }
         if (filter.getCustNo() != null) {
-            sql.append(" and custNo = ? ");
+            sql.append(" and cust_No = ? ");
             paramList.add(filter.getCustNo());
         }
         if(filter.getVersion() != null) {

@@ -54,4 +54,38 @@ public class WorkFlowNodeServiceTestCase extends BasicServiceTest<WorkFlowNodeSe
         //        flowNodeService.saveDiableWorkFlowNode(2l, 3l);
         flowNodeService.saveEnableWorkFlowNode(6l, 34l);
     }
+
+    @Test
+    public void testAssignOper1() {
+        final WorkFlowNodeService flowNodeService = getServiceObject();
+        flowNodeService.saveAssignOperator(7l, 47l, 200l);
+    }
+    @Test
+    public void testAssignOper2() {
+        final WorkFlowNodeService flowNodeService = getServiceObject();
+        flowNodeService.saveAssignOperator(7l, 50l, 201l);
+    }
+    @Test
+    public void testAssignOper3() {
+        final WorkFlowNodeService flowNodeService = getServiceObject();
+        flowNodeService.saveAssignOperator(7l, 53l, 202l);
+    }
+
+    @Test
+    public void testAssignOper4() {
+        final WorkFlowNodeService flowNodeService = getServiceObject();
+        flowNodeService.saveAssignOperator(8l, 58l, 300l);
+    }
+
+    @Test
+    public void testAssignOper5() {
+        final WorkFlowNodeService flowNodeService = getServiceObject();
+        flowNodeService.saveAssignOperator(9l, 63l, 301l);
+    }
+
+    @Test
+    public void testAssignOper6() {
+        final WorkFlowNodeService flowNodeService = getServiceObject();
+        flowNodeService.saveAssignOperator(10l, 67l, 400l);
+    }
 }
