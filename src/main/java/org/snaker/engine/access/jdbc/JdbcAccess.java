@@ -27,9 +27,9 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.snaker.engine.DBAccess;
 import org.snaker.engine.SnakerException;
 import org.snaker.engine.access.AbstractDBAccess;
-import org.snaker.engine.DBAccess;
 import org.snaker.engine.entity.Process;
 import org.snaker.engine.helper.ClassHelper;
 
@@ -41,92 +41,98 @@ import org.snaker.engine.helper.ClassHelper;
  * @since 1.0
  */
 public class JdbcAccess extends AbstractDBAccess implements DBAccess {
-	private static final Logger log = LoggerFactory.getLogger(JdbcAccess.class);
+    private static final Logger log = LoggerFactory.getLogger(JdbcAccess.class);
     /**
      * dbutils的QueryRunner对象
      */
-    private QueryRunner runner = new QueryRunner(true);
-    
-	/**
-	 * jdbc的数据源
-	 */
-    protected DataSource dataSource;
-	
-	/**
-	 * setter
-	 * @param dataSource
-	 */
-    public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
-    
-	public void initialize(Object accessObject) {
-		if(accessObject == null) return;
-		if(accessObject instanceof DataSource) {
-			this.dataSource = (DataSource)accessObject;
-		}
-	}
+    private final QueryRunner runner = new QueryRunner(true);
 
-	/**
+    /**
+     * jdbc的数据源
+     */
+    protected DataSource dataSource;
+
+    /**
+     * setter
+     * @param dataSource
+     */
+    public void setDataSource(final DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    @Override
+    public void initialize(final Object accessObject) {
+        if(accessObject == null) {
+            return;
+        }
+        if(accessObject instanceof DataSource) {
+            this.dataSource = (DataSource)accessObject;
+        }
+    }
+
+    /**
      * 返回数据库连接对象
      * @return
      * @throws java.sql.SQLException
      */
+    @Override
     protected Connection getConnection() throws SQLException {
-    	return JdbcHelper.getConnection(dataSource);
+        return JdbcHelper.getConnection(dataSource);
     }
 
-	/**
-	 * 使用原生JDBC操作BLOB字段
-	 */
-	public void saveProcess(Process process) {
-		super.saveProcess(process);
-		if(process.getBytes() != null) {
-			Connection conn = null;
-			PreparedStatement pstmt = null;
-			try {
-				conn = getConnection();
-				pstmt = conn.prepareStatement(PROCESS_UPDATE_BLOB);
-				pstmt.setBytes(1, process.getBytes());
-				pstmt.setString(2, process.getId());
-				pstmt.execute();
-			} catch (Exception e) {
-				throw new SnakerException(e.getMessage(), e.getCause());
-			} finally {
-				try {
-					JdbcHelper.close(pstmt);
-				} catch (SQLException e) {
-					throw new SnakerException(e.getMessage(), e.getCause());
-				}
-			}
-		}
-	}
+    /**
+     * 使用原生JDBC操作BLOB字段
+     */
+    @Override
+    public void saveProcess(final Process process) {
+        super.saveProcess(process);
+        if(process.getBytes() != null) {
+            Connection conn = null;
+            PreparedStatement pstmt = null;
+            try {
+                conn = getConnection();
+                pstmt = conn.prepareStatement(PROCESS_UPDATE_BLOB);
+                pstmt.setBytes(1, process.getBytes());
+                pstmt.setString(2, process.getId());
+                pstmt.execute();
+            } catch (final Exception e) {
+                throw new SnakerException(e.getMessage(), e.getCause());
+            } finally {
+                try {
+                    JdbcHelper.close(pstmt);
+                } catch (final SQLException e) {
+                    throw new SnakerException(e.getMessage(), e.getCause());
+                }
+            }
+        }
+    }
 
-	/**
-	 * 使用原生JDBC操作BLOB字段
-	 */
-	public void updateProcess(Process process) {
-		super.updateProcess(process);
-		if(process.getBytes() != null) {
-			Connection conn = null;
-			PreparedStatement pstmt = null;
-			try {
-				conn = getConnection();
-				pstmt = conn.prepareStatement(PROCESS_UPDATE_BLOB);
-				pstmt.setBytes(1, process.getBytes());
-				pstmt.setString(2, process.getId());
-				pstmt.execute();
-			} catch (Exception e) {
-				throw new SnakerException(e.getMessage(), e.getCause());
-			} finally {
-				try {
-					JdbcHelper.close(pstmt);
-				} catch (SQLException e) {
-					throw new SnakerException(e.getMessage(), e.getCause());
-				}
-			}
-		}
-	}
+    /**
+     * 使用原生JDBC操作BLOB字段
+     */
+    @Override
+    public void updateProcess(final Process process) {
+        super.updateProcess(process);
+        if(process.getBytes() != null) {
+            Connection conn = null;
+            PreparedStatement pstmt = null;
+            try {
+                conn = getConnection();
+                pstmt = conn.prepareStatement(PROCESS_UPDATE_BLOB);
+                pstmt.setBytes(1, process.getBytes());
+                pstmt.setString(2, process.getId());
+                pstmt.execute();
+            } catch (final Exception e) {
+                throw new SnakerException(e.getMessage(), e.getCause());
+            } finally {
+                try {
+                    JdbcHelper.close(pstmt);
+                } catch (final SQLException e) {
+                    throw new SnakerException(e.getMessage(), e.getCause());
+                }
+            }
+        }
+    }
 
     /**
      * 查询指定列
@@ -135,71 +141,77 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
      * @param params 查询参数
      * @return 指定列的结果对象
      */
-    public Object query(int column, String sql, Object... params) {
-    	Object result;
+    public Object query(final int column, final String sql, final Object... params) {
+        Object result;
         try {
-        	if(log.isDebugEnabled()) {
-        		log.debug("查询单列数据=\n" + sql);
-        	}
+            if(log.isDebugEnabled()) {
+                log.debug("查询单列数据=\n" + sql);
+            }
             result = runner.query(getConnection(), sql, new ScalarHandler(column), params);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
         return result;
     }
-    
-	public Integer getLatestProcessVersion(String name, Long custNo) {
-		String where = " where name = ? and custNo = ?";
-		Object result = query(1, QUERY_VERSION + where, name, custNo);
-		return new Long(ClassHelper.castLong(result)).intValue();
-	}
-    
-	public boolean isORM() {
-		return false;
-	}
-	
-	public void saveOrUpdate(Map<String, Object> map) {
-		String sql = (String)map.get(KEY_SQL);
-		Object[] args = (Object[])map.get(KEY_ARGS);
+
+    @Override
+    public Integer getLatestProcessVersion(final String name, final Long custNo) {
+        final String where = " where name = ? and cust_No = ?";
+        final Object result = query(1, QUERY_VERSION + where, name, custNo);
+        return new Long(ClassHelper.castLong(result)).intValue();
+    }
+
+    @Override
+    public boolean isORM() {
+        return false;
+    }
+
+    @Override
+    public void saveOrUpdate(final Map<String, Object> map) {
+        final String sql = (String)map.get(KEY_SQL);
+        final Object[] args = (Object[])map.get(KEY_ARGS);
         try {
-        	if(log.isDebugEnabled()) {
-        		log.debug("增删改数据(需手动提交事务)=\n" + sql);
-        	}
+            if(log.isDebugEnabled()) {
+                log.debug("增删改数据(需手动提交事务)=\n" + sql);
+            }
             runner.update(getConnection(), sql, args);
-        } catch (SQLException e) {
-        	log.error(e.getMessage(), e);
+        } catch (final SQLException e) {
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
-	}
+    }
 
-	public <T> T queryObject(Class<T> clazz, String sql, Object... args) {
-    	List<T> result = null;
+    @Override
+    public <T> T queryObject(final Class<T> clazz, final String sql, final Object... args) {
+        List<T> result = null;
         try {
-        	if(log.isDebugEnabled()) {
-        		log.debug("查询单条记录=\n" + sql);
-        	}
-        	result = runner.query(getConnection(), sql, new BeanPropertyHandler<T>(clazz), args);
-        	return JdbcHelper.requiredSingleResult(result);
-        } catch (SQLException e) {
-        	log.error(e.getMessage(), e);
+            if(log.isDebugEnabled()) {
+                log.debug("查询单条记录=\n" + sql);
+            }
+            result = runner.query(getConnection(), sql, new BeanPropertyHandler<T>(clazz), args);
+            return JdbcHelper.requiredSingleResult(result);
+        } catch (final SQLException e) {
+            log.error(e.getMessage(), e);
             return null;
         }
-	}
-	
-	public <T> List<T> queryList(Class<T> clazz, String sql, Object... args) {
+    }
+
+    @Override
+    public <T> List<T> queryList(final Class<T> clazz, final String sql, final Object... args) {
         try {
-        	if(log.isDebugEnabled()) {
-        		log.debug("查询多条记录=\n" + sql);
-        	}
-        	return runner.query(getConnection(), sql, new BeanPropertyHandler<T>(clazz), args);
-        } catch (SQLException e) {
-        	log.error(e.getMessage(), e);
+            if(log.isDebugEnabled()) {
+                log.debug("查询多条记录=\n" + sql);
+            }
+            return runner.query(getConnection(), sql, new BeanPropertyHandler<T>(clazz), args);
+        } catch (final SQLException e) {
+            log.error(e.getMessage(), e);
             return Collections.emptyList();
         }
-	}
+    }
 
-    public Object queryCount(String sql, Object... args) {
+    @Override
+    public Object queryCount(final String sql, final Object... args) {
         return query(1, sql, args);
     }
 }

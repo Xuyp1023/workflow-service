@@ -48,6 +48,42 @@ public class WorkFlowBaseServiceTestCase extends BasicServiceTest<WorkFlowBaseSe
     }
 
     @Test
+    public void testAddWorkFlowBase1() {
+        final WorkFlowBaseService baseService = this.getServiceObject();
+
+        final WorkFlowBase workFlowBase = new WorkFlowBase();
+        workFlowBase.setNickname("供应商票据融资申请流程");
+        workFlowBase.setOperRole(WorkFlowConstants.SUPPLIER_USER);
+        workFlowBase.setCategoryId(2L);
+
+        baseService.addWorkFlowBase(workFlowBase, -20001l, 111l);
+    }
+
+    @Test
+    public void testAddWorkFlowBase2() {
+        final WorkFlowBaseService baseService = this.getServiceObject();
+
+        final WorkFlowBase workFlowBase = new WorkFlowBase();
+        workFlowBase.setNickname("供应商票据融资融资方案签约流程");
+        workFlowBase.setOperRole(WorkFlowConstants.SUPPLIER_USER);
+        workFlowBase.setCategoryId(2L);
+
+        baseService.addWorkFlowBase(workFlowBase, -20002l, 111l);
+    }
+
+    @Test
+    public void testAddWorkFlowBase3() {
+        final WorkFlowBaseService baseService = this.getServiceObject();
+
+        final WorkFlowBase workFlowBase = new WorkFlowBase();
+        workFlowBase.setNickname("核心企业票据融资确认贸易背景流程");
+        workFlowBase.setOperRole(WorkFlowConstants.CORE_USER);
+        workFlowBase.setCategoryId(2L);
+
+        baseService.addWorkFlowBase(workFlowBase, -20003l, 112l);
+    }
+
+    @Test
     public void testDisableWorkFlowBase() {
         final WorkFlowBaseService baseService = this.getServiceObject();
         baseService.saveDisableWorkFlow(5l);

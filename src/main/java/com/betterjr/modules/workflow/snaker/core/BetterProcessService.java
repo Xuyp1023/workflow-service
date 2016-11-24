@@ -16,7 +16,6 @@ import org.snaker.engine.core.ProcessService;
 import org.snaker.engine.entity.Process;
 import org.snaker.engine.helper.DateHelper;
 import org.snaker.engine.helper.StringHelper;
-import org.snaker.engine.model.ProcessModel;
 
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
 import com.betterjr.modules.workflow.service.WorkFlowApproverService;
@@ -61,9 +60,9 @@ public class BetterProcessService extends ProcessService {
             final WorkFlowBase workFlowBase = workFlowBaseService.checkWorkFlowBaseByPublish(anBaseId);
 
             final Integer version = access().getLatestProcessVersion(workFlowBase.getName(), workFlowBase.getCustNo());
-            final ProcessModel model = BetterModelParser.parse(anBaseId);
             final Process entity = new Process();
             entity.setId(StringHelper.getPrimaryKey());
+            entity.setModel(BetterModelParser.parse(anBaseId));
             if (version == null || version < 0) {
                 entity.setVersion(0);
             }
@@ -71,13 +70,12 @@ public class BetterProcessService extends ProcessService {
                 entity.setVersion(version + 1);
             }
             entity.setState(STATE_ACTIVE);
-            entity.setModel(model);
             entity.setCreateTime(DateHelper.getTime());
             entity.setCustNo(workFlowBase.getCustNo());
             saveProcess(entity);
-            cache(entity);
             final String processId = entity.getId();
             workFlowBaseService.savePublishWorkFlow(anBaseId, processId);
+            cache(entity);
             return processId;
         }
         catch (final Exception e) {

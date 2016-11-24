@@ -6,4 +6,6 @@
 	<bean class="org.snaker.engine.spring.SpelExpression"/>
 	<bean class="org.snaker.engine.impl.SurrogateInterceptor"/>
 	<bean class="org.snaker.engine.impl.GeneralAccessStrategy"/>
+	<bean class="org.snaker.engine.scheduling.quartz.QuartzScheduler"></bean>
+	<bean class="org.snaker.engine.impl.SchedulerInterceptor"/>
 </config>

@@ -9,7 +9,9 @@ package com.betterjr.modules.workflow.snaker.parser;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.snaker.engine.model.DecisionModel;
 import org.snaker.engine.model.EndModel;
@@ -44,6 +46,7 @@ import com.betterjr.modules.workflow.service.WorkFlowStepService;
  *
  */
 public class BetterModelParser {
+
     /**
      * 通过流程编号解析model
      *
@@ -93,6 +96,9 @@ public class BetterModelParser {
         final List<NodeModel> nodeModels = process.getNodes();
 
         TransitionModel prevStep = null;
+
+        final Map<String, Object> context = new HashMap<>();
+
         // 解析节点
         for (int i = 0; i < flowNodes.size(); i++) {
             final WorkFlowNode flowNode = flowNodes.get(i);
@@ -121,19 +127,19 @@ public class BetterModelParser {
             else {
                 switch (flowNode.getType()) {
                 case WorkFlowConstants.NODE_TYPE_OPER: { // 经办节点
-                    final TaskModel taskModel = parseOperNode(flowNode);
+                    final TaskModel taskModel = parseOperNode(anWorkFlowBase, flowNode);
 
                     prevStep.setTarget(taskModel);
                     final TransitionModel nextStep = new TransitionModel();
                     taskModel.setOutputs(Collections.singletonList(nextStep));
                     nextStep.setSource(taskModel);
-
                     prevStep = nextStep;
+                    nodeModels.add(taskModel);
                 }
                 break;
                 case WorkFlowConstants.NODE_TYPE_APP: { // 审批节点 此处可能生成若干节点
                     final List<NodeModel> stepNodeList = new ArrayList<NodeModel>();
-                    prevStep = parseAppNode(flowNode, prevStep, stepNodeList);
+                    prevStep = parseAppNode(anWorkFlowBase, flowNode, prevStep, stepNodeList);
 
                     nodeModels.addAll(stepNodeList);
                 }
@@ -151,6 +157,8 @@ public class BetterModelParser {
                     nextStep.setSource(subProcessModel);
 
                     prevStep = nextStep;
+
+                    nodeModels.add(subProcessModel);
                 }
                 break;
                 default:
@@ -159,25 +167,31 @@ public class BetterModelParser {
             }
         }
 
-        return null;
+        return process;
     }
 
     /**
      * 解析经办人节点
      *
+     * @param anWorkFlowBase
+     *
      * @param anFlowNode
      * @return
      */
-    private static TaskModel parseOperNode(final WorkFlowNode anFlowNode) {
+    private static TaskModel parseOperNode(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anFlowNode) {
         final TaskModel operTaskModel = new TaskModel();
         operTaskModel.setName(anFlowNode.getName());
         operTaskModel.setDisplayName(anFlowNode.getNickname());
+        operTaskModel.setForm(anFlowNode.getForm());
 
         final WorkFlowApproverService workFlowApproverService = SpringContextHolder.getBean(WorkFlowApproverService.class);
         final WorkFlowApprover workFlowApprover = workFlowApproverService.findApproverByNode(anFlowNode.getId());
 
         if (workFlowApprover != null) {
-            operTaskModel.setAssignee(String.valueOf(workFlowApprover.getOperId()));
+            operTaskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(workFlowApprover.getOperId()));
+        }
+        else {
+            operTaskModel.setAssignee(WorkFlowConstants.PREFIX_CUST_NO + String.valueOf(anWorkFlowBase.getCustNo()));
         }
         return operTaskModel;
     }
@@ -185,12 +199,14 @@ public class BetterModelParser {
     /**
      * 解析审批节点
      *
+     * @param anWorkFlowBase
+     *
      * @param anFlowNode
      * @param anStepNodeList
      * @param anPrevStep
      * @return
      */
-    private static TransitionModel parseAppNode(final WorkFlowNode anFlowNode, final TransitionModel anPrevStep,
+    private static TransitionModel parseAppNode(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anFlowNode, final TransitionModel anPrevStep,
             final List<NodeModel> anStepNodeList) {
         BTAssert.notNull(anFlowNode, "流程节点不允许为空");
 
@@ -202,31 +218,34 @@ public class BetterModelParser {
             if (flowSteps.size() == 1) { // 仅有一步时
                 final WorkFlowStep flowStep = flowSteps.get(0);
 
-                nextStep = parseStep(anFlowNode.getBaseId(), flowStep, anPrevStep, anStepNodeList);
+                nextStep = parseStep(anWorkFlowBase, flowStep, anPrevStep, anStepNodeList, 0);
             }
             else {
+                TransitionModel tempNextStep = null;
                 for (int i = 0; i < flowSteps.size(); i++) {
                     final WorkFlowStep flowStep = flowSteps.get(i);
-                    if (i == 0) {
-                        parseStep(anFlowNode.getBaseId(), flowStep, anPrevStep, anStepNodeList);
+                    if (i == 0) { // 有多步时 第一步
+                        tempNextStep = parseStep(anWorkFlowBase, flowStep, anPrevStep, anStepNodeList, i);
                     }
-                    else if (i == flowSteps.size() - 1) {
-                        parseStep(anFlowNode.getBaseId(), flowStep, anPrevStep, anStepNodeList);
+                    else if (i == flowSteps.size() - 1) { // 有多步时 最后一步
+                        nextStep = parseStep(anWorkFlowBase, flowStep, tempNextStep, anStepNodeList, i);
                     }
-                    else {
-                        parseStep(anFlowNode.getBaseId(), flowStep, anPrevStep, anStepNodeList);
+                    else { // 中间步骤
+                        tempNextStep = parseStep(anWorkFlowBase, flowStep, anPrevStep, anStepNodeList, i);
                     }
                 }
             }
         }
-        else { // 如果没有步骤，则为自动结点
-            final TaskModel taskModel = new TaskModel();
-            taskModel.setName(anFlowNode.getName());
-            taskModel.setAutoExecute("Y");
-            nextStep = new TransitionModel();
-            anPrevStep.setTarget(taskModel);
-            taskModel.setOutputs(Collections.singletonList(nextStep));
-            nextStep.setSource(taskModel);
+        else { // 如果没有步骤，则跳过
+            /*
+             * final TaskModel taskModel = new TaskModel(); taskModel.setName(anFlowNode.getName());
+             * taskModel.setDisplayName(anFlowNode.getNickname());
+             *
+             * taskModel.setAutoExecute("Y"); nextStep = new TransitionModel(); anPrevStep.setTarget(taskModel);
+             * taskModel.setOutputs(Collections.singletonList(nextStep)); nextStep.setSource(taskModel);
+             */
+            // anStepNodeList.add(taskModel);
+            nextStep = anPrevStep;
         }
 
         return nextStep;
@@ -234,33 +253,38 @@ public class BetterModelParser {
 
     /**
      * @param anFlowStep
+     * @param anStep
      */
-    private static TransitionModel parseStep(final Long anBaseId, final WorkFlowStep anFlowStep, final TransitionModel anPrevStep, final List<NodeModel> anStepNodeList) {
+    private static TransitionModel parseStep(final WorkFlowBase anWorkFlowBase, final WorkFlowStep anFlowStep, final TransitionModel anPrevStep,
+            final List<NodeModel> anStepNodeList, final int anStep) {
+        final WorkFlowNodeService workFlowNodeService = SpringContextHolder.getBean(WorkFlowNodeService.class);
         final WorkFlowMoneyService workFlowMoneyService = SpringContextHolder.getBean(WorkFlowMoneyService.class);
-        final WorkFlowApproverService workFlowApproverService = SpringContextHolder.getBean(WorkFlowApproverService.class);
+
+        final Long anNodeId = anFlowStep.getNodeId();
+        final WorkFlowNode workFlowNode = workFlowNodeService.findWorkFlowNodeById(anNodeId);
 
         final String auditType = anFlowStep.getAuditType();
         final String isMoney = anFlowStep.getIsMoney();
 
         final List<WorkFlowApprover> flowApprovers = getApprovers(anFlowStep.getId());
-        final List<WorkFlowMoney> flowMoneys = workFlowMoneyService.queryWorkFlowMoneyByBaseId(anBaseId);
+        final List<WorkFlowMoney> flowMoneys = workFlowMoneyService.queryWorkFlowMoneyByBaseId(anWorkFlowBase.getId());
 
         if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType) && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
             BTAssert.isTrue(flowApprovers.size() == 1, "此节点只能拥有1位审批人");
 
-            final TaskModel appTaskModel = new TaskModel();
-            appTaskModel.setName(anFlowStep.getName());
-            appTaskModel.setDisplayName(anFlowStep.getNickname());
+            final TaskModel taskModel = new TaskModel();
+            taskModel.setName(anFlowStep.getName() + "-" + String.valueOf(anStep));
+            taskModel.setDisplayName(anFlowStep.getNickname());
 
             final WorkFlowApprover workFlowApprover = flowApprovers.get(0);
-            if (workFlowApprover != null) {
-                appTaskModel.setAssignee(String.valueOf(workFlowApprover.getOperId()));
-            }
+            taskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(workFlowApprover.getOperId()));
 
-            anPrevStep.setTarget(appTaskModel);
+            anPrevStep.setTarget(taskModel);
             final TransitionModel nextStep = new TransitionModel();
-            appTaskModel.setOutputs(Collections.singletonList(nextStep));
-            nextStep.setSource(appTaskModel);
+            taskModel.setOutputs(Collections.singletonList(nextStep));
+            nextStep.setSource(taskModel);
+
+            anStepNodeList.add(taskModel);
 
             return nextStep;
         }
@@ -270,22 +294,30 @@ public class BetterModelParser {
             final DecisionModel decisionModel = new DecisionModel(); // 进
             anPrevStep.setTarget(decisionModel);
 
-            final JoinModel joinModel = new JoinModel();  // 出
+            final JoinModel joinModel = new JoinModel(); // 出
             final List<TransitionModel> decisionOutputs = new ArrayList<>();
 
-            for (final WorkFlowApprover workFlowApprover: flowApprovers) {
+            anStepNodeList.add(decisionModel);
+            for (int i = 0; i < flowApprovers.size(); i++) {
+                final WorkFlowApprover workFlowApprover = flowApprovers.get(i);
                 final TransitionModel enterTrans = new TransitionModel();
                 enterTrans.setSource(decisionModel);
                 final Long moneyId = workFlowApprover.getMoneyId();
                 final WorkFlowMoney workFlowMoney = workFlowMoneyService.findWorkFlowMoney(moneyId);
                 BTAssert.notNull(workFlowMoney, "未找到正确的金额段");
 
-                enterTrans.setExpr(workFlowMoney.getSpelExpr());// TODO 此处需要处理 transition expr 表达式
+                String moneyVariable = workFlowNode.getMoneyVariable();
+                if (BetterStringUtils.isBlank(moneyVariable)) {
+                    moneyVariable = anWorkFlowBase.getMoneyVariable();
+                }
+
+                BTAssert.isTrue(BetterStringUtils.isNotBlank(moneyVariable), "金额段变量不允许为空！");
+                enterTrans.setExpr(workFlowMoney.getSpelExpr(moneyVariable));// TODO 此处需要处理 transition expr 表达式
 
                 final TaskModel taskModel = new TaskModel();
-                taskModel.setName(anFlowStep.getName());
+                taskModel.setName(anFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i));
                 taskModel.setDisplayName(anFlowStep.getNickname());
-                taskModel.setAssignee(String.valueOf(workFlowApprover.getOperId()));
+                taskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(workFlowApprover.getOperId()));
 
                 enterTrans.setTarget(taskModel);
                 decisionOutputs.add(enterTrans);
@@ -294,6 +326,7 @@ public class BetterModelParser {
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
                 exitTrans.setSource(taskModel);
 
+                anStepNodeList.add(taskModel);
                 exitTrans.setTarget(joinModel);
             }
 
@@ -301,6 +334,7 @@ public class BetterModelParser {
             final TransitionModel nextStep = new TransitionModel();
             joinModel.setOutputs(Collections.singletonList(nextStep));
             nextStep.setSource(joinModel);
+            anStepNodeList.add(joinModel);
 
             return nextStep;
         }
@@ -310,18 +344,21 @@ public class BetterModelParser {
             anPrevStep.setTarget(forkModel);
 
             final JoinModel joinModel = new JoinModel();
+            anStepNodeList.add(forkModel);
 
             final List<TransitionModel> forkOutputs = new ArrayList<>();
-            for (final WorkFlowApprover workFlowApprover: flowApprovers) {
+            for (int i = 0; i < flowApprovers.size(); i++) {
+                final WorkFlowApprover workFlowApprover = flowApprovers.get(i);
+
                 final TransitionModel enterTrans = new TransitionModel();
                 enterTrans.setSource(forkModel);
 
                 final TaskModel taskModel = new TaskModel();
                 taskModel.setHasWeight(true);
                 taskModel.setWeight(workFlowApprover.getWeight());// TODO 此处需要处理权重
-                taskModel.setName(anFlowStep.getName());
+                taskModel.setName(anFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i));
                 taskModel.setDisplayName(anFlowStep.getNickname());
-                taskModel.setAssignee(String.valueOf(workFlowApprover.getOperId()));
+                taskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(workFlowApprover.getOperId()));
 
                 enterTrans.setTarget(taskModel);
                 forkOutputs.add(enterTrans);
@@ -329,6 +366,7 @@ public class BetterModelParser {
                 final TransitionModel exitTrans = new TransitionModel();
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
                 exitTrans.setSource(taskModel);
+                anStepNodeList.add(taskModel);
 
                 exitTrans.setTarget(joinModel);
             }
@@ -336,22 +374,32 @@ public class BetterModelParser {
             final TransitionModel nextStep = new TransitionModel();
             joinModel.setOutputs(Collections.singletonList(nextStep));
             nextStep.setSource(joinModel);
+            anStepNodeList.add(joinModel);
 
             return nextStep;
         }
         else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType) && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
-            //先按moneyId 分组
+            // 先按moneyId 分组
             final DecisionModel decisionModel = new DecisionModel();
             anPrevStep.setTarget(decisionModel);
             final List<TransitionModel> decisionOutputs = new ArrayList<>();
             final JoinModel decisionJoinModel = new JoinModel();
 
-            for (final WorkFlowMoney workFlowMoney: flowMoneys) {
+            anStepNodeList.add(decisionModel);
+            for (int i = 0; i < flowMoneys.size(); i++) {
+                final WorkFlowMoney workFlowMoney = flowMoneys.get(i);
                 final TransitionModel decisionEnterTrans = new TransitionModel();
                 decisionEnterTrans.setSource(decisionModel);
-                decisionEnterTrans.setExpr(workFlowMoney.getSpelExpr());// TODO 此处需要处理 transition expr 表达式
 
-                //各个金额段下的并行
+                String moneyVariable = workFlowNode.getMoneyVariable();
+                if (BetterStringUtils.isBlank(moneyVariable)) {
+                    moneyVariable = anWorkFlowBase.getMoneyVariable();
+                }
+
+                BTAssert.isTrue(BetterStringUtils.isNotBlank(moneyVariable), "金额段变量不允许为空！");
+                decisionEnterTrans.setExpr(workFlowMoney.getSpelExpr(moneyVariable));// TODO 此处需要处理 transition expr 表达式
+
+                // 各个金额段下的并行
                 final ForkModel forkModel = new ForkModel();
 
                 decisionEnterTrans.setTarget(forkModel);
@@ -359,8 +407,11 @@ public class BetterModelParser {
 
                 final JoinModel joinModel = new JoinModel();
                 final List<TransitionModel> forkOutputs = new ArrayList<>();
-                //当前段中所有节点
-                for(final WorkFlowApprover flowApprover: flowApprovers) {
+                anStepNodeList.add(forkModel);
+                // 当前段中所有节点
+                for (int j = 0; i < flowApprovers.size(); j++) {
+                    final WorkFlowApprover flowApprover = flowApprovers.get(j);
+
                     if (workFlowMoney.getId().equals(flowApprover.getMoneyId())) {
                         final TransitionModel enterTrans = new TransitionModel();
                         enterTrans.setSource(forkModel);
@@ -368,7 +419,7 @@ public class BetterModelParser {
                         final TaskModel taskModel = new TaskModel();
                         taskModel.setHasWeight(true);
                         taskModel.setWeight(flowApprover.getWeight());// TODO 此处需要处理权重
-                        taskModel.setName(anFlowStep.getName());
+                        taskModel.setName(anFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-" + String.valueOf(j));
                         taskModel.setDisplayName(anFlowStep.getNickname());
                         taskModel.setAssignee(String.valueOf(flowApprover.getOperId()));
 
@@ -378,6 +429,7 @@ public class BetterModelParser {
                         final TransitionModel exitTrans = new TransitionModel();
                         taskModel.setOutputs(Collections.singletonList(exitTrans));
                         exitTrans.setSource(taskModel);
+                        anStepNodeList.add(taskModel);
 
                         exitTrans.setTarget(joinModel);
                     }
@@ -386,6 +438,8 @@ public class BetterModelParser {
                 final TransitionModel decisionExitTrans = new TransitionModel();
                 joinModel.setOutputs(Collections.singletonList(decisionExitTrans));
                 decisionExitTrans.setSource(joinModel);
+                anStepNodeList.add(joinModel);
+
                 decisionExitTrans.setTarget(decisionJoinModel);
             }
 
@@ -393,6 +447,7 @@ public class BetterModelParser {
             final TransitionModel nextStep = new TransitionModel();
             decisionJoinModel.setOutputs(Collections.singletonList(nextStep));
             nextStep.setSource(decisionJoinModel);
+            anStepNodeList.add(decisionJoinModel);
 
             return nextStep;
         }

@@ -18,6 +18,9 @@ import com.betterjr.common.utils.UserUtils;
 @Entity
 @Table(name = "t_sys_wf_money")
 public class WorkFlowMoney implements BetterjrEntity {
+    public static final BigDecimal MAX_AMOUNT=new BigDecimal("-1");
+    public static final String MONEY_PARAM = "money";
+
     @Id
     @Column(name = "ID",  columnDefinition="INTEGER" )
     private Long id;
@@ -306,10 +309,15 @@ public class WorkFlowMoney implements BetterjrEntity {
      * 组装 expr
      * @return
      */
-    public String getSpelExpr() {
-        if (this.endMoney.equals(-1)) {
-
+    public String getSpelExpr(final String anMoneyParam) {
+        final StringBuilder builder=new StringBuilder();
+        builder.append("#").append(anMoneyParam);
+        builder.append(" >= ").append(this.beginMoney);
+        if(this.endMoney.compareTo(MAX_AMOUNT)!=0){
+            builder.append(" and ");
+            builder.append("#").append(anMoneyParam);
+            builder.append(" < ").append(this.endMoney);
         }
-        return null;
+        return builder.toString();
     }
 }

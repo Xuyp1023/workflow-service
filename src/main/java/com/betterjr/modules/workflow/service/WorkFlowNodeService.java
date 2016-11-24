@@ -70,7 +70,7 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
      * @param anNodeId
      * @return
      */
-    private WorkFlowNode findWorkFlowNodeById(final Long anNodeId) {
+    public WorkFlowNode findWorkFlowNodeById(final Long anNodeId) {
         return this.selectByPrimaryKey(anNodeId);
     }
 
