@@ -32,6 +32,10 @@ public interface WorkFlowConstants {
     String IS_DISABLED = "1";
     String NOT_DISABLED = "0";
 
+    // 子流程
+    String IS_SUBPROCESS = "1";
+    String NOT_SUBPROCESS = "0";
+
     // 起始
     String NODE_TYPE_START = "0";
     // 结束

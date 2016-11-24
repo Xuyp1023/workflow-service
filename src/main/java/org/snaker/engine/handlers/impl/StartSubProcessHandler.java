@@ -33,6 +33,7 @@ import org.snaker.engine.model.SubProcessModel;
 
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.modules.workflow.constant.WorkFlowConstants;
 import com.betterjr.modules.workflow.data.WorkFlowInput;
 
 /**
@@ -65,7 +66,10 @@ public class StartSubProcessHandler implements IHandler {
         //根据子流程模型名称获取子流程定义对象
         final SnakerEngine engine = execution.getEngine();
 
-        final Long custNo = findCustNo(model, execution.getArgs());
+        final Map<String, Object> param = execution.getArgs();
+        final Long custNo = findCustNo(model, param);
+
+        execution.setOperator(WorkFlowConstants.PREFIX_CUST_NO + String.valueOf(custNo));
 
         // TODO 这里需要解决输入 具体公司的问题 不能按version
         final Process process = engine.process().getProcessByName(model.getProcessName(), custNo);

@@ -15,6 +15,7 @@ import java.util.Map;
 import com.betterjr.common.utils.BTAssert;
 
 /**
+ * 流程运行输入项
  * @author liuwl
  *
  */

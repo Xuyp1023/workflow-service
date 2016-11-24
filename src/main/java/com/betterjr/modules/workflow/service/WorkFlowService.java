@@ -7,7 +7,10 @@
 // ============================================================================
 package com.betterjr.modules.workflow.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -22,12 +25,19 @@ import org.snaker.engine.entity.Order;
 import org.snaker.engine.entity.Task;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.account.dubbo.interfaces.ICustOperatorService;
+import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.customer.ICustMechBaseService;
+import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.workflow.constant.WorkFlowConstants;
+import com.betterjr.modules.workflow.data.WorkFlowHistoryOrder;
 import com.betterjr.modules.workflow.data.WorkFlowInput;
+import com.betterjr.modules.workflow.data.WorkFlowOrder;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
 import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
 
@@ -37,6 +47,12 @@ import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
  */
 @Service
 public class WorkFlowService {
+
+    @Reference(interfaceClass = ICustMechBaseService.class)
+    private ICustMechBaseService custMechBaseService;
+
+    @Reference(interfaceClass = ICustOperatorService.class)
+    private ICustOperatorService custOperatorService;
 
     @Inject
     private SnakerEngine engine;
@@ -60,8 +76,11 @@ public class WorkFlowService {
         final ITaskService taskService = engine.task();
         final IQueryService queryService = engine.query();
 
+        final CustMechBase custMechBase = custMechBaseService.findBaseInfo(flowInput.getFlowCustNo());
+        BTAssert.notNull(custMechBase, "没有找到启动流程公司！");
+
         final Order order = engine.startInstanceByName(flowInput.getFlowName(), flowInput.getFlowCustNo(), null,
-                String.valueOf(flowInput.getOperId()), flowInput.getParam());
+                WorkFlowConstants.PREFIX_CUST_NO + flowInput.getFlowCustNo(), flowInput.getParam());
         BTAssert.notNull(order, "启动流程出现错误！");
 
         final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseByProcessId(order.getProcessId());
@@ -156,14 +175,46 @@ public class WorkFlowService {
 
     /**
      *
+     * @param anTaskId
+     * @param anOperId
+     */
+    public void findTask(final String anTaskId, final Long anOperId) {
+
+    }
+
+    /**
+     * 获取当前实例
+     *
      * @param anOperId
      * @param anPageNo
      */
-    public void queryCurrentOrder(final Long anOperId, final Integer anPageNo) {
+    public List<WorkFlowOrder> queryCurrentOrder(final Long anOperId, final Integer anPageNo) {
         final IQueryService queryService = engine.query();
         final Page<Order> page = new Page<>();
         page.setPageNo(anPageNo);
-        final List<Order> orders = queryService.getActiveOrders(page, new QueryFilter().setOperator(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(anOperId)));
+        final List<String> operators = new ArrayList<>();
+
+        final Collection<CustInfo> custInfos = custMechBaseService.queryCustInfoByOperId(anOperId);
+
+        operators.addAll(
+                custInfos.stream().map(custInfo -> WorkFlowConstants.PREFIX_CUST_NO + String.valueOf(custInfo.getId())).collect(Collectors.toList()));
+
+        // 获取当前用户拥有的公司
+        final String operId = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(anOperId);
+        operators.add(operId);
+
+        final List<Order> orders = queryService.getActiveOrders(page,
+                new QueryFilter().setOperators(operators.toArray(new String[operators.size()])));
+
+        final List<WorkFlowOrder> workFlowOrders = orders.stream().map(order -> {
+            final WorkFlowOrder workFlowOrder = new WorkFlowOrder();
+            workFlowOrder.setOrder(order);
+            workFlowOrder.setWorkFlowBase(workFlowBaseService.findWorkFlowBaseByProcessId(order.getProcessId()));
+            workFlowOrder.setWorkFlowBusiness(workFlowBusinessService.findWorkFlowBusinessByOrderId(order.getId()));
+            return workFlowOrder;
+        }).collect(Collectors.toList());
+
+        return workFlowOrders;
     }
 
     /**
@@ -171,11 +222,36 @@ public class WorkFlowService {
      * @param anOperId
      * @param anPageNo
      */
-    public void queryHistoryOrder(final Long anOperId, final Integer anPageNo) {
+    public List<WorkFlowHistoryOrder> queryHistoryOrder(final Long anOperId, final Integer anPageNo) {
         final IQueryService queryService = engine.query();
         final Page<HistoryOrder> page = new Page<>();
         page.setPageNo(anPageNo);
-        final List<HistoryOrder> orders = queryService.getHistoryOrders(page, new QueryFilter().setOperator(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(anOperId)));
+        final List<String> operators = new ArrayList<>();
+
+        final Collection<CustInfo> custInfos = custMechBaseService.queryCustInfoByOperId(anOperId);
+
+        operators.addAll(
+                custInfos.stream().map(custInfo -> WorkFlowConstants.PREFIX_CUST_NO + String.valueOf(custInfo.getId())).collect(Collectors.toList()));
+
+        // 获取当前用户拥有的公司
+        final String operId = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(anOperId);
+        operators.add(operId);
+
+        final List<HistoryOrder> historyOrders = queryService.getHistoryOrders(page,
+                new QueryFilter().setOperators(operators.toArray(new String[operators.size()])));
+
+        final List<WorkFlowHistoryOrder> workFlowHistoryOrders = historyOrders.stream().map(historyOrder -> {
+            final WorkFlowHistoryOrder workFlowHistoryOrder = new WorkFlowHistoryOrder();
+            workFlowHistoryOrder.setHistoryOrder(historyOrder);
+            final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseByProcessId(historyOrder.getProcessId());
+            workFlowHistoryOrder.setWorkFlowBase(workFlowBase);
+            if (BetterStringUtils.equals(workFlowBase.getIsSubprocess(), WorkFlowConstants.IS_SUBPROCESS)) {
+                workFlowHistoryOrder.setWorkFlowBusiness(workFlowBusinessService.findWorkFlowBusinessByOrderId(historyOrder.getParentId()));
+            }
+            return workFlowHistoryOrder;
+        }).collect(Collectors.toList());
+
+        return workFlowHistoryOrders;
     }
 
     /**
