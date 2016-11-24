@@ -7,12 +7,16 @@
 // ============================================================================
 package com.betterjr.modules.workflow;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.snaker.engine.IProcessService;
 
 import com.betterjr.modules.BasicServiceTest;
 import com.betterjr.modules.workflow.data.WorkFlowBusinessType;
+import com.betterjr.modules.workflow.data.WorkFlowHistoryOrder;
 import com.betterjr.modules.workflow.data.WorkFlowInput;
+import com.betterjr.modules.workflow.data.WorkFlowOrder;
 import com.betterjr.modules.workflow.service.WorkFlowService;
 import com.betterjr.modules.workflow.snaker.core.BetterSpringSnakerEngine;
 
@@ -36,12 +40,38 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
     public void testStartWorkFlow() {
         final WorkFlowService workFlowService = this.getServiceObject();
 
-        final WorkFlowInput flowInput = new WorkFlowInput(300l, "资金方票据融资业务流程", 110l, 1000l, WorkFlowBusinessType.SUPPLIER_BILL_FINANCING);
-        flowInput.setFactorCustNo(110l);
-        flowInput.setCoreCustNo(112l);
-        flowInput.setSupplierCustNo(111l);
+        final WorkFlowInput flowInput = new WorkFlowInput(1000156l, "资金方票据融资业务流程", 102202019l, 1000l, WorkFlowBusinessType.SUPPLIER_BILL_FINANCING);
+        flowInput.setFactorCustNo(102202019l);
+        flowInput.setCoreCustNo(102200336l);
+        flowInput.setSupplierCustNo(102202021l);
 
         workFlowService.saveStart(flowInput);
+    }
+
+    @Test
+    public void testQueryCurrentOrder() {
+        final WorkFlowService workFlowService = this.getServiceObject();
+        final List<WorkFlowOrder> workFlowOrders = workFlowService.queryCurrentOrder(17108l, 1);
+
+        workFlowOrders.forEach(workFlowOrder-> {
+            System.out.println("ORDER-PROCESSNAME:" + workFlowOrder.getOrder().getParentNodeName());
+            System.out.println("NAME:" + workFlowOrder.getWorkFlowBase().getName());
+            System.out.println("PROCESSID:" + workFlowOrder.getWorkFlowBase().getProcessId());
+            System.out.println("BUSINESSID:" + workFlowOrder.getWorkFlowBusiness().getBusinessId());
+        });
+    }
+
+    @Test
+    public void testQueryHistoryOrder() {
+        final WorkFlowService workFlowService = this.getServiceObject();
+        final List<WorkFlowHistoryOrder> workFlowOrders = workFlowService.queryHistoryOrder(1000156l, 1);
+
+        workFlowOrders.forEach(workFlowOrder-> {
+            System.out.println("ORDER-PROCESSNAME:" + workFlowOrder.getHistoryOrder().getProcessName());
+            System.out.println("NAME:" + workFlowOrder.getWorkFlowBase().getName());
+            System.out.println("PROCESSID:" + workFlowOrder.getWorkFlowBase().getProcessId());
+            System.out.println("BUSINESSID:" + workFlowOrder.getWorkFlowBusiness().getBusinessId());
+        });
     }
 
     @Test
@@ -95,7 +125,7 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
         final BetterSpringSnakerEngine engine = this.getCtx().getBean(BetterSpringSnakerEngine.class);
 
         final IProcessService processService = engine.process();
-        processService.deploy(7l);
+        processService.deploy(22l);
     }
 
     @Test
@@ -103,7 +133,7 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
         final BetterSpringSnakerEngine engine = this.getCtx().getBean(BetterSpringSnakerEngine.class);
 
         final IProcessService processService = engine.process();
-        processService.deploy(8l);
+        processService.deploy(23l);
     }
 
     @Test
@@ -111,7 +141,7 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
         final BetterSpringSnakerEngine engine = this.getCtx().getBean(BetterSpringSnakerEngine.class);
 
         final IProcessService processService = engine.process();
-        processService.deploy(9l);
+        processService.deploy(24l);
     }
 
     @Test
@@ -119,6 +149,6 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
         final BetterSpringSnakerEngine engine = this.getCtx().getBean(BetterSpringSnakerEngine.class);
 
         final IProcessService processService = engine.process();
-        processService.deploy(10l);
+        processService.deploy(25l);
     }
 }

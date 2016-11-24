@@ -425,6 +425,8 @@ public class WorkFlowBase implements BetterjrEntity {
         this.name = anWorkFlowBaseDefault.getName();
         this.isSubprocess = anWorkFlowBaseDefault.getIsSubprocess();
 
+        this.moneyVariable = anWorkFlowBaseDefault.getMoneyVariable();
+
         this.isDefault = WorkFlowConstants.NOT_DEFAULT;
         this.isPublished = WorkFlowConstants.NOT_PUBLISHED;
         this.isLatest = WorkFlowConstants.NOT_LATEST;
@@ -433,7 +435,6 @@ public class WorkFlowBase implements BetterjrEntity {
         this.regTime = BetterDateUtils.getNumTime();
         this.regOperId = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getId() : 0L;
         this.regOperName = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getName() : "";
-        this.operOrg = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getOperOrg() : "";
 
         this.modiOperId = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getId() : 0L;
         this.modiOperName = UserUtils.getOperatorInfo() != null ? UserUtils.getOperatorInfo().getName() : "";

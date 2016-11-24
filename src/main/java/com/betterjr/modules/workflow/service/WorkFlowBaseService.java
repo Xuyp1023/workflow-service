@@ -17,6 +17,7 @@ import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
@@ -25,6 +26,8 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.cert.entity.CustCertRule;
+import com.betterjr.modules.customer.ICustMechBaseService;
+import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.workflow.constant.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowBaseMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
@@ -35,6 +38,8 @@ import com.betterjr.modules.workflow.entity.WorkFlowBase;
  */
 @Service
 public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlowBase> {
+    @Reference(interfaceClass = ICustMechBaseService.class)
+    ICustMechBaseService custMechBaseService;
 
     @Inject
     private WorkFlowNodeService workFlowNodeService;
@@ -185,6 +190,9 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
         BTAssert.notNull(anDefaultBaseId, "基础流程编号不允许为空！");
         BTAssert.notNull(anCustNo, "公司编号不允许为空！");
 
+        final CustMechBase custMechBase = custMechBaseService.findBaseInfo(anCustNo);
+        BTAssert.notNull(custMechBase, "公司信息没有找到！");
+
         checkWorkFlowBase(anWorkFlowBase);
 
         final WorkFlowBase workFlowBaseDefault = findWorkFlowBaseById(anDefaultBaseId);
@@ -192,9 +200,11 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
 
         anWorkFlowBase.setName(workFlowBaseDefault.getName());// 这个不允许改变 保持与默认模板一致
         anWorkFlowBase.setCustNo(anCustNo);
+        anWorkFlowBase.setCustName(custMechBase.getCustName());
         anWorkFlowBase.setIsDefault(WorkFlowConstants.NOT_DEFAULT);
         anWorkFlowBase.setIsDisabled(WorkFlowConstants.NOT_DISABLED);
         anWorkFlowBase.setIsLatest(WorkFlowConstants.NOT_LATEST);
+        anWorkFlowBase.setOperOrg(custMechBase.getOperOrg());
 
         // 检查是否已经存在已有版本
         final WorkFlowBase workFlowBaseLast = findWorkFlowBaseLastByName(anWorkFlowBase.getName(), anCustNo);

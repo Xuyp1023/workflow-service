@@ -44,7 +44,7 @@ public class WorkFlowBaseServiceTestCase extends BasicServiceTest<WorkFlowBaseSe
         workFlowBase.setOperRole(WorkFlowConstants.FACTOR_USER);
         workFlowBase.setCategoryId(2L);
 
-        baseService.addWorkFlowBase(workFlowBase, -20000l, 110l);
+        baseService.addWorkFlowBase(workFlowBase, -20000l, 102202019l);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class WorkFlowBaseServiceTestCase extends BasicServiceTest<WorkFlowBaseSe
         workFlowBase.setOperRole(WorkFlowConstants.SUPPLIER_USER);
         workFlowBase.setCategoryId(2L);
 
-        baseService.addWorkFlowBase(workFlowBase, -20001l, 111l);
+        baseService.addWorkFlowBase(workFlowBase, -20001l, 102202021l);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class WorkFlowBaseServiceTestCase extends BasicServiceTest<WorkFlowBaseSe
         workFlowBase.setOperRole(WorkFlowConstants.SUPPLIER_USER);
         workFlowBase.setCategoryId(2L);
 
-        baseService.addWorkFlowBase(workFlowBase, -20002l, 111l);
+        baseService.addWorkFlowBase(workFlowBase, -20002l, 102202021l);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class WorkFlowBaseServiceTestCase extends BasicServiceTest<WorkFlowBaseSe
         workFlowBase.setOperRole(WorkFlowConstants.CORE_USER);
         workFlowBase.setCategoryId(2L);
 
-        baseService.addWorkFlowBase(workFlowBase, -20003l, 112l);
+        baseService.addWorkFlowBase(workFlowBase, -20003l, 102200336l);
     }
 
     @Test

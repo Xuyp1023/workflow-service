@@ -28,6 +28,12 @@
 			<artifactId>workflow-interfaces</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		
+		<dependency>
+            <groupId>com.betterjr</groupId>
+            <artifactId>platform-interfaces</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
 		<dependency>
 			<groupId>de.odysseus.juel</groupId>
