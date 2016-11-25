@@ -25,6 +25,7 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
+import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.cert.entity.CustCertRule;
 import com.betterjr.modules.customer.ICustMechBaseService;
 import com.betterjr.modules.customer.entity.CustMechBase;
@@ -75,6 +76,20 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
         // 返回 未创建的 默认流程
         // TODO
         return workFlowBases.stream().map(base -> new SimpleDataEntity(String.valueOf(base.getId()), base.getName())).collect(Collectors.toList());
+    }
+
+    /**
+     * 按公司查询流程记录
+     * @param anCustNo
+     * @return
+     */
+    public Page<WorkFlowBase> queryWorkFlowBaseByCustNo(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
+        BTAssert.notNull(anCustNo, "公司编号不允许为空");
+
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("custNo", anCustNo);
+
+        return this.selectPropertyByPage(conditionMap, anPageNum, anPageSize, anFlag == 1);
     }
 
     /**
@@ -363,11 +378,11 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
     /**
      * 停用一个流程 （已停用流程将不能再发起申请)
      *
-     * @param anWorkFlowBaseId
+     * @param anBaseId
      *            待停用已发布最新流程
      * @return
      */
-    public WorkFlowBase saveDisableWorkFlow(final long anBaseId) {
+    public WorkFlowBase saveDisableWorkFlow(final Long anBaseId) {
         // 检查是否已经存在已有版本
         BTAssert.notNull(anBaseId, "流程定义编号不允许为空");
 
@@ -387,6 +402,36 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
         }
         else {
             throw new BytterException("停用流程发生错误!");
+        }
+    }
+
+    /**
+     * 启用一个流程 （已启用流程将不能再启用)
+     *
+     * @param anBaseId
+     *            待启用已发布最新流程
+     * @return
+     */
+    public WorkFlowBase saveEnableWorkFlow(final long anBaseId) {
+        // 检查是否已经存在已有版本
+        BTAssert.notNull(anBaseId, "流程定义编号不允许为空");
+
+        final WorkFlowBase workFlowBase = findWorkFlowBaseById(anBaseId);
+        BTAssert.notNull(workFlowBase, "没有找到相应流程");
+        // 如果已有一个未发布的流程，则修改它
+
+        if (BetterStringUtils.equals(workFlowBase.getIsLatest(), WorkFlowConstants.IS_LATEST)
+                && BetterStringUtils.equals(workFlowBase.getIsPublished(), WorkFlowConstants.IS_PUBLISHED)
+                && BetterStringUtils.equals(workFlowBase.getIsDisabled(), WorkFlowConstants.IS_DISABLED)) {
+            // 修改流程为停用状态
+            workFlowBase.setIsDisabled(WorkFlowConstants.NOT_DISABLED);
+            workFlowBase.initModifyValue();
+
+            this.updateByPrimaryKeySelective(workFlowBase);
+            return workFlowBase;
+        }
+        else {
+            throw new BytterException("启用流程发生错误!");
         }
     }
 }

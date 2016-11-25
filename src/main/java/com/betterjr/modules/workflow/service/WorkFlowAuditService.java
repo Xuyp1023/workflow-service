@@ -20,4 +20,12 @@ import com.betterjr.modules.workflow.entity.WorkFlowAudit;
 @Service
 public class WorkFlowAuditService extends BaseService<WorkFlowAuditMapper, WorkFlowAudit> {
 
+    public WorkFlowAudit addWorkFlowAudit(final WorkFlowAudit anWorkFlowAudit) {
+
+        return anWorkFlowAudit;
+    }
+
+    public void queryWorkFlowAudit() {
+
+    }
 }
