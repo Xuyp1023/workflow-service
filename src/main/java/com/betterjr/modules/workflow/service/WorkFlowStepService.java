@@ -79,7 +79,8 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
 
     /**
      * 添加流程步骤
-     *
+     * @param anBaseId
+     * @param anNodeId
      * @param anStep
      * @return
      */
@@ -99,6 +100,23 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
     }
 
     /**
+     * 修改流程步骤
+     * @param anBaseId
+     * @param anNodeId
+     * @param anStepId
+     * @param anWorkFlowStep
+     * @return
+     */
+    public WorkFlowStep saveWorkFlowStep(final Long anBaseId, final Long anNodeId, final Long anStepId, final WorkFlowStep anWorkFlowStep) {
+        final WorkFlowStep workFlowStep = checkWorkFlowStep(anBaseId, anNodeId, anStepId);
+
+        workFlowStep.setNickname(anWorkFlowStep.getNickname());
+        workFlowStep.initModifyValue();
+
+        return workFlowStep;
+    }
+
+    /**
      * 通过节点编号 查询步骤
      *
      * @param anNodeId
@@ -109,6 +127,16 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
         conditionMap.put("nodeId", anNodeId);
 
         return this.selectByProperty(conditionMap, "seq ASC");
+    }
+
+    /**
+     * 查询流程步骤详情成功
+     * @param anStepId
+     * @return
+     */
+    public WorkFlowStep findWorkFlowStepById(final Long anStepId) {
+        BTAssert.notNull(anStepId, "流程步骤编号不允许为空！");
+        return this.selectByPrimaryKey(anStepId);
     }
 
     /**
@@ -219,17 +247,11 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      * @param anDefMap
      */
     /**
-     * 格式定义 {
-     * auditType: 0串行 1并行 审批方式 isMoney: 0未启用 1启用 金额段
+     * 格式定义 { auditType: 0串行 1并行 审批方式 isMoney: 0未启用 1启用 金额段
      *
-     * 0,0串行审批未启用金额段
-     * approver:operId
-     * 0,1串行审批启用金额段
-     * approver:[ {moneyId: , operId: }, {moneyId: , operId: } ]
-     * 1,0并行未启用金额段
-     * approver:[ {operId: , weight:}, {operId: , weight: } ]
-     * 1,1并行启用金额段
-     * approver:[ {moneyId: , opers:[ {operId: , weight: }, {operId: , weight: } ]}, {moneyId: , opers:[ {operId: , weight: }, {operId: , weight: } ]} ] }
+     * 0,0串行审批未启用金额段 approver:operId 0,1串行审批启用金额段 approver:[ {moneyId: , operId: }, {moneyId: , operId: } ] 1,0并行未启用金额段 approver:[ {operId: ,
+     * weight:}, {operId: , weight: } ] 1,1并行启用金额段 approver:[ {moneyId: , opers:[ {operId: , weight: }, {operId: , weight: } ]}, {moneyId: , opers:[
+     * {operId: , weight: }, {operId: , weight: } ]} ] }
      */
     public void saveStepDefinition(final Long anBaseId, final Long anNodeId, final Long anStepId, final Map<String, Object> anDefMap) {
         // 检查当前步骤对应的流程是否有操作权限
@@ -363,4 +385,7 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
             this.insert(workFlowStep);
         });
     }
+
+
+
 }
