@@ -15,11 +15,14 @@ import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.account.dubbo.interfaces.ICustOperatorService;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.workflow.constant.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowNodeMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowApprover;
@@ -45,6 +48,9 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
     @Inject
     private WorkFlowApproverService workFlowApproverService;
 
+    @Reference(interfaceClass=ICustOperatorService.class)
+    private ICustOperatorService custOperatorService;
+
     /**
      * 查询流程的所有节点，按顺序查询
      *
@@ -61,7 +67,28 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
         conditionMap.put("baseId", workFlowBase.getId());
 
         // 返回
-        return this.selectByProperty(conditionMap, "seq");
+        final List<WorkFlowNode> workFlowNodes = this.selectByProperty(conditionMap, "seq");
+
+        for (final WorkFlowNode workFlowNode: workFlowNodes) {
+            fillOperator(workFlowNode);
+        }
+        return workFlowNodes;
+    }
+
+    /**
+     * @param anWorkFlowNode
+     */
+    private void fillOperator(final WorkFlowNode anWorkFlowNode) {
+        if (BetterStringUtils.equals(anWorkFlowNode.getType(), WorkFlowConstants.NODE_TYPE_OPER)) { // 经办节点指定经办人
+            final WorkFlowApprover approver = workFlowApproverService.findApproverByNode(anWorkFlowNode.getId());
+            if (approver != null) {
+                anWorkFlowNode.setOperId(approver.getOperId());
+                final CustOperatorInfo operator = custOperatorService.findCustOperatorById(approver.getOperId());
+                if (operator != null) {
+                    anWorkFlowNode.setOperName(operator.getName());
+                }
+            }
+        }
     }
 
     /**
@@ -122,12 +149,12 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
         // 检查流程是否存在
         final WorkFlowNode workFlowNode = checkWorkFlowNode(anBaseId, anNodeId);
 
-        if (BetterStringUtils.equals(WorkFlowConstants.NOT_DISABLED, workFlowNode.getIsDisabled())) {
+        if (BetterStringUtils.equals(WorkFlowConstants.IS_DISABLED, workFlowNode.getIsDisabled())) {
             throw new BytterException("当前节点已是禁用状态");
         }
 
         // 如果为未发布流程则修改为停用
-        workFlowNode.setIsDisabled(WorkFlowConstants.NOT_DISABLED);
+        workFlowNode.setIsDisabled(WorkFlowConstants.IS_DISABLED);
         this.updateByPrimaryKeySelective(workFlowNode);
 
         return workFlowNode;

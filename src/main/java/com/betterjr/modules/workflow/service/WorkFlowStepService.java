@@ -81,22 +81,26 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      * 添加流程步骤
      * @param anBaseId
      * @param anNodeId
-     * @param anStep
+     * @param anNickname
      * @return
      */
-    public WorkFlowStep addWorkFlowStep(final Long anBaseId, final Long anNodeId, final WorkFlowStep anStep) {
+    public WorkFlowStep addWorkFlowStep(final Long anBaseId, final Long anNodeId, final String anNickname) {
         // 检查当前步骤对应的流程是否有操作权限
         final WorkFlowNode workFlowNode = workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
 
         BTAssert.isTrue(BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_APP), "只允许审批节点创建步骤");
 
-        anStep.setNodeId(anNodeId);
-        anStep.initAddValue();
-        // 将添加的步骤加到最后一步
-        anStep.setSeq(queryWorkFlowStepByNodeId(anNodeId).size());
+        final WorkFlowStep workFlowStep = new WorkFlowStep();
 
-        this.insert(anStep);
-        return anStep;
+        workFlowStep.setName(workFlowNode.getName());
+        workFlowStep.setNickname(anNickname);
+        workFlowStep.setNodeId(anNodeId);
+        workFlowStep.initAddValue();
+        // 将添加的步骤加到最后一步
+        workFlowStep.setSeq(queryWorkFlowStepByNodeId(anNodeId).size());
+
+        this.insert(workFlowStep);
+        return workFlowStep;
     }
 
     /**

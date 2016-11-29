@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.selectkey.SerialGenerator;
@@ -81,6 +82,27 @@ public class WorkFlowNode implements BetterjrEntity {
     private String lastStatus;
 
     private static final long serialVersionUID = 1479349929430L;
+
+    // 经办人
+    @Transient
+    private Long operId;
+    private String operName;
+
+    public Long getOperId() {
+        return operId;
+    }
+
+    public void setOperId(final Long anOperId) {
+        operId = anOperId;
+    }
+
+    public String getOperName() {
+        return operName;
+    }
+
+    public void setOperName(final String anOperName) {
+        operName = anOperName;
+    }
 
     public Long getId() {
         return id;

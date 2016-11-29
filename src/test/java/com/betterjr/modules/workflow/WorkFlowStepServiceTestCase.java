@@ -42,26 +42,17 @@ public class WorkFlowStepServiceTestCase extends BasicServiceTest<WorkFlowStepSe
     public void testAddWorkFlowStep() {
         final WorkFlowStepService workFlowStepService = this.getServiceObject();
 
-        final WorkFlowStep workFlowStep1 = new WorkFlowStep();
-        workFlowStep1.setName("测试1步");
-        workFlowStepService.addWorkFlowStep(6l, 33l, workFlowStep1);
+        workFlowStepService.addWorkFlowStep(6l, 33l, "测试1步");
 
-        final WorkFlowStep workFlowStep2 = new WorkFlowStep();
-        workFlowStep2.setName("测试2步");
-        workFlowStepService.addWorkFlowStep(6l, 33l, workFlowStep2);
+        workFlowStepService.addWorkFlowStep(6l, 33l, "测试2步");
 
-        final WorkFlowStep workFlowStep3 = new WorkFlowStep();
-        workFlowStep3.setName("测试3步");
-        workFlowStepService.addWorkFlowStep(6l, 33l, workFlowStep3);
+        workFlowStepService.addWorkFlowStep(6l, 33l, "测试3步");
     }
 
     @Test
     public void testAddWorkFlowStep1() {
         final WorkFlowStepService workFlowStepService = this.getServiceObject();
-
-        final WorkFlowStep workFlowStep3 = new WorkFlowStep();
-        workFlowStep3.setName("测试4步");
-        workFlowStepService.addWorkFlowStep(6l, 33l, workFlowStep3);
+        workFlowStepService.addWorkFlowStep(6l, 33l, "测试4步");
     }
 
     @Test
