@@ -75,7 +75,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
 
         // 返回 未创建的 默认流程
         // TODO
-        return workFlowBases.stream().map(base -> new SimpleDataEntity(String.valueOf(base.getId()), base.getName())).collect(Collectors.toList());
+        return workFlowBases.stream().map(base -> new SimpleDataEntity(base.getName(), String.valueOf(base.getId()))).collect(Collectors.toList());
     }
 
     /**
@@ -215,6 +215,8 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
 
         anWorkFlowBase.setName(workFlowBaseDefault.getName());// 这个不允许改变 保持与默认模板一致
         anWorkFlowBase.setCustNo(anCustNo);
+        anWorkFlowBase.setOperRole(workFlowBaseDefault.getOperRole());
+        anWorkFlowBase.setCategoryId(workFlowBaseDefault.getCategoryId());
         anWorkFlowBase.setCustName(custMechBase.getCustName());
         anWorkFlowBase.setIsDefault(WorkFlowConstants.NOT_DEFAULT);
         anWorkFlowBase.setIsDisabled(WorkFlowConstants.NOT_DISABLED);
@@ -259,8 +261,6 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      */
     private void checkWorkFlowBase(final WorkFlowBase anWorkFlowBase) {
         BTAssert.notNull(anWorkFlowBase.getNickname());
-        BTAssert.notNull(anWorkFlowBase.getOperRole());
-        BTAssert.notNull(anWorkFlowBase.getCategoryId());
     }
 
     /**
@@ -292,14 +292,13 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      *            基础流程实例
      * @return
      */
-    public WorkFlowBase saveWorkFlowBase(final Long anBaseId, final WorkFlowBase anWorkFlowBase) {
+    public WorkFlowBase saveWorkFlowBase(final Long anBaseId, final String anNickname) {
         // 检查是否已经存在已有版本
         final WorkFlowBase workFlowBase = checkWorkFlowBase(anBaseId);
 
         // 如果没有则产生一个新的未发布流程
         workFlowBase.initModifyValue();
-        workFlowBase.setNickname(anWorkFlowBase.getNickname());
-        workFlowBase.setCategoryId(anWorkFlowBase.getCategoryId());
+        workFlowBase.setNickname(anNickname);
 
         this.updateByPrimaryKeySelective(workFlowBase);
 

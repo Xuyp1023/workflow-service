@@ -11,11 +11,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
+import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.account.dubbo.interfaces.ICustOperatorService;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.workflow.constant.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowApproverMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowApprover;
@@ -28,6 +34,31 @@ import com.betterjr.modules.workflow.entity.WorkFlowStep;
  */
 @Service
 public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper, WorkFlowApprover> {
+    @Inject
+    private WorkFlowNodeService workFlowNodeService;
+
+    @Reference(interfaceClass=ICustOperatorService.class)
+    private ICustOperatorService custOperatorService;
+
+    /**
+     * 添加分配的经办人
+     * @param anBaseId
+     * @param anNodeId
+     * @param anOperId
+     */
+    public WorkFlowApprover addApproverByNode(final Long anBaseId, final Long anNodeId, final Long anOperId) {
+        workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
+
+        final CustOperatorInfo operator = custOperatorService.findCustOperatorById(anOperId);
+
+        BTAssert.notNull(operator, "没有找到相应操作员");
+
+        final WorkFlowApprover workFlowApprover = new WorkFlowApprover();
+
+        workFlowApprover.setOperId(anOperId);
+
+        return addApproverByNode(anNodeId, workFlowApprover);
+    }
 
     /**
      * 添加分配的经办人
@@ -35,6 +66,9 @@ public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper,
      * @return
      */
     public WorkFlowApprover addApproverByNode(final Long anNodeId, final WorkFlowApprover anApprover) {
+        // 选删除
+        saveDelWorkFlowApprover(WorkFlowConstants.PARENT_TYPE_NODE, anNodeId);
+
         anApprover.setParentType(WorkFlowConstants.PARENT_TYPE_NODE);
         anApprover.setParentId(anNodeId);
 
@@ -156,4 +190,5 @@ public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper,
             }
         }
     }
+
 }

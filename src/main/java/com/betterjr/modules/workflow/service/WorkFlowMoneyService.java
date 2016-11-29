@@ -9,6 +9,7 @@ package com.betterjr.modules.workflow.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.workflow.constant.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowMoneyMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
@@ -48,7 +50,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
      * @param anMoneySection
      * @return
      */
-    public String saveWorkFlowMoney(final Long anBaseId, final String anMoneySection) {
+    public String saveWorkFlowMoneySection(final Long anBaseId, final String anMoneySection) {
         // 校验金额段字符串是否有效 并返回 workFlowMoneys
         final List<WorkFlowMoney> workFlowMoneys = checkMoneySection(anMoneySection);
 
@@ -90,6 +92,9 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
      * @param anMoneySection
      */
     private List<WorkFlowMoney> checkMoneySection(final String anMoneySection) {
+        if (BetterStringUtils.isBlank(anMoneySection)) {
+            return Collections.EMPTY_LIST;
+        }
         // 0,100,200,-1
         BTAssert.isTrue(MONEY_SECTION_PATTERN.matcher(anMoneySection).matches(), "金额段格式不正确！");
 
@@ -162,6 +167,9 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
         // 将读取到的金额段 组成 金额段字符串
         final List<WorkFlowMoney> workFlowMoneys = queryWorkFlowMoneyByBaseId(anBaseId);
 
+        if (Collections3.isEmpty(workFlowMoneys))  {
+            return "";
+        }
         final StringBuilder moneySection = new StringBuilder("0,");
         for (final WorkFlowMoney workFlowMoney : workFlowMoneys) {
             moneySection.append(workFlowMoney.getEndMoney().toString()).append(",");

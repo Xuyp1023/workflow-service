@@ -31,7 +31,7 @@ public class WorkFlowMoneyServiceTestCase extends BasicServiceTest<WorkFlowMoney
         final WorkFlowMoneyService flowMoneyService = this.getServiceObject();
         final String moneySection = "0,20000,50000,100000,-1";
 
-        flowMoneyService.saveWorkFlowMoney(2L, moneySection);
+        flowMoneyService.saveWorkFlowMoneySection(2L, moneySection);
     }
 
 
