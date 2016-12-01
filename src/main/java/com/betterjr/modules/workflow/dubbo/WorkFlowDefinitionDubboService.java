@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 import com.betterjr.modules.workflow.IWorkFlowDefinitionService;
@@ -175,7 +176,10 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
      */
     @Override
     public String webSaveWorkFlowStepDefine(final Map<String, Object> anParam, final Long anBaseId, final Long anNodeId, final Long anStepId) {
-        workFlowStepService.saveStepDefinition(anBaseId, anNodeId, anStepId, anParam);
+
+        final String data = (String) anParam.get("data");
+        final Map<String, Object> param = JsonMapper.parserJson(data);
+        workFlowStepService.saveStepDefinition(anBaseId, anNodeId, anStepId, param);
         return AjaxObject.newOk("保存流程步骤定义成功!").toJson();
     }
 
@@ -257,5 +261,21 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
     public String webMoveDownWorkFlowStep(final Long anBaseId, final Long anNodeId, final Long anStepId) {
         workFlowStepService.saveMoveDownStep(anBaseId, anNodeId, anStepId);
         return AjaxObject.newOk("下移流程步骤成功！").toJson();
+    }
+
+    /* (non-Javadoc)
+     * @see com.betterjr.modules.workflow.IWorkFlowDefinitionService#webQueryWorkFlowMoney(java.lang.Long)
+     */
+    @Override
+    public String webQueryWorkFlowMoney(final Long anBaseId) {
+        return AjaxObject.newOk("查询金额段成功！", workFlowMoneyService.queryWorkFlowMoneyByBaseId(anBaseId)).toJson();
+    }
+
+    /* (non-Javadoc)
+     * @see com.betterjr.modules.workflow.IWorkFlowDefinitionService#webFindWorkFlowStepDefine(java.lang.Long, java.lang.Long, java.lang.Long)
+     */
+    @Override
+    public String webFindWorkFlowStepDefine(final Long anBaseId, final Long anNodeId, final Long anStepId) {
+        return AjaxObject.newOk("查询流程定义成功！", workFlowStepService.findStepDefinition(anBaseId, anNodeId, anStepId)).toJson();
     }
 }
