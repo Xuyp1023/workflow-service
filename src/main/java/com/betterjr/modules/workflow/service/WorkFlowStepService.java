@@ -21,7 +21,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.modules.workflow.constant.WorkFlowConstants;
+import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowStepMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowApprover;
 import com.betterjr.modules.workflow.entity.WorkFlowMoney;
@@ -157,6 +157,7 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
         final WorkFlowStep workFlowStep = checkWorkFlowStep(anBaseId, anNodeId, anStepId);
 
         // XXX 删除已经存在的定义已经分配的操作员
+        workFlowApproverService.saveDelWorkFlowApprover(WorkFlowConstants.PARENT_TYPE_STEP, anStepId);
 
         // 删除当前步骤
         this.delete(workFlowStep);

@@ -23,7 +23,7 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.account.dubbo.interfaces.ICustOperatorService;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
-import com.betterjr.modules.workflow.constant.WorkFlowConstants;
+import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowNodeMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowApprover;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;

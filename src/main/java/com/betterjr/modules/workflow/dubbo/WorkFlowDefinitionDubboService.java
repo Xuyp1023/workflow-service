@@ -11,6 +11,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.web.AjaxObject;
@@ -30,6 +33,8 @@ import com.betterjr.modules.workflow.snaker.core.BetterSpringSnakerEngine;
  */
 @Service(interfaceClass = IWorkFlowDefinitionService.class)
 public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionService {
+    private static final Logger logger = LoggerFactory.getLogger(WorkFlowDefinitionDubboService.class);
+
     @Inject
     private WorkFlowBaseService workFlowBaseService;
 

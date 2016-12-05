@@ -29,7 +29,7 @@ import com.betterjr.common.service.SpringContextHolder;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.modules.workflow.constant.WorkFlowConstants;
+import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.entity.WorkFlowApprover;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
 import com.betterjr.modules.workflow.entity.WorkFlowMoney;
@@ -88,6 +88,7 @@ public class BetterModelParser {
         process.setName(anWorkFlowBase.getName());
         process.setDisplayName(anWorkFlowBase.getNickname());
         process.setOperRole(anWorkFlowBase.getOperRole());
+        process.setWorkFlowBase(anWorkFlowBase);;
 
         final List<WorkFlowNode> flowNodes = getNodes(anWorkFlowBase.getId());
 
@@ -184,6 +185,8 @@ public class BetterModelParser {
         operTaskModel.setDisplayName(anFlowNode.getNickname());
         operTaskModel.setForm(anFlowNode.getForm());
 
+        operTaskModel.setWorkFlowNode(anFlowNode);
+
         final WorkFlowApproverService workFlowApproverService = SpringContextHolder.getBean(WorkFlowApproverService.class);
         final WorkFlowApprover workFlowApprover = workFlowApproverService.findApproverByNode(anFlowNode.getId());
 
@@ -218,20 +221,20 @@ public class BetterModelParser {
             if (flowSteps.size() == 1) { // 仅有一步时
                 final WorkFlowStep flowStep = flowSteps.get(0);
 
-                nextStep = parseStep(anWorkFlowBase, flowStep, anPrevStep, anStepNodeList, 0);
+                nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, 0);
             }
             else {
                 TransitionModel tempNextStep = null;
                 for (int i = 0; i < flowSteps.size(); i++) {
                     final WorkFlowStep flowStep = flowSteps.get(i);
                     if (i == 0) { // 有多步时 第一步
-                        tempNextStep = parseStep(anWorkFlowBase, flowStep, anPrevStep, anStepNodeList, i);
+                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, i);
                     }
                     else if (i == flowSteps.size() - 1) { // 有多步时 最后一步
-                        nextStep = parseStep(anWorkFlowBase, flowStep, tempNextStep, anStepNodeList, i);
+                        nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList, i);
                     }
                     else { // 中间步骤
-                        tempNextStep = parseStep(anWorkFlowBase, flowStep, anPrevStep, anStepNodeList, i);
+                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, i);
                     }
                 }
             }
@@ -252,29 +255,34 @@ public class BetterModelParser {
     }
 
     /**
-     * @param anFlowStep
+     * @param anWorkFlowNode
+     * @param anWorkFlowStep
      * @param anStep
      */
-    private static TransitionModel parseStep(final WorkFlowBase anWorkFlowBase, final WorkFlowStep anFlowStep, final TransitionModel anPrevStep,
+    private static TransitionModel parseStep(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anWorkFlowNode, final WorkFlowStep anWorkFlowStep, final TransitionModel anPrevStep,
             final List<NodeModel> anStepNodeList, final int anStep) {
         final WorkFlowNodeService workFlowNodeService = SpringContextHolder.getBean(WorkFlowNodeService.class);
         final WorkFlowMoneyService workFlowMoneyService = SpringContextHolder.getBean(WorkFlowMoneyService.class);
 
-        final Long anNodeId = anFlowStep.getNodeId();
+        final Long anNodeId = anWorkFlowStep.getNodeId();
         final WorkFlowNode workFlowNode = workFlowNodeService.findWorkFlowNodeById(anNodeId);
 
-        final String auditType = anFlowStep.getAuditType();
-        final String isMoney = anFlowStep.getIsMoney();
+        final String auditType = anWorkFlowStep.getAuditType();
+        final String isMoney = anWorkFlowStep.getIsMoney();
 
-        final List<WorkFlowApprover> flowApprovers = getApprovers(anFlowStep.getId());
+        final List<WorkFlowApprover> flowApprovers = getApprovers(anWorkFlowStep.getId());
         final List<WorkFlowMoney> flowMoneys = workFlowMoneyService.queryWorkFlowMoneyByBaseId(anWorkFlowBase.getId());
 
         if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType) && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
             BTAssert.isTrue(flowApprovers.size() == 1, "此节点只能拥有1位审批人");
 
             final TaskModel taskModel = new TaskModel();
-            taskModel.setName(anFlowStep.getName() + "-" + String.valueOf(anStep));
-            taskModel.setDisplayName(anFlowStep.getNickname());
+            taskModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep));
+            taskModel.setDisplayName(anWorkFlowStep.getNickname());
+
+            taskModel.setWorkFlowBase(anWorkFlowBase);
+            taskModel.setWorkFlowNode(anWorkFlowNode);
+            taskModel.setWorkFlowStep(anWorkFlowStep);
 
             final WorkFlowApprover workFlowApprover = flowApprovers.get(0);
             taskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(workFlowApprover.getOperId()));
@@ -315,8 +323,13 @@ public class BetterModelParser {
                 enterTrans.setExpr(workFlowMoney.getSpelExpr(moneyVariable));// TODO 此处需要处理 transition expr 表达式
 
                 final TaskModel taskModel = new TaskModel();
-                taskModel.setName(anFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i));
-                taskModel.setDisplayName(anFlowStep.getNickname());
+                taskModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i));
+                taskModel.setDisplayName(anWorkFlowStep.getNickname());
+
+                taskModel.setWorkFlowBase(anWorkFlowBase);
+                taskModel.setWorkFlowNode(anWorkFlowNode);
+                taskModel.setWorkFlowStep(anWorkFlowStep);
+
                 taskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(workFlowApprover.getOperId()));
 
                 enterTrans.setTarget(taskModel);
@@ -356,8 +369,13 @@ public class BetterModelParser {
                 final TaskModel taskModel = new TaskModel();
                 taskModel.setHasWeight(true);
                 taskModel.setWeight(workFlowApprover.getWeight());// TODO 此处需要处理权重
-                taskModel.setName(anFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i));
-                taskModel.setDisplayName(anFlowStep.getNickname());
+                taskModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i));
+                taskModel.setDisplayName(anWorkFlowStep.getNickname());
+
+                taskModel.setWorkFlowBase(anWorkFlowBase);
+                taskModel.setWorkFlowNode(anWorkFlowNode);
+                taskModel.setWorkFlowStep(anWorkFlowStep);
+
                 taskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(workFlowApprover.getOperId()));
 
                 enterTrans.setTarget(taskModel);
@@ -419,8 +437,13 @@ public class BetterModelParser {
                         final TaskModel taskModel = new TaskModel();
                         taskModel.setHasWeight(true);
                         taskModel.setWeight(flowApprover.getWeight());// TODO 此处需要处理权重
-                        taskModel.setName(anFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-" + String.valueOf(j));
-                        taskModel.setDisplayName(anFlowStep.getNickname());
+                        taskModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-" + String.valueOf(j));
+                        taskModel.setDisplayName(anWorkFlowStep.getNickname());
+
+                        taskModel.setWorkFlowBase(anWorkFlowBase);
+                        taskModel.setWorkFlowNode(anWorkFlowNode);
+                        taskModel.setWorkFlowStep(anWorkFlowStep);
+
                         taskModel.setAssignee(String.valueOf(flowApprover.getOperId()));
 
                         enterTrans.setTarget(taskModel);

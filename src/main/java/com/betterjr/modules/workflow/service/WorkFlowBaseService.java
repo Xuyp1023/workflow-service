@@ -29,7 +29,7 @@ import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.cert.entity.CustCertRule;
 import com.betterjr.modules.customer.ICustMechBaseService;
 import com.betterjr.modules.customer.entity.CustMechBase;
-import com.betterjr.modules.workflow.constant.WorkFlowConstants;
+import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowBaseMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
 
