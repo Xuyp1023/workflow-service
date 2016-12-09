@@ -823,9 +823,11 @@ public abstract class AbstractDBAccess implements DBAccess {
     public List<HistoryTask> getHistoryTasks(final Page<HistoryTask> page, final QueryFilter filter) {
         final StringBuilder sql = new StringBuilder(QUERY_HIST_TASK);
         final boolean isFetchActor = filter.getOperators() != null && filter.getOperators().length > 0;
-        if(isFetchActor) {
+        // TODO
+        /*        if(isFetchActor) {
             sql.append(" left join wf_hist_task_actor ta on ta.task_id = id ");
         }
+         */
         sql.append(" where 1=1 ");
         final List<Object> paramList = new ArrayList<Object>();
         if(StringHelper.isNotEmpty(filter.getOrderId())) {
@@ -833,7 +835,7 @@ public abstract class AbstractDBAccess implements DBAccess {
             paramList.add(filter.getOrderId());
         }
         if(isFetchActor) {
-            sql.append(" and ta.actor_Id in (");
+            sql.append(" and operator in (");
             for(int i = 0; i < filter.getOperators().length; i++) {
                 sql.append("?,");
                 paramList.add(filter.getOperators()[i]);

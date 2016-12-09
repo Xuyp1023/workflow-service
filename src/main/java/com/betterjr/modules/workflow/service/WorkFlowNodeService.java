@@ -10,12 +10,14 @@ package com.betterjr.modules.workflow.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
@@ -73,6 +75,27 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
             fillOperator(workFlowNode);
         }
         return workFlowNodes;
+    }
+
+    /**
+     * 查询可驳回节点
+     * @param anId
+     * @param anId2
+     * @return
+     */
+    public List<SimpleDataEntity> queryRejectNodeList(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anWorkFlowNode) {
+        BTAssert.notNull(anWorkFlowBase, "没有找到流程！");
+        BTAssert.notNull(anWorkFlowNode, "没有找到流程结点！");
+
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("baseId", anWorkFlowBase.getId());
+        conditionMap.put("LTseq", anWorkFlowNode.getSeq());
+        conditionMap.put("type", new String[]{"2"});   // 只允许退回到经办和子流程
+
+        final List<WorkFlowNode> workFlowNodes = this.selectByProperty(conditionMap, "seq DESC");
+        return workFlowNodes.stream().map(workFlowNode-> {
+            return new SimpleDataEntity(workFlowNode.getNickname(), workFlowNode.getName());
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -271,4 +294,6 @@ public class WorkFlowNodeService extends BaseService<WorkFlowNodeMapper, WorkFlo
 
         }
     }
+
+
 }

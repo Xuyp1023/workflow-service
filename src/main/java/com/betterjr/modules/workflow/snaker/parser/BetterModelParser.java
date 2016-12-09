@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.snaker.engine.model.DecisionModel;
 import org.snaker.engine.model.EndModel;
+import org.snaker.engine.model.ExtJoinModel;
 import org.snaker.engine.model.ForkModel;
 import org.snaker.engine.model.JoinModel;
 import org.snaker.engine.model.NodeModel;
@@ -185,6 +186,7 @@ public class BetterModelParser {
         operTaskModel.setDisplayName(anFlowNode.getNickname());
         operTaskModel.setForm(anFlowNode.getForm());
 
+        operTaskModel.setWorkFlowBase(anWorkFlowBase);
         operTaskModel.setWorkFlowNode(anFlowNode);
 
         final WorkFlowApproverService workFlowApproverService = SpringContextHolder.getBean(WorkFlowApproverService.class);
@@ -356,7 +358,7 @@ public class BetterModelParser {
             final ForkModel forkModel = new ForkModel();
             anPrevStep.setTarget(forkModel);
 
-            final JoinModel joinModel = new JoinModel();
+            final ExtJoinModel joinModel = new ExtJoinModel();
             anStepNodeList.add(forkModel);
 
             final List<TransitionModel> forkOutputs = new ArrayList<>();
@@ -423,7 +425,7 @@ public class BetterModelParser {
                 decisionEnterTrans.setTarget(forkModel);
                 decisionOutputs.add(decisionEnterTrans);
 
-                final JoinModel joinModel = new JoinModel();
+                final ExtJoinModel joinModel = new ExtJoinModel();
                 final List<TransitionModel> forkOutputs = new ArrayList<>();
                 anStepNodeList.add(forkModel);
                 // 当前段中所有节点

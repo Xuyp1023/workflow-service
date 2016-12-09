@@ -50,13 +50,13 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
 
         final WorkFlowBusiness workFlowBusiness = workFlowService.saveStart(flowInput);
 
-        System.out.println(workFlowBusiness);
+        System.out.println("到此" + workFlowBusiness);
     }
 
     @Test
     public void testQueryCurrentOrder() {
         final WorkFlowService workFlowService = this.getServiceObject();
-        final List<WorkFlowOrder> workFlowOrders = workFlowService.queryCurrentOrder(17108l, 1);
+        final List<WorkFlowOrder> workFlowOrders = workFlowService.queryCurrentOrder(17108l, 1, 10);
 
         workFlowOrders.forEach(workFlowOrder-> {
             System.out.println("ORDER-PROCESSNAME:" + workFlowOrder.getProcessName());
@@ -69,7 +69,7 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
     @Test
     public void testQueryHistoryOrder() {
         final WorkFlowService workFlowService = this.getServiceObject();
-        final List<WorkFlowHistoryOrder> workFlowOrders = workFlowService.queryHistoryOrder(1000156l, 1);
+        final List<WorkFlowHistoryOrder> workFlowOrders = workFlowService.queryHistoryOrder(1000156l, 1, 10);
 
         workFlowOrders.forEach(workFlowOrder-> {
             System.out.println("ORDER-PROCESSNAME:" + SnakerHelper.getProcessName(workFlowOrder.getProcessId()));
@@ -82,7 +82,7 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
     @Test
     public void testQueryCurrentTask() {
         final WorkFlowService workFlowService = this.getServiceObject();
-        final List<WorkFlowTask> workFlowTasks = workFlowService.queryCurrentTask(17112l, 1);
+        final List<WorkFlowTask> workFlowTasks = workFlowService.queryCurrentTask(17112l, 1, 10);
 
         for (final WorkFlowTask workFlowTask: workFlowTasks) {
             System.out.println("TASK-ID:" + workFlowTask.getId() );

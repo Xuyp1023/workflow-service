@@ -379,7 +379,12 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
 
         if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType) && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
             // 如果是 串行审批 并且未启用金额段 只接受一个 审批操作员, 否则报错
-            final Long operId = Long.valueOf((String)anDefMap.get("approver"));
+            Long operId = null;
+            if (anDefMap.get("approver") instanceof Integer) {
+                operId = Long.valueOf((Integer)anDefMap.get("approver"));
+            } else  if (anDefMap.get("approver") instanceof String) {
+                operId = Long.valueOf((String)anDefMap.get("approver"));
+            }
             BTAssert.notNull(operId, "操作员编号未找到！");
 
             final WorkFlowApprover approver = new WorkFlowApprover();

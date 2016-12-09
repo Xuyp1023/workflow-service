@@ -35,8 +35,6 @@ public class Page<T> {
     private int pageSize = -1;
     //总记录数
     private long totalCount = 0;
-    // 总数 XXX 兼容性
-    private long total;
     //查询结果集
     private List<T> result;
 
@@ -124,16 +122,6 @@ public class Page<T> {
      */
     public void setTotalCount(final long totalCount) {
         this.totalCount = totalCount;
-        this.total = totalCount;
-    }
-
-
-    public long getTotal() {
-        return total;
-    }
-
-    public void setTotal(final long anTotal) {
-        total = anTotal;
     }
 
     /**
