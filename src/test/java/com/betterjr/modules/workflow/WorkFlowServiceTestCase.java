@@ -13,12 +13,15 @@ import org.junit.Test;
 import org.snaker.engine.IProcessService;
 
 import com.betterjr.modules.BasicServiceTest;
+import com.betterjr.modules.workflow.constants.WorkFlowInput;
 import com.betterjr.modules.workflow.data.WorkFlowBusinessType;
 import com.betterjr.modules.workflow.data.WorkFlowHistoryOrder;
-import com.betterjr.modules.workflow.data.WorkFlowInput;
 import com.betterjr.modules.workflow.data.WorkFlowOrder;
+import com.betterjr.modules.workflow.data.WorkFlowTask;
+import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
 import com.betterjr.modules.workflow.service.WorkFlowService;
 import com.betterjr.modules.workflow.snaker.core.BetterSpringSnakerEngine;
+import com.betterjr.modules.workflow.snaker.util.SnakerHelper;
 
 /**
  * @author liuwl
@@ -45,16 +48,18 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
         flowInput.setCoreCustNo(102200336l);
         flowInput.setSupplierCustNo(102202021l);
 
-        workFlowService.saveStart(flowInput);
+        final WorkFlowBusiness workFlowBusiness = workFlowService.saveStart(flowInput);
+
+        System.out.println("到此" + workFlowBusiness);
     }
 
     @Test
     public void testQueryCurrentOrder() {
         final WorkFlowService workFlowService = this.getServiceObject();
-        final List<WorkFlowOrder> workFlowOrders = workFlowService.queryCurrentOrder(17108l, 1);
+        final List<WorkFlowOrder> workFlowOrders = workFlowService.queryCurrentOrder(17108l, 1, 10);
 
         workFlowOrders.forEach(workFlowOrder-> {
-            System.out.println("ORDER-PROCESSNAME:" + workFlowOrder.getOrder().getParentNodeName());
+            System.out.println("ORDER-PROCESSNAME:" + workFlowOrder.getProcessName());
             System.out.println("NAME:" + workFlowOrder.getWorkFlowBase().getName());
             System.out.println("PROCESSID:" + workFlowOrder.getWorkFlowBase().getProcessId());
             System.out.println("BUSINESSID:" + workFlowOrder.getWorkFlowBusiness().getBusinessId());
@@ -64,10 +69,10 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
     @Test
     public void testQueryHistoryOrder() {
         final WorkFlowService workFlowService = this.getServiceObject();
-        final List<WorkFlowHistoryOrder> workFlowOrders = workFlowService.queryHistoryOrder(1000156l, 1);
+        final List<WorkFlowHistoryOrder> workFlowOrders = workFlowService.queryHistoryOrder(1000156l, 1, 10);
 
         workFlowOrders.forEach(workFlowOrder-> {
-            System.out.println("ORDER-PROCESSNAME:" + workFlowOrder.getHistoryOrder().getProcessName());
+            System.out.println("ORDER-PROCESSNAME:" + SnakerHelper.getProcessName(workFlowOrder.getProcessId()));
             System.out.println("NAME:" + workFlowOrder.getWorkFlowBase().getName());
             System.out.println("PROCESSID:" + workFlowOrder.getWorkFlowBase().getProcessId());
             System.out.println("BUSINESSID:" + workFlowOrder.getWorkFlowBusiness().getBusinessId());
@@ -77,8 +82,18 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
     @Test
     public void testQueryCurrentTask() {
         final WorkFlowService workFlowService = this.getServiceObject();
+        final List<WorkFlowTask> workFlowTasks = workFlowService.queryCurrentTask(17112l, 1, 10);
 
-        workFlowService.queryCurrentTask(300l, 1);
+        for (final WorkFlowTask workFlowTask: workFlowTasks) {
+            System.out.println("TASK-ID:" + workFlowTask.getId() );
+            System.out.println("TASK-PROCESSNAME:" + workFlowTask.getProcessName());
+            System.out.println("NAME:" + workFlowTask.getWorkFlowStep().getName());
+            System.out.println("FORM:" + workFlowTask.getWorkFlowNode().getForm());
+            System.out.println("HANDLER:" + workFlowTask.getWorkFlowNode().getHandler());
+            System.out.println("NICKNAME:" + workFlowTask.getWorkFlowStep().getNickname());
+            System.out.println("PROCESSID:" + workFlowTask.getWorkFlowBase().getProcessId());
+            System.out.println("BUSINESSID:" + workFlowTask.getWorkFlowBusiness().getBusinessId());
+        }
     }
 
     @Test

@@ -7,48 +7,192 @@
 // ============================================================================
 package com.betterjr.modules.workflow.dubbo;
 
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.mapper.JsonMapper;
+import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.common.utils.UserUtils;
+import com.betterjr.common.web.AjaxObject;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.workflow.IWorkFlowService;
+import com.betterjr.modules.workflow.constants.WorkFlowInput;
+import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
+import com.betterjr.modules.workflow.service.WorkFlowService;
 
 /**
- * @author liuwl
- * 流程服务
+ * @author liuwl 流程服务
  */
+@Service(interfaceClass = IWorkFlowService.class)
 public class WorkFlowDubboService implements IWorkFlowService {
+    private static final Logger logger = LoggerFactory.getLogger(WorkFlowDubboService.class);
 
-    /* (non-Javadoc)
-     * @see com.betterjr.modules.workflow.IWorkFlowService#webStart()
-     */
+    @Inject
+    private WorkFlowService workFlowService;
+
+    // 启动流程
     @Override
-    public void webStart() {
-        // TODO Auto-generated method stub
+    public WorkFlowBusiness startWorkFlow(final WorkFlowInput workFlowInput) {
 
+        return workFlowService.saveStart(workFlowInput);
+    }
+
+    // 待办任务
+    @Override
+    public String webQueryCurrentTask(final int anPageNo, final int anPageSize) {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        BTAssert.notNull(operator, "不能获取当前登陆用户！");
+        final Long operId = operator.getId();
+        return AjaxObject.newOkWithPage("查询待办任务成功", workFlowService.queryCurrentTask(operId, anPageNo, anPageSize)).toJson();
+    }
+
+    // 已办任务
+    @Override
+    public String webQueryHistoryTask(final int anPageNo, final int anPageSize) {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        BTAssert.notNull(operator, "不能获取当前登陆用户！");
+        final Long operId = operator.getId();
+        return AjaxObject.newOkWithPage("查询已办任务成功", workFlowService.queryHistoryTask(operId, anPageNo, anPageSize)).toJson();
+    }
+
+    // 加载节点
+    @Override
+    public String webFindTask(final String anTaskId) {
+        return "";
+    }
+
+    // 审批通过
+    @Override
+    public String webPassWorkFlow(final String anTaskId, final Map<String, Object> anParam) {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        BTAssert.notNull(operator, "不能获取当前登陆用户！");
+
+        final int result = Integer.valueOf((String) anParam.get("result"));
+        BTAssert.isTrue(result == 0, "审批类型不正确！");
+
+        final Long operId = operator.getId();
+        final String data = (String) anParam.get("data");
+        final Map<String, Object> param = JsonMapper.parserJson(data);
+        final String content = (String) anParam.get("content");
+
+        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
+        flowInput.setOperName(operator.getName());
+        flowInput.setContent(content);
+
+        flowInput.addParam("INPUT", param);
+        return AjaxObject.newOk("审批通过成功！", workFlowService.savePassTask(flowInput)).toJson();
+    }
+
+    // 审批驳回
+    @Override
+    public String webRejectWorkFlow(final String anTaskId, final Map<String, Object> anParam) {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        BTAssert.notNull(operator, "不能获取当前登陆用户！");
+
+        final int result = Integer.valueOf((String) anParam.get("result"));
+        BTAssert.isTrue(result == 1, "审批类型不正确！");
+
+        final String rejectNode = (String) anParam.get("rejectNode");
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(rejectNode), "驳回节点不允许为空！");
+
+        final Long operId = operator.getId();
+        final String data = (String) anParam.get("data");
+        final Map<String, Object> param = JsonMapper.parserJson(data);
+        final String content = (String) anParam.get("content");
+
+        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId, rejectNode);
+        flowInput.setOperName(operator.getName());
+        flowInput.setContent(content);
+
+        flowInput.addParam("INPUT", param);
+        return AjaxObject.newOk("审批驳回成功！", workFlowService.saveRejectTask(flowInput)).toJson();
+    }
+
+    // 经办提交
+    @Override
+    public String webHandleWorkFlow(final String anTaskId, final Map<String, Object> anParam) {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        BTAssert.notNull(operator, "不能获取当前登陆用户！");
+
+        final int result = Integer.valueOf((String) anParam.get("result"));
+        BTAssert.isTrue(result == 2, "审批类型不正确！");
+
+        final Long operId = operator.getId();
+        final String data = (String) anParam.get("data");
+        final Map<String, Object> param = JsonMapper.parserJson(data);
+        final String content = (String) anParam.get("content");
+
+        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
+        flowInput.setOperName(operator.getName());
+        flowInput.setContent(content);
+
+        flowInput.addParam("INPUT", param);
+        return AjaxObject.newOk("任务办理成功！", workFlowService.saveHandleTask(flowInput)).toJson();
     }
 
     /* (non-Javadoc)
-     * @see com.betterjr.modules.workflow.IWorkFlowService#webQueryCurrentUserHistoryWorkTask()
+     * @see com.betterjr.modules.workflow.IWorkFlowService#webSaveWorkFlow(java.lang.String, java.util.Map)
      */
     @Override
-    public void webQueryCurrentUserHistoryWorkTask() {
-        // TODO Auto-generated method stub
+    public String webSaveWorkFlow(final String anTaskId, final Map<String, Object> anParam) {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        BTAssert.notNull(operator, "不能获取当前登陆用户！");
 
+        final Long operId = operator.getId();
+        final String data = (String) anParam.get("data");
+        final Map<String, Object> param = JsonMapper.parserJson(data);
+        final String content = (String) anParam.get("content");
+
+        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
+        flowInput.setOperName(operator.getName());
+        flowInput.setContent(content);
+
+        flowInput.addParam("INPUT", param);
+
+        workFlowService.saveDataTask(flowInput);
+        return AjaxObject.newOk("经办数据保存成功！").toJson();
     }
 
-    /* (non-Javadoc)
-     * @see com.betterjr.modules.workflow.IWorkFlowService#webQueryCurrentUserWorkTask()
-     */
+
+    // 作废提交
     @Override
-    public void webQueryCurrentUserWorkTask() {
-        // TODO Auto-generated method stub
+    public String webCancelWorkFlow(final String anTaskId, final Map<String, Object> anParam) {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        BTAssert.notNull(operator, "不能获取当前登陆用户！");
 
+        final int result = Integer.valueOf((String) anParam.get("result"));
+        BTAssert.isTrue(result == 2, "审批类型不正确！");
+
+        final Long operId = operator.getId();
+        final String data = (String) anParam.get("data");
+        final Map<String, Object> param = JsonMapper.parserJson(data);
+        final String content = (String) anParam.get("content");
+
+        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
+        flowInput.setOperName(operator.getName());
+        flowInput.setContent(content);
+
+        flowInput.addParam("INPUT", param);
+        return AjaxObject.newOk("作废流程成功！", workFlowService.saveCancelProcess(flowInput)).toJson();
     }
 
-    /* (non-Javadoc)
-     * @see com.betterjr.modules.workflow.IWorkFlowService#webQueryCurrentWorkTask()
-     */
+    // 审批记录
     @Override
-    public void webQueryCurrentWorkTask() {
-        // TODO Auto-generated method stub
-
+    public String webQueryAudit(final String anTaskId, final int anFlag, final int anPageNum, final int anPageSize) {
+        return AjaxObject.newOkWithPage("审批记录查询成功！", workFlowService.queryWorkFlowAudit(anTaskId, anFlag, anPageNum, anPageSize)).toJson();
     }
+
+    // 查询当前可驳回节点列表 第一项为上一步
+    @Override
+    public String webQueryRejectNode(final String anTaskId) {
+        return AjaxObject.newOk("驳回节点列表查询成功！", workFlowService.queryRejectNodeList(anTaskId)).toJson();
+    }
+
 
 }

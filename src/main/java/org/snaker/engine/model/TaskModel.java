@@ -25,6 +25,10 @@ import org.snaker.engine.helper.ClassHelper;
 import org.snaker.engine.helper.StringHelper;
 import org.snaker.engine.scheduling.JobCallback;
 
+import com.betterjr.modules.workflow.entity.WorkFlowBase;
+import com.betterjr.modules.workflow.entity.WorkFlowNode;
+import com.betterjr.modules.workflow.entity.WorkFlowStep;
+
 /**
  * 任务定义task元素
  *
@@ -52,6 +56,37 @@ public class TaskModel extends WorkModel {
      * 类型：协办任务
      */
     public static final String TASKTYPE_AIDANT = "Aidant";
+
+    /**
+     * 与 流程定义绑定
+     */
+    private WorkFlowBase workFlowBase;
+    private WorkFlowNode workFlowNode;
+    private WorkFlowStep workFlowStep;
+
+    public WorkFlowBase getWorkFlowBase() {
+        return workFlowBase;
+    }
+
+    public void setWorkFlowBase(final WorkFlowBase anWorkFlowBase) {
+        workFlowBase = anWorkFlowBase;
+    }
+
+    public WorkFlowNode getWorkFlowNode() {
+        return workFlowNode;
+    }
+
+    public void setWorkFlowNode(final WorkFlowNode anWorkFlowNode) {
+        workFlowNode = anWorkFlowNode;
+    }
+
+    public WorkFlowStep getWorkFlowStep() {
+        return workFlowStep;
+    }
+
+    public void setWorkFlowStep(final WorkFlowStep anWorkFlowStep) {
+        workFlowStep = anWorkFlowStep;
+    }
 
     /**
      * 参与类型

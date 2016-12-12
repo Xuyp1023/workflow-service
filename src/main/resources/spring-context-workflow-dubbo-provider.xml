@@ -181,13 +181,15 @@
 	<aop:config>
 		<aop:pointcut id="appService"
 			expression="execution(* com.betterjr..service.*Service.*(..)) 
-			or execution(* com.betterjr..dubbo.*Service.*(..))" />
+			or execution(* com.betterjr..dubbo.*Service.*(..))
+			or execution(* com.betterjr.modules.workflow.handlers..*Handler.*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="appService" />
 	</aop:config>
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<tx:method name="save*" propagation="REQUIRED" />
 			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="process" propagation="REQUIRED" />
 			<tx:method name="query*" read-only="true" />
 			<tx:method name="find*" read-only="true" />
 			<tx:method name="*" propagation="REQUIRED" />

@@ -26,7 +26,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.modules.workflow.constant.WorkFlowConstants;
+import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowMoneyMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
 import com.betterjr.modules.workflow.entity.WorkFlowMoney;

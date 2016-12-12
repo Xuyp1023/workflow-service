@@ -172,14 +172,14 @@
             expression="execution(* com.betterjr..service.*Service.*(..)) 
             or execution(* org.snaker.engine.core..*.*(..))
             or execution(* com.betterjr..job.*Job.*(..))
-            or execution(* com.betterjr..handler.*HandlerService.*(..))" />
+            or execution(* com.betterjr.modules.workflow.handlers.*Handler.*(..))" />
         <aop:advisor advice-ref="txAdvice" pointcut-ref="appService" />
     </aop:config>
     <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>
             <tx:method name="save*" propagation="REQUIRED" />
             <tx:method name="add*" propagation="REQUIRED" />
-            <tx:method name="process*" propagation="REQUIRED" />
+            <tx:method name="process" propagation="REQUIRED" />
             <tx:method name="query*" read-only="true" />
             <tx:method name="find*" read-only="true" />
             <tx:method name="*" propagation="REQUIRED" />

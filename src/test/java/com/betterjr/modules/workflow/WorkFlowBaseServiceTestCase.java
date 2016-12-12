@@ -10,7 +10,7 @@ package com.betterjr.modules.workflow;
 import org.junit.Test;
 
 import com.betterjr.modules.BasicServiceTest;
-import com.betterjr.modules.workflow.constant.WorkFlowConstants;
+import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
 import com.betterjr.modules.workflow.service.WorkFlowBaseService;
 
