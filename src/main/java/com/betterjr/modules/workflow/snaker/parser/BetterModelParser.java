@@ -303,9 +303,11 @@ public class BetterModelParser {
 
             final DecisionModel decisionModel = new DecisionModel(); // 进
             anPrevStep.setTarget(decisionModel);
+            decisionModel.setInputs(Collections.singletonList(anPrevStep));
 
             final JoinModel joinModel = new JoinModel(); // 出
             final List<TransitionModel> decisionOutputs = new ArrayList<>();
+            final List<TransitionModel> joinInputs = new ArrayList<>();
 
             anStepNodeList.add(decisionModel);
             for (int i = 0; i < flowApprovers.size(); i++) {
@@ -340,13 +342,16 @@ public class BetterModelParser {
                 final TransitionModel exitTrans = new TransitionModel();
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
                 exitTrans.setSource(taskModel);
+                joinInputs.add(exitTrans);
 
                 anStepNodeList.add(taskModel);
                 exitTrans.setTarget(joinModel);
             }
-
+            decisionModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-decision");
             decisionModel.setOutputs(decisionOutputs);
             final TransitionModel nextStep = new TransitionModel();
+            joinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-join");
+            joinModel.setInputs(joinInputs);
             joinModel.setOutputs(Collections.singletonList(nextStep));
             nextStep.setSource(joinModel);
             anStepNodeList.add(joinModel);
@@ -357,11 +362,14 @@ public class BetterModelParser {
             BTAssert.isTrue(flowApprovers.size() > 1, "此节点至少2位审批人");
             final ForkModel forkModel = new ForkModel();
             anPrevStep.setTarget(forkModel);
+            forkModel.setInputs(Collections.singletonList(anPrevStep));
 
             final ExtJoinModel joinModel = new ExtJoinModel();
             anStepNodeList.add(forkModel);
 
             final List<TransitionModel> forkOutputs = new ArrayList<>();
+            final List<TransitionModel> joinInputs = new ArrayList<>();
+
             for (int i = 0; i < flowApprovers.size(); i++) {
                 final WorkFlowApprover workFlowApprover = flowApprovers.get(i);
 
@@ -385,14 +393,19 @@ public class BetterModelParser {
 
                 final TransitionModel exitTrans = new TransitionModel();
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
+                joinInputs.add(exitTrans);
                 exitTrans.setSource(taskModel);
                 anStepNodeList.add(taskModel);
 
                 exitTrans.setTarget(joinModel);
             }
             forkModel.setOutputs(forkOutputs);
+            forkModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-fork");
             final TransitionModel nextStep = new TransitionModel();
+            joinModel.setInputs(joinInputs);
             joinModel.setOutputs(Collections.singletonList(nextStep));
+            joinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-join");
+
             nextStep.setSource(joinModel);
             anStepNodeList.add(joinModel);
 
@@ -402,7 +415,11 @@ public class BetterModelParser {
             // 先按moneyId 分组
             final DecisionModel decisionModel = new DecisionModel();
             anPrevStep.setTarget(decisionModel);
+            decisionModel.setInputs(Collections.singletonList(anPrevStep));
+
             final List<TransitionModel> decisionOutputs = new ArrayList<>();
+            final List<TransitionModel> decisionJoinInputs = new ArrayList<>();
+
             final JoinModel decisionJoinModel = new JoinModel();
 
             anStepNodeList.add(decisionModel);
@@ -423,10 +440,12 @@ public class BetterModelParser {
                 final ForkModel forkModel = new ForkModel();
 
                 decisionEnterTrans.setTarget(forkModel);
+                forkModel.setInputs(Collections.singletonList(decisionEnterTrans));
                 decisionOutputs.add(decisionEnterTrans);
 
                 final ExtJoinModel joinModel = new ExtJoinModel();
                 final List<TransitionModel> forkOutputs = new ArrayList<>();
+                final List<TransitionModel> joinInputs = new ArrayList<>();
                 anStepNodeList.add(forkModel);
                 // 当前段中所有节点
                 for (int j = 0; i < flowApprovers.size(); j++) {
@@ -454,23 +473,32 @@ public class BetterModelParser {
                         final TransitionModel exitTrans = new TransitionModel();
                         taskModel.setOutputs(Collections.singletonList(exitTrans));
                         exitTrans.setSource(taskModel);
+                        joinInputs.add(exitTrans);
                         anStepNodeList.add(taskModel);
 
                         exitTrans.setTarget(joinModel);
                     }
                 }
 
+                forkModel.setOutputs(forkOutputs);
+                forkModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-fork");
                 final TransitionModel decisionExitTrans = new TransitionModel();
                 joinModel.setOutputs(Collections.singletonList(decisionExitTrans));
+                joinModel.setInputs(joinInputs);
+                joinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-join");
                 decisionExitTrans.setSource(joinModel);
+                decisionJoinInputs.add(decisionExitTrans);
                 anStepNodeList.add(joinModel);
 
                 decisionExitTrans.setTarget(decisionJoinModel);
             }
 
             decisionModel.setOutputs(decisionOutputs);
+            decisionModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-decision");
             final TransitionModel nextStep = new TransitionModel();
             decisionJoinModel.setOutputs(Collections.singletonList(nextStep));
+            decisionJoinModel.setInputs(decisionJoinInputs);
+            decisionJoinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-decisionJoin");
             nextStep.setSource(decisionJoinModel);
             anStepNodeList.add(decisionJoinModel);
 

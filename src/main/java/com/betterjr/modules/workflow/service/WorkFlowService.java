@@ -354,7 +354,6 @@ public class WorkFlowService {
                 BetterStringUtils.equals(workFlowBase.getIsSubprocess(), "1") ? order.getParentId() : task.getOrderId());
         BTAssert.notNull(workFlowBusiness, "没有找到业务记录！");
 
-
         final String handlerName = workFlowNode.getHandler();
         if (BetterStringUtils.isNotBlank(handlerName)) {
             final INodeHandler handler = SpringContextHolder.getBean(handlerName);
