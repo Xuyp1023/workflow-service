@@ -47,6 +47,7 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
         flowInput.setFactorCustNo(102202019l);
         flowInput.setCoreCustNo(102200336l);
         flowInput.setSupplierCustNo(102202021l);
+        flowInput.addParam("request_amount", 6000);
 
         final WorkFlowBusiness workFlowBusiness = workFlowService.saveStart(flowInput);
 
