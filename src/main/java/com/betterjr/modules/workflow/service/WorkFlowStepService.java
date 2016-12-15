@@ -400,7 +400,12 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
 
             for (final Map<String, Object> tempApprover : approvers) {
                 final Long moneyId = Long.valueOf((Integer)tempApprover.get("moneyId"));
-                final Long operId = Long.valueOf((String)tempApprover.get("operId")); // 允许为空，为空为所有人
+                Long operId = null; // 允许为空，为空为所有人
+                if (tempApprover.get("operId") instanceof Integer) {
+                    operId = Long.valueOf((Integer)tempApprover.get("operId"));
+                } else  if (tempApprover.get("operId") instanceof String) {
+                    operId = Long.valueOf((String)tempApprover.get("operId"));
+                }
                 checkWorkFlowMoney(moneyId, workFlowMoneys); // 检查moneyId 是否在当前流程定义金额段内
 
                 final WorkFlowApprover approver = new WorkFlowApprover();
@@ -415,9 +420,18 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
             final List<Map<String, Object>> approvers = (List<Map<String, Object>>) anDefMap.get("approver");
 
             for (final Map<String, Object> tempApprover : approvers) {
-                final Long operId = Long.valueOf((String)tempApprover.get("operId"));
-                final Integer weight = Integer.valueOf((String)tempApprover.get("weight"));
-
+                Long operId = null; // 允许为空，为空为所有人
+                if (tempApprover.get("operId") instanceof Integer) {
+                    operId = Long.valueOf((Integer)tempApprover.get("operId"));
+                } else  if (tempApprover.get("operId") instanceof String) {
+                    operId = Long.valueOf((String)tempApprover.get("operId"));
+                }
+                Integer weight = null;
+                if (tempApprover.get("weight") instanceof Integer) {
+                    weight = (Integer)tempApprover.get("weight");
+                } else  if (tempApprover.get("weight") instanceof String) {
+                    weight = Integer.valueOf((String)tempApprover.get("weight"));
+                }
                 final WorkFlowApprover approver = new WorkFlowApprover();
                 approver.setOperId(operId);
                 approver.setWeight(weight);
@@ -437,8 +451,18 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
                 final List<Map<String, Object>> opers = (List<Map<String, Object>>) tempApprover.get("opers");
 
                 for (final Map<String, Object> oper : opers) {
-                    final Long operId = Long.valueOf((String)oper.get("operId"));
-                    final Integer weight = Integer.valueOf((String)oper.get("weight"));
+                    Long operId = null; // 允许为空，为空为所有人
+                    if (oper.get("operId") instanceof Integer) {
+                        operId = Long.valueOf((Integer)oper.get("operId"));
+                    } else  if (oper.get("operId") instanceof String) {
+                        operId = Long.valueOf((String)oper.get("operId"));
+                    }
+                    Integer weight = null;
+                    if (oper.get("weight") instanceof Integer) {
+                        weight = (Integer)oper.get("weight");
+                    } else  if (oper.get("weight") instanceof String) {
+                        weight = Integer.valueOf((String)oper.get("weight"));
+                    }
 
                     final WorkFlowApprover approver = new WorkFlowApprover();
                     approver.setMoneyId(moneyId);

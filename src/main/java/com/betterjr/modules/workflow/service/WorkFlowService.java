@@ -192,10 +192,12 @@ public class WorkFlowService {
         BTAssert.notNull(workFlowBusiness, "没有找到业务记录！");
 
         final String handlerName = workFlowNode.getHandler();
+        Map<String, Object> result = null;
         if (BetterStringUtils.isNotBlank(handlerName)) {
             final INodeHandler handler = SpringContextHolder.getBean(handlerName);
             if (handler != null) {
                 handler.processPass(param);
+                result = (Map<String, Object>) param.get("result");
             }
         }
 
@@ -219,7 +221,7 @@ public class WorkFlowService {
         workFlowAudit.setAuditResult("0"); //通过
         workFlowAuditService.addWorkFlowAudit(workFlowAudit);
 
-        engine.executeTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
+        engine.executeTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId), result);
 
         return workFlowAudit;
     }
@@ -264,10 +266,12 @@ public class WorkFlowService {
         BTAssert.notNull(workFlowBusiness, "没有找到业务记录！");
 
         final String handlerName = workFlowNode.getHandler();
+        Map<String, Object> result = null;
         if (BetterStringUtils.isNotBlank(handlerName)) {
             final INodeHandler handler = SpringContextHolder.getBean(handlerName);
             if (handler != null) {
                 handler.processReject(param);
+                result = (Map<String, Object>) param.get("result");
             }
         }
 
@@ -291,7 +295,7 @@ public class WorkFlowService {
         workFlowAudit.setAuditResult("1"); //驳回
         workFlowAuditService.addWorkFlowAudit(workFlowAudit);
 
-        engine.executeAndJumpTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId), null, rejectNode);
+        engine.executeAndJumpTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId), result, rejectNode);
 
         return workFlowAudit;
     }
@@ -406,10 +410,12 @@ public class WorkFlowService {
 
 
         final String handlerName = workFlowNode.getHandler();
+        Map<String, Object> result = null;
         if (BetterStringUtils.isNotBlank(handlerName)) {
             final INodeHandler handler = SpringContextHolder.getBean(handlerName);
             if (handler != null) {
                 handler.processHandle(param);
+                result = (Map<String, Object>) param.get("result");
             }
         }
 
@@ -429,7 +435,7 @@ public class WorkFlowService {
         workFlowAudit.setAuditResult("2"); //经办
         workFlowAuditService.addWorkFlowAudit(workFlowAudit);
 
-        engine.executeTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
+        engine.executeTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId), result);
 
         return workFlowAudit;
     }
