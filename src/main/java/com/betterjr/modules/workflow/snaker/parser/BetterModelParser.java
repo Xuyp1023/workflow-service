@@ -448,7 +448,7 @@ public class BetterModelParser {
                 final List<TransitionModel> joinInputs = new ArrayList<>();
                 anStepNodeList.add(forkModel);
                 // 当前段中所有节点
-                for (int j = 0; i < flowApprovers.size(); j++) {
+                for (int j = 0; j < flowApprovers.size(); j++) {
                     final WorkFlowApprover flowApprover = flowApprovers.get(j);
 
                     if (workFlowMoney.getId().equals(flowApprover.getMoneyId())) {
@@ -465,7 +465,7 @@ public class BetterModelParser {
                         taskModel.setWorkFlowNode(anWorkFlowNode);
                         taskModel.setWorkFlowStep(anWorkFlowStep);
 
-                        taskModel.setAssignee(String.valueOf(flowApprover.getOperId()));
+                        taskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowApprover.getOperId()));
 
                         enterTrans.setTarget(taskModel);
                         forkOutputs.add(enterTrans);
