@@ -43,7 +43,7 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
     public void testStartWorkFlow() {
         final WorkFlowService workFlowService = this.getServiceObject();
 
-        final WorkFlowInput flowInput = new WorkFlowInput(1000156l, "资金方票据融资业务流程", 102202019l, 1001l, WorkFlowBusinessType.SUPPLIER_BILL_FINANCING);
+        final WorkFlowInput flowInput = new WorkFlowInput(1000156l, "资金方票据融资业务流程", 102202019l, "1001l", WorkFlowBusinessType.SUPPLIER_BILL_FINANCING);
         flowInput.setFactorCustNo(102202019l);
         flowInput.setCoreCustNo(102200336l);
         flowInput.setSupplierCustNo(102202021l);
