@@ -43,15 +43,27 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
     public void testStartWorkFlow() {
         final WorkFlowService workFlowService = this.getServiceObject();
 
-        final WorkFlowInput flowInput = new WorkFlowInput(1000156l, "资金方票据融资业务流程", 102202019l, "1001", WorkFlowBusinessType.SUPPLIER_BILL_FINANCING);
+        final WorkFlowInput flowInput = new WorkFlowInput(1000157l, "资金方票据融资业务流程", 102202019l, "1001", WorkFlowBusinessType.SUPPLIER_BILL_FINANCING);
         flowInput.setFactorCustNo(102202019l);
         flowInput.setCoreCustNo(102200336l);
         flowInput.setSupplierCustNo(102202021l);
-        flowInput.addParam("request_amount", 120000);
+        flowInput.addParam("request_amount", 60000);
 
         final WorkFlowBusiness workFlowBusiness = workFlowService.saveStart(flowInput);
 
         System.out.println("到此" + workFlowBusiness);
+    }
+
+    @Test
+    public void testQueryWorkItem() {
+        final WorkFlowService workFlowService = this.getServiceObject();
+        workFlowService.queryWorkItem(17108l, 1, 10, null);
+    }
+
+    @Test
+    public void testQueryHistoryWorkItem() {
+        final WorkFlowService workFlowService = this.getServiceObject();
+        workFlowService.queryHistoryWorkItem(17108l, 1, 10, null);
     }
 
     @Test
@@ -83,7 +95,7 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
     @Test
     public void testQueryCurrentTask() {
         final WorkFlowService workFlowService = this.getServiceObject();
-        final List<WorkFlowTask> workFlowTasks = workFlowService.queryCurrentTask(17112l, 1, 10);
+        final List<WorkFlowTask> workFlowTasks = workFlowService.queryCurrentTask(17112l, 1, 10, null);
 
         for (final WorkFlowTask workFlowTask: workFlowTasks) {
             System.out.println("TASK-ID:" + workFlowTask.getId() );
