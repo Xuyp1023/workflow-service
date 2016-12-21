@@ -8,7 +8,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.modules.approval.IScfSupplyApprovalService;
 import com.betterjr.modules.workflow.handler.INodeHandler;
 
-@Service("confirmTradingBackgrandHandler")
+@Service("supplyConfirmTradingBackgrandHandler")
 public class ConfirmTradingBackgrand implements INodeHandler  {
 	@Reference(interfaceClass = IScfSupplyApprovalService.class)
     private IScfSupplyApprovalService scfSupplyFlowService;
