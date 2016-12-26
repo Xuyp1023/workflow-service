@@ -61,6 +61,14 @@ public class WorkFlowDubboService implements IWorkFlowService {
         return AjaxObject.newOkWithPage("查询已办任务成功", workFlowService.queryHistoryWorkItem(operId, anPageNo, anPageSize, anParam)).toJson();
     }
 
+    // 监控任务
+    @Override
+    public String webQueryMonitorTask(final long anCustNo, final int anPageNo, final int anPageSize, final Map<String, Object> anParam) {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        BTAssert.notNull(operator, "不能获取当前登陆用户！");
+        return AjaxObject.newOkWithPage("查询监控任务成功", workFlowService.queryMonitorWorkItem(anCustNo, anPageNo, anPageSize, anParam)).toJson();
+    }
+
     // 加载节点
     @Override
     public String webFindTask(final String anTaskId) {
