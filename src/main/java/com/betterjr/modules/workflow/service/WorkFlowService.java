@@ -43,6 +43,7 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.account.dubbo.interfaces.ICustOperatorService;
 import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.customer.ICustMechBaseService;
 import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.workflow.constants.WorkFlowConstants;
@@ -105,7 +106,10 @@ public class WorkFlowService {
         final IQueryService queryService = engine.query();
 
         final CustMechBase custMechBase = custMechBaseService.findBaseInfo(flowInput.getFlowCustNo());
-        BTAssert.notNull(custMechBase, "没有找到启动流程公司！");
+        BTAssert.notNull(custMechBase, "没有找到主流程公司！");
+
+        final CustMechBase initCustMechBase = custMechBaseService.findBaseInfo(flowInput.getStartCustNo());
+        BTAssert.notNull(initCustMechBase, "没有找到启动流程公司！");
 
         final Order order = engine.startInstanceByName(flowInput.getFlowName(), flowInput.getFlowCustNo(), null,
                 WorkFlowConstants.PREFIX_CUST_NO + flowInput.getFlowCustNo(), flowInput.getParam());
@@ -115,6 +119,8 @@ public class WorkFlowService {
         BTAssert.notNull(workFlowBase, "没有找到流程定义！");
 
         final WorkFlowBusiness workFlowBusiness = new WorkFlowBusiness();
+        workFlowBusiness.setCustNo(initCustMechBase.getCustNo());
+        workFlowBusiness.setCustName(initCustMechBase.getCustName());
         workFlowBusiness.setOrderId(order.getId());
         workFlowBusiness.setBaseId(workFlowBase.getId());
         workFlowBusiness.setBusinessId(flowInput.getBusinessId());
@@ -753,8 +759,11 @@ public class WorkFlowService {
             else {
                 workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(workItem.getOrderId());
             }
-            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(workItem, taskModel.getWorkFlowBase(), taskModel.getWorkFlowNode(),
-                    taskModel.getWorkFlowStep(), workFlowBusiness);
+            final String[] actors = queryService.getTaskActorsByTaskId(workItem.getTaskId());
+            final String[] actorNames = processActorNames(actors);
+
+            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(workItem, actors, actorNames, taskModel.getWorkFlowBase(),
+                    taskModel.getWorkFlowNode(), taskModel.getWorkFlowStep(), workFlowBusiness);
             return workFlowWorkItem;
         }).collect(Collectors.toList());
 
@@ -813,8 +822,12 @@ public class WorkFlowService {
             else {
                 workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(workItem.getOrderId());
             }
-            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(workItem, taskModel.getWorkFlowBase(), taskModel.getWorkFlowNode(),
-                    taskModel.getWorkFlowStep(), workFlowBusiness);
+            final String[] actors = new String[1];
+            actors[0] = workItem.getOperator();
+            final String[] actorNames = processActorNames(actors);
+
+            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(workItem, actors, actorNames, taskModel.getWorkFlowBase(),
+                    taskModel.getWorkFlowNode(), taskModel.getWorkFlowStep(), workFlowBusiness);
             return workFlowWorkItem;
         }).collect(Collectors.toList());
 
@@ -991,6 +1004,100 @@ public class WorkFlowService {
         });
 
         return workFlowAudits;
+    }
+
+    /**
+     * 查询已办工作项
+     *
+     * @param anOperId
+     * @param anPageNo
+     * @param anPageSize
+     * @return
+     */
+    public com.betterjr.mapper.pagehelper.Page<WorkFlowWorkItem> queryMonitorWorkItem(final Long anCustNo, final Integer anPageNo,
+            final Integer anPageSize, final Map<String, Object> anParam) {
+        final Page<WorkItem> page = new Page<>();
+        page.setPageNo(anPageNo);
+        page.setPageSize(anPageSize);
+
+        // 获取当前用户拥有的公司
+
+        final ITaskService taskService = engine.task();
+        final IQueryService queryService = engine.query();
+        final IProcessService processService = engine.process();
+
+        final List<Process> processes = processService.getProcesss(new QueryFilter().setCustNo(anCustNo));
+
+        final List<String> processIdList = processes.stream().map(process -> process.getId()).collect(Collectors.toList());
+        final String[] processIds = processIdList.toArray(new String[processIdList.size()]);
+
+        final QueryFilter queryFilter = new QueryFilter().setProcessIds(processIds);
+        if (anParam != null) {
+            final String title = (String) anParam.get("title");
+            final String startDate = (String) anParam.get("GTEauditDate");
+            final String endDate = (String) anParam.get("LTEauditDate");
+
+            if (BetterStringUtils.isNotBlank(title)) {
+                queryFilter.setDisplayName(title);
+            }
+            if (BetterStringUtils.isNotBlank(startDate) && startDate.length() == 8) {
+                queryFilter.setCreateTimeStart(BetterDateUtils.formatDispDate(startDate));
+            }
+            if (BetterStringUtils.isNotBlank(endDate) && endDate.length() == 8) {
+                queryFilter.setCreateTimeEnd(BetterDateUtils.formatDispDate(endDate));
+            }
+        }
+
+        final List<WorkItem> workItems = queryService.getWorkItems(page, queryFilter);
+
+        final List<WorkFlowWorkItem> workFlowWorkItems = workItems.stream().map(workItem -> {
+            final TaskModel taskModel = taskService.getTaskModel(workItem.getTaskId());
+            WorkFlowBusiness workFlowBusiness = null;
+            if (BetterStringUtils.equals(taskModel.getWorkFlowBase().getIsSubprocess(), "1")) {
+                workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(workItem.getParentId());
+            }
+            else {
+                workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(workItem.getOrderId());
+            }
+            final String[] actors = queryService.getTaskActorsByTaskId(workItem.getTaskId());
+            final String[] actorNames = processActorNames(actors);
+
+            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(workItem, actors, actorNames, taskModel.getWorkFlowBase(),
+                    taskModel.getWorkFlowNode(), taskModel.getWorkFlowStep(), workFlowBusiness);
+
+            return workFlowWorkItem;
+        }).collect(Collectors.toList());
+
+        return com.betterjr.mapper.pagehelper.Page.listToPage(workFlowWorkItems, page.getPageNo(), anPageSize,
+                Long.valueOf(page.getTotalPages()).intValue(), page.getPageNo() * anPageSize, page.getTotalCount());
+    }
+
+    /**
+     * @param anActors
+     * @return
+     */
+    private String[] processActorNames(final String[] anActors) {
+        if (anActors == null) {
+            return null;
+        }
+        final String[] actorNames = new String[anActors.length];
+
+        for (int i = 0; i < anActors.length; i++) {
+            if (BetterStringUtils.startsWith(anActors[i], WorkFlowConstants.PREFIX_OPER_ID)) {
+                final Long operId = Long.valueOf(BetterStringUtils.substring(anActors[i], WorkFlowConstants.PREFIX_OPER_ID.length()));
+                final CustOperatorInfo operator = custOperatorService.findCustOperatorById(operId);
+                BTAssert.notNull(operator, "没有找到操作员！");
+                actorNames[i] = operator.getName();
+            } else if (BetterStringUtils.startsWith(anActors[i], WorkFlowConstants.PREFIX_CUST_NO)) {
+                final Long custNo = Long.valueOf(BetterStringUtils.substring(anActors[i], WorkFlowConstants.PREFIX_CUST_NO.length()));
+                final CustMechBase custInfo = custMechBaseService.findBaseInfo(custNo);
+                BTAssert.notNull(custInfo, "没有找到操作员！");
+                actorNames[i] = custInfo.getCustName();
+            } else {
+                throw new BytterException("不能识别的操作员！");
+            }
+        }
+        return actorNames;
     }
 
     /**
