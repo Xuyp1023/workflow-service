@@ -192,8 +192,8 @@ public class WorkFlowDubboService implements IWorkFlowService {
 
     // 审批记录
     @Override
-    public String webQueryAudit(final String anTaskId, final int anFlag, final int anPageNum, final int anPageSize) {
-        return AjaxObject.newOkWithPage("审批记录查询成功！", workFlowService.queryWorkFlowAudit(anTaskId, anFlag, anPageNum, anPageSize)).toJson();
+    public String webQueryAudit(final String anBusinessId, final int anFlag, final int anPageNum, final int anPageSize) {
+        return AjaxObject.newOkWithPage("审批记录查询成功！", workFlowService.queryWorkFlowAudit(anBusinessId, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     // 查询当前可驳回节点列表 第一项为上一步
