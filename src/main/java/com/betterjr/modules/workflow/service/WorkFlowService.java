@@ -455,7 +455,7 @@ public class WorkFlowService {
         final WorkFlowAudit workFlowAudit = new WorkFlowAudit();
         workFlowAudit.setBaseId(anWorkFlowBase.getId());
         workFlowAudit.setNodeId(anWorkFlowNode.getId());
-        workFlowAudit.setStepId(anWorkFlowStep == null ? anWorkFlowStep.getId() : null);
+        workFlowAudit.setStepId(anWorkFlowStep != null ? anWorkFlowStep.getId() : null);
         workFlowAudit.setTaskId(anTask.getId());
         workFlowAudit.setOrderId(anTask.getOrderId());
         workFlowAudit.setOperId(anWorkFlowInput.getOperId());
@@ -764,7 +764,7 @@ public class WorkFlowService {
 
             final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(taskModel.getWorkFlowBase(), taskModel.getWorkFlowNode(),
                     taskModel.getWorkFlowStep(), workFlowBusiness, actors, actorNames);
-            
+
             initWorkFLowWorkItem(workFlowWorkItem, workItem);
             return workFlowWorkItem;
         }).collect(Collectors.toList());
@@ -830,7 +830,7 @@ public class WorkFlowService {
 
             final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(taskModel.getWorkFlowBase(), taskModel.getWorkFlowNode(),
                     taskModel.getWorkFlowStep(), workFlowBusiness, actors, actorNames);
-            
+
             initWorkFLowWorkItem(workFlowWorkItem, workItem);
             return workFlowWorkItem;
         }).collect(Collectors.toList());
@@ -973,25 +973,15 @@ public class WorkFlowService {
      * @param anTaskId
      * @return
      */
-    public com.betterjr.mapper.pagehelper.Page<WorkFlowAudit> queryWorkFlowAudit(final String anTaskId, final int anFlag, final int anPageNum,
+    public com.betterjr.mapper.pagehelper.Page<WorkFlowAudit> queryWorkFlowAudit(final String anBusinessId, final int anFlag, final int anPageNum,
             final int anPageSize) {
-        final IQueryService queryService = engine.query();
-        final IProcessService processService = engine.process();
 
-        final Task task = queryService.getTask(anTaskId);
-        BTAssert.notNull(task, "没有找到相应任务！");
-
-        final Order order = queryService.getOrder(task.getOrderId());
-        BTAssert.notNull(order, "没有找到相应的流程实例！");
-
-        final Process process = processService.getProcessById(order.getProcessId());
-        BTAssert.notNull(process, "没有找到流程定义流程定义！");
-
-        final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseByProcessId(order.getProcessId());
-
-        final WorkFlowBusiness workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(
-                BetterStringUtils.equals(workFlowBase.getIsSubprocess(), "1") ? order.getParentId() : task.getOrderId());
+        final WorkFlowBusiness workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessById(anBusinessId);
         BTAssert.notNull(workFlowBusiness, "没有找到业务记录！");
+
+        final Long baseId = workFlowBusiness.getBaseId();
+        final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseById(baseId);
+        BTAssert.notNull(workFlowBase, "没有找到流程信息！");
 
         final com.betterjr.mapper.pagehelper.Page<WorkFlowAudit> workFlowAudits = workFlowAuditService
                 .queryWorkFlowAuditByBusinessId(workFlowBusiness.getId(), anFlag, anPageNum, anPageSize);
@@ -1068,7 +1058,7 @@ public class WorkFlowService {
 
             final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(taskModel.getWorkFlowBase(), taskModel.getWorkFlowNode(),
                     taskModel.getWorkFlowStep(), workFlowBusiness, actors, actorNames);
-            
+
             initWorkFLowWorkItem(workFlowWorkItem, workItem);
             return workFlowWorkItem;
         }).collect(Collectors.toList());
@@ -1077,7 +1067,7 @@ public class WorkFlowService {
                 Long.valueOf(page.getTotalPages()).intValue(), page.getPageNo() * anPageSize, page.getTotalCount());
     }
 
-    
+
     /**
      * @param anActors
      * @return
@@ -1223,25 +1213,25 @@ public class WorkFlowService {
         }
         return jsonMap;
     }
-    
-    private void initWorkFLowWorkItem(WorkFlowWorkItem workFlowWorkItem, WorkItem workItem) {
-    	workFlowWorkItem.setProcessId(workItem.getProcessId());
-    	workFlowWorkItem.setOrderId(workItem.getOrderId());
-    	workFlowWorkItem.setTaskId(workItem.getTaskId());
-    	workFlowWorkItem.setProcessName(workItem.getProcessName());
-    	workFlowWorkItem.setCreator(workItem.getCreator());
-    	workFlowWorkItem.setOrderCreateTime(workItem.getOrderCreateTime());
-    	workFlowWorkItem.setOrderEndTime(workItem.getOrderEndTime());
-    	workFlowWorkItem.setOrderExpireTime(workItem.getOrderExpireTime());
-    	workFlowWorkItem.setOrderNo(workItem.getOrderNo());
-    	workFlowWorkItem.setTaskName(workItem.getTaskName());
-    	workFlowWorkItem.setTaskKey(workItem.getTaskKey());
-    	workFlowWorkItem.setPerformType(workItem.getPerformType());
-    	workFlowWorkItem.setTaskType(workItem.getTaskType());
-    	workFlowWorkItem.setTaskState(workItem.getTaskState());
-    	workFlowWorkItem.setTaskCreateTime(workItem.getTaskCreateTime());
-    	workFlowWorkItem.setTaskEndTime(workItem.getTaskEndTime());
-    	workFlowWorkItem.setTaskExpireTime(workItem.getTaskExpireTime());
-    	workFlowWorkItem.setOperator(workItem.getOperator());		
-	}
+
+    private void initWorkFLowWorkItem(final WorkFlowWorkItem workFlowWorkItem, final WorkItem workItem) {
+        workFlowWorkItem.setProcessId(workItem.getProcessId());
+        workFlowWorkItem.setOrderId(workItem.getOrderId());
+        workFlowWorkItem.setTaskId(workItem.getTaskId());
+        workFlowWorkItem.setProcessName(workItem.getProcessName());
+        workFlowWorkItem.setCreator(workItem.getCreator());
+        workFlowWorkItem.setOrderCreateTime(workItem.getOrderCreateTime());
+        workFlowWorkItem.setOrderEndTime(workItem.getOrderEndTime());
+        workFlowWorkItem.setOrderExpireTime(workItem.getOrderExpireTime());
+        workFlowWorkItem.setOrderNo(workItem.getOrderNo());
+        workFlowWorkItem.setTaskName(workItem.getTaskName());
+        workFlowWorkItem.setTaskKey(workItem.getTaskKey());
+        workFlowWorkItem.setPerformType(workItem.getPerformType());
+        workFlowWorkItem.setTaskType(workItem.getTaskType());
+        workFlowWorkItem.setTaskState(workItem.getTaskState());
+        workFlowWorkItem.setTaskCreateTime(workItem.getTaskCreateTime());
+        workFlowWorkItem.setTaskEndTime(workItem.getTaskEndTime());
+        workFlowWorkItem.setTaskExpireTime(workItem.getTaskExpireTime());
+        workFlowWorkItem.setOperator(workItem.getOperator());
+    }
 }
