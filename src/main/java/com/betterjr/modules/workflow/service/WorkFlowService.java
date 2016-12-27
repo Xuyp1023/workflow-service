@@ -762,8 +762,10 @@ public class WorkFlowService {
             final String[] actors = queryService.getTaskActorsByTaskId(workItem.getTaskId());
             final String[] actorNames = processActorNames(actors);
 
-            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(workItem, actors, actorNames, taskModel.getWorkFlowBase(),
-                    taskModel.getWorkFlowNode(), taskModel.getWorkFlowStep(), workFlowBusiness);
+            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(taskModel.getWorkFlowBase(), taskModel.getWorkFlowNode(),
+                    taskModel.getWorkFlowStep(), workFlowBusiness, actors, actorNames);
+            
+            initWorkFLowWorkItem(workFlowWorkItem, workItem);
             return workFlowWorkItem;
         }).collect(Collectors.toList());
 
@@ -826,8 +828,10 @@ public class WorkFlowService {
             actors[0] = workItem.getOperator();
             final String[] actorNames = processActorNames(actors);
 
-            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(workItem, actors, actorNames, taskModel.getWorkFlowBase(),
-                    taskModel.getWorkFlowNode(), taskModel.getWorkFlowStep(), workFlowBusiness);
+            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(taskModel.getWorkFlowBase(), taskModel.getWorkFlowNode(),
+                    taskModel.getWorkFlowStep(), workFlowBusiness, actors, actorNames);
+            
+            initWorkFLowWorkItem(workFlowWorkItem, workItem);
             return workFlowWorkItem;
         }).collect(Collectors.toList());
 
@@ -1062,9 +1066,10 @@ public class WorkFlowService {
             final String[] actors = queryService.getTaskActorsByTaskId(workItem.getTaskId());
             final String[] actorNames = processActorNames(actors);
 
-            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(workItem, actors, actorNames, taskModel.getWorkFlowBase(),
-                    taskModel.getWorkFlowNode(), taskModel.getWorkFlowStep(), workFlowBusiness);
-
+            final WorkFlowWorkItem workFlowWorkItem = new WorkFlowWorkItem(taskModel.getWorkFlowBase(), taskModel.getWorkFlowNode(),
+                    taskModel.getWorkFlowStep(), workFlowBusiness, actors, actorNames);
+            
+            initWorkFLowWorkItem(workFlowWorkItem, workItem);
             return workFlowWorkItem;
         }).collect(Collectors.toList());
 
@@ -1072,6 +1077,7 @@ public class WorkFlowService {
                 Long.valueOf(page.getTotalPages()).intValue(), page.getPageNo() * anPageSize, page.getTotalCount());
     }
 
+    
     /**
      * @param anActors
      * @return
@@ -1217,4 +1223,25 @@ public class WorkFlowService {
         }
         return jsonMap;
     }
+    
+    private void initWorkFLowWorkItem(WorkFlowWorkItem workFlowWorkItem, WorkItem workItem) {
+    	workFlowWorkItem.setProcessId(workItem.getProcessId());
+    	workFlowWorkItem.setOrderId(workItem.getOrderId());
+    	workFlowWorkItem.setTaskId(workItem.getTaskId());
+    	workFlowWorkItem.setProcessName(workItem.getProcessName());
+    	workFlowWorkItem.setCreator(workItem.getCreator());
+    	workFlowWorkItem.setOrderCreateTime(workItem.getOrderCreateTime());
+    	workFlowWorkItem.setOrderEndTime(workItem.getOrderEndTime());
+    	workFlowWorkItem.setOrderExpireTime(workItem.getOrderExpireTime());
+    	workFlowWorkItem.setOrderNo(workItem.getOrderNo());
+    	workFlowWorkItem.setTaskName(workItem.getTaskName());
+    	workFlowWorkItem.setTaskKey(workItem.getTaskKey());
+    	workFlowWorkItem.setPerformType(workItem.getPerformType());
+    	workFlowWorkItem.setTaskType(workItem.getTaskType());
+    	workFlowWorkItem.setTaskState(workItem.getTaskState());
+    	workFlowWorkItem.setTaskCreateTime(workItem.getTaskCreateTime());
+    	workFlowWorkItem.setTaskEndTime(workItem.getTaskEndTime());
+    	workFlowWorkItem.setTaskExpireTime(workItem.getTaskExpireTime());
+    	workFlowWorkItem.setOperator(workItem.getOperator());		
+	}
 }
