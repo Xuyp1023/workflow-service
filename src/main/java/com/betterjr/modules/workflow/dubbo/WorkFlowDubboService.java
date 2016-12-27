@@ -204,8 +204,12 @@ public class WorkFlowDubboService implements IWorkFlowService {
 
     // 查询流程layout json数据
     @Override
-    public String webFindWorkFlowJson(final String anOrderId) {
-        return AjaxObject.newOk(workFlowService.findWorkFlowJson(anOrderId)).toJson();
+    public String webFindWorkFlowJson(final String anProcessId, final String anOrderId) {
+        return AjaxObject.newOk(workFlowService.findWorkFlowJson(anProcessId, anOrderId)).toJson();
     }
 
+    @Override
+    public String webChangeApprover(final String anTaskId, final Long anOperId) {
+        return AjaxObject.newOk("分配操作员成功！", workFlowService.saveChangeApprover(anTaskId, anOperId)).toJson();
+    }
 }

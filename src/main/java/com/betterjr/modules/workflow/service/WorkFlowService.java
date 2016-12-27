@@ -1143,22 +1143,62 @@ public class WorkFlowService {
     }
 
     // 修改指定流程节点任务的执行人
-    public void saveChangeApprover() {
+    public Task saveChangeApprover(final String anTaskId, final Long anOperId) {
+        // 当前用户是否
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(anTaskId), "任务编号不允许为空！");
+        BTAssert.notNull(anOperId, "操作员编号不允许为空！");
 
+        final ITaskService taskService = engine.task();
+        final IQueryService queryService = engine.query();
+        final IProcessService processService = engine.process();
+
+        final Task task = queryService.getTask(anTaskId);
+        BTAssert.notNull(task, "没有找到指定任务！");
+
+        final Order order = queryService.getOrder(task.getOrderId());
+        BTAssert.notNull(order, "没有找到指定流程实例！");
+
+        final Process process = processService.getProcessById(order.getProcessId());
+        BTAssert.notNull(process, "没有找到指定流程！");
+
+        final Long custNo = process.getCustNo();
+
+        final List<CustOperatorInfo> operatorInfos = custOperatorService.queryOperatorByCustNo(custNo);
+        boolean flag = false;
+        for (final CustOperatorInfo operator : operatorInfos) {
+            if (anOperId.equals(operator.getId())) {
+                flag = true;
+                break;
+            }
+        }
+        BTAssert.isTrue(flag, "操作员不匹配！");
+
+        final String[] actors = queryService.getTaskActorsByTaskId(anTaskId);
+
+        BTAssert.isTrue(actors.length == 1, "没有找到现有操作员！");
+
+        if (BetterStringUtils.equals(actors[0], WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(anOperId))) {
+            return task;
+        }
+
+        taskService.addTaskActor(anTaskId, (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(anOperId));
+
+        taskService.removeTaskActor(anTaskId, actors);
+
+        return task;
     }
 
     /**
      * @param anBusinessId
      * @return
      */
-    public Map<String, String> findWorkFlowJson(final String anOrderId) {
+    public Map<String, String> findWorkFlowJson(final String anProcessId, final String anOrderId) {
 
         final IProcessService processService = engine.process();
         final IQueryService queryService = engine.query();
 
-        final HistoryOrder histOrder = queryService.getHistOrder(anOrderId);
-
-        final org.snaker.engine.entity.Process process = processService.getProcessById(histOrder.getProcessId());
+        final org.snaker.engine.entity.Process process = processService.getProcessById(anProcessId);
+        BTAssert.notNull(process, "没有找到流程信息！");
 
         final ProcessModel model = process.getModel();
         final Map<String, String> jsonMap = new HashMap<String, String>();
@@ -1167,6 +1207,10 @@ public class WorkFlowService {
         }
 
         if (BetterStringUtils.isNotEmpty(anOrderId)) {
+            final HistoryOrder histOrder = queryService.getHistOrder(anOrderId);
+            BTAssert.notNull(histOrder, "没有找到流程实例！");
+            BTAssert.isTrue(BetterStringUtils.equals(anProcessId, histOrder.getProcessId()), "流程实例与流程不匹配");
+
             final List<Task> tasks = this.engine.query().getActiveTasks(new QueryFilter().setOrderId(anOrderId));
             final List<HistoryTask> historyTasks = this.engine.query().getHistoryTasks(new QueryFilter().setOrderId(anOrderId));
             jsonMap.put("state", SnakerHelper.getStateJson(model, tasks, historyTasks));
