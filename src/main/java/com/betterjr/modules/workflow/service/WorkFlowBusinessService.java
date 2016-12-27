@@ -8,6 +8,7 @@
 package com.betterjr.modules.workflow.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -45,11 +46,24 @@ public class WorkFlowBusinessService extends BaseService<WorkFlowBusinessMapper,
      * @return
      */
     public WorkFlowBusiness findWorkFlowBusinessByOrderId(final String anOrderId) {
-        BTAssert.notNull(BetterStringUtils.isNotBlank(anOrderId), "流程实例编号不允许为空");
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(anOrderId), "流程实例编号不允许为空");
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("orderId", anOrderId);
 
         return Collections3.getFirst(this.selectByProperty(conditionMap));
+    }
+
+    /**
+     * 根据业务编号查找 流程业务数据
+     * @param anBusinessId
+     */
+    public List<WorkFlowBusiness> findWorkFlowBusinessById(final String anBusinessId) {
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(anBusinessId), "流程业务编号不允许为空");
+
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("businessId", anBusinessId);
+
+        return this.selectByProperty(conditionMap);
     }
 }

@@ -1,6 +1,8 @@
 package com.betterjr.modules.workflow.handlers.supply;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -15,18 +17,18 @@ public class ConfirmLoan implements INodeHandler{
     private IScfSupplyApprovalService scfSupplyFlowService;
     
     @Override
-	public void processPass(Map<String, Object> context) {
-		scfSupplyFlowService.confirmLoan(context, 1);
+	public void processPass(Map<String, Object> anContext) {
+		
 	}
 
 	@Override
-	public void processReject(Map<String, Object> context) {
-		scfSupplyFlowService.confirmLoan(context, 2);
+	public void processReject(Map<String, Object> anContext) {
+		scfSupplyFlowService.confirmLoan(formartToString((Map<String, Object>)anContext.get("INPUT")), 2);
 	}
     
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		// 业务办理
+		scfSupplyFlowService.confirmLoan(formartToString((Map<String, Object>)anContext.get("INPUT")), 1);
 	}
 
 	@Override
@@ -34,6 +36,14 @@ public class ConfirmLoan implements INodeHandler{
 		// 暂存
 		
 	}
-
+	
+	private Map<String, Object> formartToString(Map<String, Object> anContext){
+		Map<String, Object> parm = new HashMap<String, Object>();
+		Set set = anContext.entrySet();
+		for(Map.Entry<String, Object> entry: anContext.entrySet()){    
+			parm.put(entry.getKey(), entry.getValue().toString().replaceAll("-", ""));
+		}
+		return parm;
+	} 
 
 }

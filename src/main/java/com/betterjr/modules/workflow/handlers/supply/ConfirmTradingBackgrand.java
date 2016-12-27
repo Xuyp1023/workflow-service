@@ -14,19 +14,18 @@ public class ConfirmTradingBackgrand implements INodeHandler  {
     private IScfSupplyApprovalService scfSupplyFlowService;
 	
 	@Override
-	public void processPass(Map<String, Object> context) {
-		scfSupplyFlowService.confirmTradingBackgrand(context, 1);
+	public void processPass(Map<String, Object> anContext) {
+		
 	}
 	
 	@Override
-	public void processReject(Map<String, Object> context) {
-		scfSupplyFlowService.confirmTradingBackgrand(context, 2);
+	public void processReject(Map<String, Object> anContext) {
+		scfSupplyFlowService.confirmTradingBackgrand((Map<String, Object>)anContext.get("INPUT"), 2);
 	}
 	
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		// TODO Auto-generated method stub
-		
+		scfSupplyFlowService.confirmTradingBackgrand((Map<String, Object>)anContext.get("INPUT"), 1);
 	}
 
 	@Override

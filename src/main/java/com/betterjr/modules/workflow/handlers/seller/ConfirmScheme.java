@@ -6,28 +6,26 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.modules.approval.IScfSellerApprovalService;
-import com.betterjr.modules.approval.IScfSupplyApprovalService;
 import com.betterjr.modules.workflow.handler.INodeHandler;
 
 @Service("sellerConfirmSchemeHandler")
 public class ConfirmScheme implements INodeHandler {
-    @Reference(interfaceClass = IScfSupplyApprovalService.class)
-    private IScfSellerApprovalService scfSellerFlowService;
+    @Reference(interfaceClass = IScfSellerApprovalService.class)
+    private IScfSellerApprovalService scfSupplyApprovalService;
    
     @Override
-	public void processPass(Map<String, Object> context) {
-    	scfSellerFlowService.confirmScheme(context, 1);
+	public void processPass(Map<String, Object> anContext) {
+    	
 	}
 
 	@Override
-	public void processReject(Map<String, Object> context) {
-		scfSellerFlowService.confirmScheme(context, 2);
+	public void processReject(Map<String, Object> anContext) {
+		scfSupplyApprovalService.confirmScheme((Map<String, Object>)anContext.get("INPUT"), 2);
 	}
 	
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		// TODO Auto-generated method stub
-		
+		scfSupplyApprovalService.confirmScheme((Map<String, Object>)anContext.get("INPUT"), 1);
 	}
 
 	@Override

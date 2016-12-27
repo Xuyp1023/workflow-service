@@ -1,6 +1,8 @@
 package com.betterjr.modules.workflow.handlers.seller;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -14,19 +16,17 @@ public class OfferScheme implements INodeHandler  {
     private IScfSellerApprovalService scfSellerFlowService;
 	
 	@Override
-	public void processPass(Map<String, Object> context) {
-		context = scfSellerFlowService.offerScheme(context, 1);
+	public void processPass(Map<String, Object> anContext) {
 	}
 	
 	@Override
-	public void processReject(Map<String, Object> context) {
-		scfSellerFlowService.offerScheme(context, 2);
+	public void processReject(Map<String, Object> anContext) {
+		scfSellerFlowService.offerScheme(formartToString((Map<String, Object>)anContext.get("INPUT")), 2);
 	}
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		// TODO Auto-generated method stub
-		
+		scfSellerFlowService.offerScheme(formartToString((Map<String, Object>)anContext.get("INPUT")), 1);
 	}
 
 	@Override
@@ -35,6 +35,13 @@ public class OfferScheme implements INodeHandler  {
 		
 	}
 
-
+	private Map<String, Object> formartToString(Map<String, Object> anContext){
+		Map<String, Object> parm = new HashMap<String, Object>();
+		Set set = anContext.entrySet();
+		for(Map.Entry<String, Object> entry: anContext.entrySet()){    
+			parm.put(entry.getKey(), entry.getValue().toString().replaceAll("-", ""));
+		}
+		return parm;
+	} 
 
 }

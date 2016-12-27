@@ -15,7 +15,7 @@ public class ConfirmScheme implements INodeHandler {
    
     @Override
 	public void processPass(Map<String, Object> context) {
-    	scfSupplyFlowService.confirmScheme(context, 1);
+    	
 	}
 
 	@Override
@@ -25,8 +25,7 @@ public class ConfirmScheme implements INodeHandler {
 	
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		// TODO Auto-generated method stub
-		
+		scfSupplyFlowService.confirmScheme((Map<String, Object>)anContext.get("INPUT"), 1);
 	}
 
 	@Override

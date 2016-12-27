@@ -45,20 +45,20 @@ public class WorkFlowDubboService implements IWorkFlowService {
 
     // 待办任务
     @Override
-    public String webQueryCurrentTask(final int anPageNo, final int anPageSize) {
+    public String webQueryCurrentTask(final int anPageNo, final int anPageSize, final Map<String, Object> anParam) {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         BTAssert.notNull(operator, "不能获取当前登陆用户！");
         final Long operId = operator.getId();
-        return AjaxObject.newOkWithPage("查询待办任务成功", workFlowService.queryCurrentTask(operId, anPageNo, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("查询待办任务成功", workFlowService.queryWorkItem(operId, anPageNo, anPageSize, anParam)).toJson();
     }
 
     // 已办任务
     @Override
-    public String webQueryHistoryTask(final int anPageNo, final int anPageSize) {
+    public String webQueryHistoryTask(final int anPageNo, final int anPageSize, final Map<String, Object> anParam) {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         BTAssert.notNull(operator, "不能获取当前登陆用户！");
         final Long operId = operator.getId();
-        return AjaxObject.newOkWithPage("查询已办任务成功", workFlowService.queryHistoryTask(operId, anPageNo, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("查询已办任务成功", workFlowService.queryHistoryWorkItem(operId, anPageNo, anPageSize, anParam)).toJson();
     }
 
     // 加载节点
@@ -78,14 +78,14 @@ public class WorkFlowDubboService implements IWorkFlowService {
 
         final Long operId = operator.getId();
         final String data = (String) anParam.get("data");
-        final Map<String, Object> param = JsonMapper.parserJson(data);
+        final Map<String, Object> inputParam = JsonMapper.parserJson(data);
         final String content = (String) anParam.get("content");
 
         final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
         flowInput.setOperName(operator.getName());
         flowInput.setContent(content);
 
-        flowInput.addParam("INPUT", param);
+        flowInput.addParam("INPUT", inputParam);
         return AjaxObject.newOk("审批通过成功！", workFlowService.savePassTask(flowInput)).toJson();
     }
 
@@ -103,14 +103,14 @@ public class WorkFlowDubboService implements IWorkFlowService {
 
         final Long operId = operator.getId();
         final String data = (String) anParam.get("data");
-        final Map<String, Object> param = JsonMapper.parserJson(data);
+        final Map<String, Object> inputParam = JsonMapper.parserJson(data);
         final String content = (String) anParam.get("content");
 
         final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId, rejectNode);
         flowInput.setOperName(operator.getName());
         flowInput.setContent(content);
 
-        flowInput.addParam("INPUT", param);
+        flowInput.addParam("INPUT", inputParam);
         return AjaxObject.newOk("审批驳回成功！", workFlowService.saveRejectTask(flowInput)).toJson();
     }
 
@@ -121,18 +121,18 @@ public class WorkFlowDubboService implements IWorkFlowService {
         BTAssert.notNull(operator, "不能获取当前登陆用户！");
 
         final int result = Integer.valueOf((String) anParam.get("result"));
-        BTAssert.isTrue(result == 2, "审批类型不正确！");
+        BTAssert.isTrue(result == 3, "审批类型不正确！");
 
         final Long operId = operator.getId();
         final String data = (String) anParam.get("data");
-        final Map<String, Object> param = JsonMapper.parserJson(data);
+        final Map<String, Object> inputParam = JsonMapper.parserJson(data);
         final String content = (String) anParam.get("content");
 
         final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
         flowInput.setOperName(operator.getName());
         flowInput.setContent(content);
 
-        flowInput.addParam("INPUT", param);
+        flowInput.addParam("INPUT", inputParam);
         return AjaxObject.newOk("任务办理成功！", workFlowService.saveHandleTask(flowInput)).toJson();
     }
 
@@ -171,14 +171,14 @@ public class WorkFlowDubboService implements IWorkFlowService {
 
         final Long operId = operator.getId();
         final String data = (String) anParam.get("data");
-        final Map<String, Object> param = JsonMapper.parserJson(data);
+        final Map<String, Object> inputParam = JsonMapper.parserJson(data);
         final String content = (String) anParam.get("content");
 
         final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
         flowInput.setOperName(operator.getName());
         flowInput.setContent(content);
 
-        flowInput.addParam("INPUT", param);
+        flowInput.addParam("INPUT", inputParam);
         return AjaxObject.newOk("作废流程成功！", workFlowService.saveCancelProcess(flowInput)).toJson();
     }
 
@@ -194,5 +194,10 @@ public class WorkFlowDubboService implements IWorkFlowService {
         return AjaxObject.newOk("驳回节点列表查询成功！", workFlowService.queryRejectNodeList(anTaskId)).toJson();
     }
 
+    // 查询流程layout json数据
+    @Override
+    public String webFindWorkFlowJson(final String anOrderId) {
+        return AjaxObject.newOk(workFlowService.findWorkFlowJson(anOrderId)).toJson();
+    }
 
 }

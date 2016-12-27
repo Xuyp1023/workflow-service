@@ -1,5 +1,6 @@
 package com.betterjr.modules.workflow.handlers.supply;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -15,13 +16,16 @@ public class EndFlow implements IProcessHandler{
 	
 	@Override
 	public void processCancel(Map<String, Object> context) {
-		scfSupplyFlowService.endFlow(context, 1);
-		
+		Map<String, Object> parmMap = new HashMap<String, Object>();
+		parmMap.put("requestNo", context.get("businessId"));
+		scfSupplyFlowService.endFlow(parmMap, 1);
 	}
 
 	@Override
 	public void processEnd(Map<String, Object> context) {
-		scfSupplyFlowService.endFlow(context, 2);
+		Map<String, Object> parmMap = new HashMap<String, Object>();
+		parmMap.put("requestNo", context.get("businessId"));
+		scfSupplyFlowService.endFlow(parmMap, 2);
 	}
 
 }

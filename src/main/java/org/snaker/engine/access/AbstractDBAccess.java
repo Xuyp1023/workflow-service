@@ -660,6 +660,16 @@ public abstract class AbstractDBAccess implements DBAccess {
             sql.append(" and o.process_Id = ? ");
             paramList.add(filter.getProcessId());
         }
+        // XXX processId 和 processIds应2选1
+        if (filter.getProcessIds() != null && filter.getProcessIds().length > 0) {
+            sql.append(" and o.process_Id in(");
+            for (int i = 0; i < filter.getProcessIds().length; i++) {
+                sql.append("?,");
+                paramList.add(filter.getProcessIds()[i]);
+            }
+            sql.deleteCharAt(sql.length() - 1);
+            sql.append(") ");
+        }
         if(StringHelper.isNotEmpty(filter.getDisplayName())) {
             sql.append(" and p.display_Name like ?");
             paramList.add("%" + filter.getDisplayName() + "%");

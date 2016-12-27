@@ -51,7 +51,7 @@ public class EndProcessHandler implements IHandler {
         if (BetterStringUtils.isNotBlank(handlerName)) {
             final IProcessHandler handler = SpringContextHolder.getBean(handlerName);
             if (handler != null) {
-                handler.processEnd(null);
+                handler.processEnd(execution.getArgs());
             }
         }
 
