@@ -217,7 +217,7 @@ public class WorkFlowService {
         }
 
         // 添加审批记录
-        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, workFlowStep, flowInput, workFlowBusiness, task, "0");
+        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, workFlowStep, flowInput, workFlowBusiness, task, "1");
 
         engine.executeTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId), result);
 
@@ -278,7 +278,7 @@ public class WorkFlowService {
         }
 
         // 添加审批记录
-        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, workFlowStep, flowInput, workFlowBusiness, task, "1");
+        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, workFlowStep, flowInput, workFlowBusiness, task, "2");
 
         // 把所有节点找出来 当前用户节点驳回，其他节点 自动complete
         if (BetterStringUtils.equals(workFlowNode.getType(), "3") && workFlowStep != null
@@ -331,6 +331,14 @@ public class WorkFlowService {
 
         BTAssert.isTrue(BetterStringUtils.equals(workFlowNode.getType(), "2"), "该节点不是经办节点！");
 
+        // 处理 task 执行人
+        final String[] actors = queryService.getTaskActorsByTaskId(taskId);
+        if (actors == null || actors.length == 0
+                || (actors.length == 1 && BetterStringUtils.startsWith(actors[0], WorkFlowConstants.PREFIX_CUST_NO))) {
+            task.setOperator(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
+            taskService.updateTask(task);
+        }
+
         final WorkFlowBusiness workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(
                 BetterStringUtils.equals(workFlowBase.getIsSubprocess(), "1") ? order.getParentId() : task.getOrderId());
         BTAssert.notNull(workFlowBusiness, "没有找到业务记录！");
@@ -351,7 +359,7 @@ public class WorkFlowService {
         }
 
         // 添加审批记录
-        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, null, flowInput, workFlowBusiness, task, "2");
+        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, null, flowInput, workFlowBusiness, task, "3");
 
         engine.executeTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId), result);
 
@@ -1067,7 +1075,6 @@ public class WorkFlowService {
                 Long.valueOf(page.getTotalPages()).intValue(), page.getPageNo() * anPageSize, page.getTotalCount());
     }
 
-
     /**
      * @param anActors
      * @return
@@ -1084,12 +1091,14 @@ public class WorkFlowService {
                 final CustOperatorInfo operator = custOperatorService.findCustOperatorById(operId);
                 BTAssert.notNull(operator, "没有找到操作员！");
                 actorNames[i] = operator.getName();
-            } else if (BetterStringUtils.startsWith(anActors[i], WorkFlowConstants.PREFIX_CUST_NO)) {
+            }
+            else if (BetterStringUtils.startsWith(anActors[i], WorkFlowConstants.PREFIX_CUST_NO)) {
                 final Long custNo = Long.valueOf(BetterStringUtils.substring(anActors[i], WorkFlowConstants.PREFIX_CUST_NO.length()));
                 final CustMechBase custInfo = custMechBaseService.findBaseInfo(custNo);
                 BTAssert.notNull(custInfo, "没有找到操作员！");
                 actorNames[i] = custInfo.getCustName();
-            } else {
+            }
+            else {
                 throw new BytterException("不能识别的操作员！");
             }
         }
