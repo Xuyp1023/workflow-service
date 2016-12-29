@@ -69,6 +69,11 @@ import com.betterjr.modules.workflow.snaker.util.SnakerHelper;
 @Service
 public class WorkFlowService {
 
+    /**
+     * 
+     */
+    private static final String _23_59_59 = " 23:59:59";
+
     @Reference(interfaceClass = ICustMechBaseService.class)
     private ICustMechBaseService custMechBaseService;
 
@@ -782,7 +787,7 @@ public class WorkFlowService {
                 queryFilter.setCreateTimeStart(BetterDateUtils.formatDispDate(startDate));
             }
             if (BetterStringUtils.isNotBlank(endDate) && endDate.length() == 8) {
-                queryFilter.setCreateTimeEnd(BetterDateUtils.formatDispDate(endDate));
+                queryFilter.setCreateTimeEnd(BetterDateUtils.formatDispDate(endDate) + _23_59_59);
             }
         }
         final List<WorkItem> workItems = queryService.getWorkItems(page, queryFilter);
@@ -846,7 +851,7 @@ public class WorkFlowService {
                 queryFilter.setCreateTimeStart(BetterDateUtils.formatDispDate(startDate));
             }
             if (BetterStringUtils.isNotBlank(endDate) && endDate.length() == 8) {
-                queryFilter.setCreateTimeEnd(BetterDateUtils.formatDispDate(endDate));
+                queryFilter.setCreateTimeEnd(BetterDateUtils.formatDispDate(endDate) + _23_59_59);
             }
         }
 
@@ -1075,7 +1080,7 @@ public class WorkFlowService {
                 queryFilter.setCreateTimeStart(BetterDateUtils.formatDispDate(startDate));
             }
             if (BetterStringUtils.isNotBlank(endDate) && endDate.length() == 8) {
-                queryFilter.setCreateTimeEnd(BetterDateUtils.formatDispDate(endDate));
+                queryFilter.setCreateTimeEnd(BetterDateUtils.formatDispDate(endDate) + _23_59_59);
             }
         }
 
