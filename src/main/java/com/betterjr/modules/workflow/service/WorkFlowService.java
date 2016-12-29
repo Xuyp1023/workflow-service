@@ -155,12 +155,15 @@ public class WorkFlowService {
         }
 
         // 初始节点使用启动操作员办理 特别注意 如果初始节点在子流程上，需要子流程所在公司操作员办理
-
-
-        taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
-        ///task.setOperator(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
-        ///taskService.updateTask(task);
-        // taskService.take(task.getId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
+        final String[] actors = queryService.getTaskActorsByTaskId(task.getId());
+        if (actors == null) {
+            taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
+        } else if (actors != null && actors.length == 1) {
+            if (!BetterStringUtils.equals(actors[0], WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()))) {
+                taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
+                taskService.removeTaskActor(task.getId(), actors);
+            }
+        }
 
         // 启动流程，并处理第一个经办任务
         final List<Task> resultTasks = engine.executeTask(task.getId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
@@ -218,6 +221,16 @@ public class WorkFlowService {
                 result = (Map<String, Object>) param.get("result");
             }
         }
+        // 初始节点使用启动操作员办理 特别注意 如果初始节点在子流程上，需要子流程所在公司操作员办理
+        final String[] actors = queryService.getTaskActorsByTaskId(task.getId());
+        if (actors == null) {
+            taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
+        } else if (actors != null && actors.length == 1) {
+            if (BetterStringUtils.startsWith(actors[0], WorkFlowConstants.PREFIX_CUST_NO)) {
+                taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
+                taskService.removeTaskActor(task.getId(), actors);
+            }
+        }
 
         // 添加审批记录
         final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, workFlowStep, flowInput, workFlowBusiness, task, "1");
@@ -248,7 +261,6 @@ public class WorkFlowService {
         final Task task = queryService.getTask(taskId);
         BTAssert.notNull(task, "没有找到相应任务");
 
-        // TODO 需要处理 从公司流程转至自己流程的业务
         final TaskModel taskModel = taskService.getTaskModel(task.getId());
         final WorkFlowBase workFlowBase = taskModel.getWorkFlowBase();
         final WorkFlowNode workFlowNode = taskModel.getWorkFlowNode();
@@ -294,6 +306,18 @@ public class WorkFlowService {
                 }
             }
         }
+
+        // 初始节点使用启动操作员办理 特别注意 如果初始节点在子流程上，需要子流程所在公司操作员办理
+        final String[] actors = queryService.getTaskActorsByTaskId(task.getId());
+        if (actors == null) {
+            taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
+        } else if (actors != null && actors.length == 1) {
+            if (BetterStringUtils.startsWith(actors[0], WorkFlowConstants.PREFIX_CUST_NO)) {
+                taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
+                taskService.removeTaskActor(task.getId(), actors);
+            }
+        }
+
         engine.executeAndJumpTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId), result, rejectNode);
 
         return workFlowAudit;
