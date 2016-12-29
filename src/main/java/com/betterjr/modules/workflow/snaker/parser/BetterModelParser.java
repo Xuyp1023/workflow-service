@@ -10,6 +10,7 @@ package com.betterjr.modules.workflow.snaker.parser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.snaker.engine.model.DecisionModel;
 import org.snaker.engine.model.EndModel;
@@ -172,8 +173,8 @@ public class BetterModelParser {
                 endModel.setName("结束");
                 endModel.setDisplayName("结束");
 
-                //prevStep.setName(endModel.getName() + "-inputPath");
-                //prevStep.setDisplayName(endModel.getName() + "-inputPath");
+                // prevStep.setName(endModel.getName() + "-inputPath");
+                // prevStep.setDisplayName(endModel.getName() + "-inputPath");
                 coordinate.setX(coordinate.getX() + X_INC);
                 setNodeLayout(endModel, coordinate);
 
@@ -708,7 +709,8 @@ public class BetterModelParser {
      */
     private static List<WorkFlowNode> getNodes(final Long anBaseId) {
         final WorkFlowNodeService workFlowNodeService = SpringContextHolder.getBean(WorkFlowNodeService.class);
-        return workFlowNodeService.queryWorkFlowNode(anBaseId);
+        return workFlowNodeService.queryWorkFlowNode(anBaseId).stream()
+                .filter(node -> BetterStringUtils.equals(node.getIsDisabled(), WorkFlowConstants.NOT_DISABLED)).collect(Collectors.toList());
     }
 
     /**

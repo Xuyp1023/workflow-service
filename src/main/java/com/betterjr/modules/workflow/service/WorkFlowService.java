@@ -70,7 +70,7 @@ import com.betterjr.modules.workflow.snaker.util.SnakerHelper;
 public class WorkFlowService {
 
     /**
-     * 
+     *
      */
     private static final String _23_59_59 = " 23:59:59";
 
@@ -238,7 +238,7 @@ public class WorkFlowService {
         }
 
         // 添加审批记录
-        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, workFlowStep, flowInput, workFlowBusiness, task, "1");
+        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, workFlowStep, flowInput, workFlowBusiness, task, "0");
 
         engine.executeTask(taskId, WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId), result);
 
@@ -298,7 +298,7 @@ public class WorkFlowService {
         }
 
         // 添加审批记录
-        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, workFlowStep, flowInput, workFlowBusiness, task, "2");
+        final WorkFlowAudit workFlowAudit = saveWorkFlowAudit(workFlowBase, workFlowNode, workFlowStep, flowInput, workFlowBusiness, task, "1");
 
         // 把所有节点找出来 当前用户节点驳回，其他节点 自动complete
         if (BetterStringUtils.equals(workFlowNode.getType(), "3") && workFlowStep != null
