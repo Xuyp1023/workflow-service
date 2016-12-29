@@ -129,7 +129,7 @@ public class WorkFlowDubboService implements IWorkFlowService {
         BTAssert.notNull(operator, "不能获取当前登陆用户！");
 
         final int result = Integer.valueOf((String) anParam.get("result"));
-        BTAssert.isTrue(result == 3, "审批类型不正确！");
+        BTAssert.isTrue(result == 2, "审批类型不正确！");
 
         final Long operId = operator.getId();
         final String data = (String) anParam.get("data");
@@ -175,7 +175,7 @@ public class WorkFlowDubboService implements IWorkFlowService {
         BTAssert.notNull(operator, "不能获取当前登陆用户！");
 
         final int result = Integer.valueOf((String) anParam.get("result"));
-        BTAssert.isTrue(result == 2, "审批类型不正确！");
+        BTAssert.isTrue(result == 3, "审批类型不正确！");
 
         final Long operId = operator.getId();
         final String data = (String) anParam.get("data");
