@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.modules.approval.IScfSellerApprovalService;
+import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
 import com.betterjr.modules.workflow.handler.IProcessHandler;
 
 @Service("sellerEndFlowHandler")
@@ -17,15 +18,17 @@ public class EndFlow implements IProcessHandler{
 	@Override
 	public void processCancel(Map<String, Object> context) {
 		Map<String, Object> parmMap = new HashMap<String, Object>();
-		parmMap.put("requestNo", context.get("businessId"));
+		WorkFlowBusiness business = (WorkFlowBusiness) context.get("BUSINESS");
+		parmMap.put("requestNo", business.getBusinessId());
 		scfSellerFlowService.endFlow(parmMap, 1);
 	}
 
 	@Override
 	public void processEnd(Map<String, Object> context) {
 		Map<String, Object> parmMap = new HashMap<String, Object>();
-		parmMap.put("requestNo", context.get("businessId"));
+		WorkFlowBusiness business = (WorkFlowBusiness) context.get("BUSINESS");
+		parmMap.put("requestNo", business.getBusinessId());
 		scfSellerFlowService.endFlow(parmMap, 2);
 	}
-
+	
 }
