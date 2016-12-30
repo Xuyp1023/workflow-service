@@ -37,4 +37,13 @@ public class DemoProcessHandler implements IProcessHandler {
         System.out.println("流程结束");
     }
 
+    /* (non-Javadoc)
+     * @see com.betterjr.modules.workflow.handler.IProcessHandler#processStart(java.util.Map)
+     */
+    @Override
+    public void processStart(final Map<String, Object> anContext) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

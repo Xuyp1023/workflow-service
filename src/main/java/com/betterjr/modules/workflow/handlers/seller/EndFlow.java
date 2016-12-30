@@ -11,21 +11,30 @@ import com.betterjr.modules.workflow.handler.IProcessHandler;
 
 @Service("sellerEndFlowHandler")
 public class EndFlow implements IProcessHandler{
-	@Reference(interfaceClass = IScfSellerApprovalService.class)
+    @Reference(interfaceClass = IScfSellerApprovalService.class)
     private IScfSellerApprovalService scfSellerFlowService;
-	
-	@Override
-	public void processCancel(Map<String, Object> context) {
-		Map<String, Object> parmMap = new HashMap<String, Object>();
-		parmMap.put("requestNo", context.get("businessId"));
-		scfSellerFlowService.endFlow(parmMap, 1);
-	}
 
-	@Override
-	public void processEnd(Map<String, Object> context) {
-		Map<String, Object> parmMap = new HashMap<String, Object>();
-		parmMap.put("requestNo", context.get("businessId"));
-		scfSellerFlowService.endFlow(parmMap, 2);
-	}
+    @Override
+    public void processCancel(final Map<String, Object> context) {
+        final Map<String, Object> parmMap = new HashMap<String, Object>();
+        parmMap.put("requestNo", context.get("businessId"));
+        scfSellerFlowService.endFlow(parmMap, 1);
+    }
+
+    @Override
+    public void processEnd(final Map<String, Object> context) {
+        final Map<String, Object> parmMap = new HashMap<String, Object>();
+        parmMap.put("requestNo", context.get("businessId"));
+        scfSellerFlowService.endFlow(parmMap, 2);
+    }
+
+    /* (non-Javadoc)
+     * @see com.betterjr.modules.workflow.handler.IProcessHandler#processStart(java.util.Map)
+     */
+    @Override
+    public void processStart(final Map<String, Object> anContext) {
+        // TODO Auto-generated method stub
+
+    }
 
 }
