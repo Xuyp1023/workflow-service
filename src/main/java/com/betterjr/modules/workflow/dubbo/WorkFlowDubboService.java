@@ -75,6 +75,24 @@ public class WorkFlowDubboService implements IWorkFlowService {
         return "";
     }
 
+    // 开始流程
+    @Override
+    public String webStartWorkFlow(final String anWorkFlowName, final Long anCustNo, final Map<String, Object> anParam) {
+        final WorkFlowInput workFlowInput = new WorkFlowInput(Long.valueOf(anParam.get(WorkFlowInput.START_CUSTNO).toString()), UserUtils.getOperatorInfo().getId(), anWorkFlowName,
+                anCustNo);
+        workFlowInput.setSupplierCustNo(anParam.get(WorkFlowInput.SUPPLIER_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.SUPPLIER_CUSTNO).toString()): null);
+        workFlowInput.setCoreCustNo(anParam.get(WorkFlowInput.CORE_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.CORE_CUSTNO).toString()) : null);
+        workFlowInput.setFactorCustNo(anParam.get(WorkFlowInput.FACTOR_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.FACTOR_CUSTNO).toString()): null);
+        workFlowInput.setSellerCustNo(anParam.get(WorkFlowInput.SELLER_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.SELLER_CUSTNO).toString()): null);
+        workFlowInput.setPlatformCustNo(anParam.get(WorkFlowInput.PLATFORM_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.PLATFORM_CUSTNO).toString()): null);
+
+        final String data = (String) anParam.get("data");
+        final Map<String, Object> inputParam = JsonMapper.parserJson(data);
+        workFlowInput.addParam("INPUT", inputParam);
+
+        return AjaxObject.newOk("审批通过成功！", workFlowService.saveStart(workFlowInput)).toJson();
+    }
+
     // 审批通过
     @Override
     public String webPassWorkFlow(final String anTaskId, final Map<String, Object> anParam) {
@@ -89,12 +107,12 @@ public class WorkFlowDubboService implements IWorkFlowService {
         final Map<String, Object> inputParam = JsonMapper.parserJson(data);
         final String content = (String) anParam.get("content");
 
-        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
-        flowInput.setOperName(operator.getName());
-        flowInput.setContent(content);
+        final WorkFlowInput workFlowInput = new WorkFlowInput(operId, anTaskId);
+        workFlowInput.setOperName(operator.getName());
+        workFlowInput.setContent(content);
 
-        flowInput.addParam("INPUT", inputParam);
-        return AjaxObject.newOk("审批通过成功！", workFlowService.savePassTask(flowInput)).toJson();
+        workFlowInput.addParam("INPUT", inputParam);
+        return AjaxObject.newOk("审批通过成功！", workFlowService.savePassTask(workFlowInput)).toJson();
     }
 
     // 审批驳回
@@ -114,12 +132,12 @@ public class WorkFlowDubboService implements IWorkFlowService {
         final Map<String, Object> inputParam = JsonMapper.parserJson(data);
         final String content = (String) anParam.get("content");
 
-        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId, rejectNode);
-        flowInput.setOperName(operator.getName());
-        flowInput.setContent(content);
+        final WorkFlowInput workFlowInput = new WorkFlowInput(operId, anTaskId, rejectNode);
+        workFlowInput.setOperName(operator.getName());
+        workFlowInput.setContent(content);
 
-        flowInput.addParam("INPUT", inputParam);
-        return AjaxObject.newOk("审批驳回成功！", workFlowService.saveRejectTask(flowInput)).toJson();
+        workFlowInput.addParam("INPUT", inputParam);
+        return AjaxObject.newOk("审批驳回成功！", workFlowService.saveRejectTask(workFlowInput)).toJson();
     }
 
     // 经办提交
@@ -136,12 +154,12 @@ public class WorkFlowDubboService implements IWorkFlowService {
         final Map<String, Object> inputParam = JsonMapper.parserJson(data);
         final String content = (String) anParam.get("content");
 
-        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
-        flowInput.setOperName(operator.getName());
-        flowInput.setContent(content);
+        final WorkFlowInput workFlowInput = new WorkFlowInput(operId, anTaskId);
+        workFlowInput.setOperName(operator.getName());
+        workFlowInput.setContent(content);
 
-        flowInput.addParam("INPUT", inputParam);
-        return AjaxObject.newOk("任务办理成功！", workFlowService.saveHandleTask(flowInput)).toJson();
+        workFlowInput.addParam("INPUT", inputParam);
+        return AjaxObject.newOk("任务办理成功！", workFlowService.saveHandleTask(workFlowInput)).toJson();
     }
 
     /* (non-Javadoc)
@@ -157,13 +175,13 @@ public class WorkFlowDubboService implements IWorkFlowService {
         final Map<String, Object> param = JsonMapper.parserJson(data);
         final String content = (String) anParam.get("content");
 
-        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
-        flowInput.setOperName(operator.getName());
-        flowInput.setContent(content);
+        final WorkFlowInput workFlowInput = new WorkFlowInput(operId, anTaskId);
+        workFlowInput.setOperName(operator.getName());
+        workFlowInput.setContent(content);
 
-        flowInput.addParam("INPUT", param);
+        workFlowInput.addParam("INPUT", param);
 
-        workFlowService.saveDataTask(flowInput);
+        workFlowService.saveDataTask(workFlowInput);
         return AjaxObject.newOk("经办数据保存成功！").toJson();
     }
 
@@ -182,12 +200,12 @@ public class WorkFlowDubboService implements IWorkFlowService {
         final Map<String, Object> inputParam = JsonMapper.parserJson(data);
         final String content = (String) anParam.get("content");
 
-        final WorkFlowInput flowInput = new WorkFlowInput(operId, anTaskId);
-        flowInput.setOperName(operator.getName());
-        flowInput.setContent(content);
+        final WorkFlowInput workFlowInput = new WorkFlowInput(operId, anTaskId);
+        workFlowInput.setOperName(operator.getName());
+        workFlowInput.setContent(content);
 
-        flowInput.addParam("INPUT", inputParam);
-        return AjaxObject.newOk("作废流程成功！", workFlowService.saveCancelProcess(flowInput)).toJson();
+        workFlowInput.addParam("INPUT", inputParam);
+        return AjaxObject.newOk("作废流程成功！", workFlowService.saveCancelProcess(workFlowInput)).toJson();
     }
 
     // 审批记录

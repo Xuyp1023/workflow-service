@@ -111,17 +111,41 @@ public class WorkFlowService {
         final IQueryService queryService = engine.query();
 
         final CustMechBase custMechBase = custMechBaseService.findBaseInfo(flowInput.getFlowCustNo());
-        BTAssert.notNull(custMechBase, "没有找到主流程公司！");
+        BTAssert.notNull(custMechBase, "没有找到主流程！");
 
         final CustMechBase initCustMechBase = custMechBaseService.findBaseInfo(flowInput.getStartCustNo());
         BTAssert.notNull(initCustMechBase, "没有找到启动流程公司！");
 
+
+        final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseLatestByName(flowInput.getFlowName(), flowInput.getFlowCustNo());
+        BTAssert.notNull(workFlowBase, "没有找到流程定义！");
+
+        final String handlerName = workFlowBase.getHandler();
+
+        String businessId = "";
+        String businessType = "";
+        Map<String, Object> param = null;
+        if (BetterStringUtils.isNotBlank(handlerName)) {
+            final IProcessHandler handler = SpringContextHolder.getBean(handlerName);
+            if (handler != null) {
+                final Map<String, Object> handleContext = new HashMap<>();
+                handleContext.put("INPUT", flowInput.getParam().get("INPUT"));
+
+                handler.processStart(handleContext);
+
+                businessId = (String) handleContext.get("businessId");
+                businessType = (String) handleContext.get("businessType");
+                param = (Map<String, Object>) handleContext.get("param");
+                flowInput.addAllParam(param);
+            }
+        }
+
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(businessId), "业务编号不允许为空！");
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(businessType), "业务类型不允许为空！");
+
         final Order order = engine.startInstanceByName(flowInput.getFlowName(), flowInput.getFlowCustNo(), null,
                 WorkFlowConstants.PREFIX_CUST_NO + flowInput.getFlowCustNo(), flowInput.getParam());
         BTAssert.notNull(order, "启动流程出现错误！");
-
-        final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseByProcessId(order.getProcessId());
-        BTAssert.notNull(workFlowBase, "没有找到流程定义！");
 
         final WorkFlowBusiness workFlowBusiness = new WorkFlowBusiness();
         workFlowBusiness.setCustNo(initCustMechBase.getCustNo());

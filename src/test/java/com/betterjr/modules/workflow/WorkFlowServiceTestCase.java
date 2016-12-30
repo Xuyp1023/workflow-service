@@ -14,7 +14,6 @@ import org.snaker.engine.IProcessService;
 
 import com.betterjr.modules.BasicServiceTest;
 import com.betterjr.modules.workflow.constants.WorkFlowInput;
-import com.betterjr.modules.workflow.data.WorkFlowBusinessType;
 import com.betterjr.modules.workflow.data.WorkFlowHistoryOrder;
 import com.betterjr.modules.workflow.data.WorkFlowOrder;
 import com.betterjr.modules.workflow.data.WorkFlowTask;
@@ -43,7 +42,8 @@ public class WorkFlowServiceTestCase extends BasicServiceTest<WorkFlowService> {
     public void testStartWorkFlow() {
         final WorkFlowService workFlowService = this.getServiceObject();
 
-        final WorkFlowInput flowInput = new WorkFlowInput(0l, 1000157l, "资金方票据融资业务流程", 102202019l, "1001", WorkFlowBusinessType.SUPPLIER_BILL_FINANCING);
+        final WorkFlowInput flowInput = new WorkFlowInput(0l, 1000157l, "资金方票据融资业务流程", 102202019l);
+
         flowInput.setFactorCustNo(102202019l);
         flowInput.setCoreCustNo(102200336l);
         flowInput.setSupplierCustNo(102202021l);
