@@ -14,13 +14,13 @@ public class ConfirmScheme implements INodeHandler {
     private IScfSupplyApprovalService scfSupplyFlowService;
    
     @Override
-	public void processPass(Map<String, Object> context) {
+	public void processPass(Map<String, Object> anContext) {
     	
 	}
 
 	@Override
-	public void processReject(Map<String, Object> context) {
-		scfSupplyFlowService.confirmScheme(context, 2);
+	public void processReject(Map<String, Object> anContext) {
+		scfSupplyFlowService.confirmScheme((Map<String, Object>)anContext.get("INPUT"), 2);
 	}
 	
 	@Override

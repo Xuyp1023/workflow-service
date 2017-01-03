@@ -2,7 +2,6 @@ package com.betterjr.modules.workflow.handlers.supply;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -39,7 +38,6 @@ public class ConfirmLoan implements INodeHandler{
 	
 	private Map<String, Object> formartToString(Map<String, Object> anContext){
 		Map<String, Object> parm = new HashMap<String, Object>();
-		Set set = anContext.entrySet();
 		for(Map.Entry<String, Object> entry: anContext.entrySet()){    
 			parm.put(entry.getKey(), entry.getValue().toString().replaceAll("-", ""));
 		}
