@@ -20,7 +20,7 @@ public class RequestTradingBackgrand implements INodeHandler  {
 	
 	@Override
 	public void processReject(Map<String, Object> anContext) {
-		scfSupplyFlowService.requestTradingBackgrand(anContext, 2);
+		scfSupplyFlowService.requestTradingBackgrand((Map<String, Object>)anContext.get("INPUT"), 2);
 	}
 	
 	@Override
