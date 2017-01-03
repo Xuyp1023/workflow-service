@@ -14,7 +14,9 @@
  */
 package org.snaker.engine.handlers.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.snaker.engine.SnakerEngine;
 import org.snaker.engine.SnakerException;
@@ -31,10 +33,13 @@ import org.snaker.engine.model.SubProcessModel;
 import com.betterjr.common.service.SpringContextHolder;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
+import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
 import com.betterjr.modules.workflow.handler.IProcessHandler;
+import com.betterjr.modules.workflow.service.WorkFlowBusinessService;
 
 /**
  * 结束流程实例的处理器
+ *
  * @author yuqs
  * @since 1.0
  */
@@ -50,16 +55,30 @@ public class EndProcessHandler implements IHandler {
         final String handlerName = workFlowBase.getHandler();
         if (BetterStringUtils.isNotBlank(handlerName)) {
             final IProcessHandler handler = SpringContextHolder.getBean(handlerName);
-            if (handler != null) {
-                handler.processEnd(execution.getArgs());
+            final WorkFlowBusinessService workFlowBusinessService = SpringContextHolder.getBean(WorkFlowBusinessService.class);
+            if (handler != null && workFlowBusinessService != null) {
+                final Order order = execution.getOrder();
+
+                WorkFlowBusiness workFlowBusiness = null;
+                if (BetterStringUtils.equals(workFlowBase.getIsSubprocess(), "1")) {
+                    workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(order.getParentId());
+                }
+                else {
+                    workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(order.getId());
+                }
+
+                final Map<String, Object> param = new HashMap<>();
+                param.put("BASE", workFlowBase);
+                param.put("BUSINESS", workFlowBusiness);
+                handler.processEnd(param);
             }
         }
 
         final SnakerEngine engine = execution.getEngine();
         final Order order = execution.getOrder();
         final List<Task> tasks = engine.query().getActiveTasks(new QueryFilter().setOrderId(order.getId()));
-        for(final Task task : tasks) {
-            if(task.isMajor()) {
+        for (final Task task : tasks) {
+            if (task.isMajor()) {
                 throw new SnakerException("存在未完成的主办任务,请确认.");
             }
             engine.task().complete(task.getId(), SnakerEngine.AUTO);
@@ -72,17 +91,17 @@ public class EndProcessHandler implements IHandler {
         /**
          * 如果存在父流程，则重新构造Execution执行对象，交给父流程的SubProcessModel模型execute
          */
-        if(StringHelper.isNotEmpty(order.getParentId())) {
+        if (StringHelper.isNotEmpty(order.getParentId())) {
             final Order parentOrder = engine.query().getOrder(order.getParentId());
-            if(parentOrder == null) {
+            if (parentOrder == null) {
                 return;
             }
             final Process process = engine.process().getProcessById(parentOrder.getProcessId());
             final ProcessModel pm = process.getModel();
-            if(pm == null) {
+            if (pm == null) {
                 return;
             }
-            final SubProcessModel spm = (SubProcessModel)pm.getNode(order.getParentNodeName());
+            final SubProcessModel spm = (SubProcessModel) pm.getNode(order.getParentNodeName());
             final Execution newExecution = new Execution(engine, process, parentOrder, execution.getArgs());
             newExecution.setChildOrderId(order.getId());
             newExecution.setTask(execution.getTask());
