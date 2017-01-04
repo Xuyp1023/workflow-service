@@ -75,16 +75,27 @@ public class WorkFlowDubboService implements IWorkFlowService {
         return "";
     }
 
+    public Long getLongValue(final Object anObject) {
+        Long result = null;
+        if (anObject != null) {
+            final String temp = anObject.toString();
+            if (BetterStringUtils.isNotBlank(temp)) {
+                result = Long.valueOf(temp);
+            }
+        }
+
+        return result;
+    }
     // 开始流程
     @Override
     public String webStartWorkFlow(final String anWorkFlowName, final Long anCustNo, final Map<String, Object> anParam) {
-        final WorkFlowInput workFlowInput = new WorkFlowInput(Long.valueOf(anParam.get(WorkFlowInput.START_CUSTNO).toString()), UserUtils.getOperatorInfo().getId(), anWorkFlowName,
+        final WorkFlowInput workFlowInput = new WorkFlowInput(getLongValue(anParam.get(WorkFlowInput.START_CUSTNO)), UserUtils.getOperatorInfo().getId(), anWorkFlowName,
                 anCustNo);
-        workFlowInput.setSupplierCustNo(anParam.get(WorkFlowInput.SUPPLIER_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.SUPPLIER_CUSTNO).toString()): null);
-        workFlowInput.setCoreCustNo(anParam.get(WorkFlowInput.CORE_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.CORE_CUSTNO).toString()) : null);
-        workFlowInput.setFactorCustNo(anParam.get(WorkFlowInput.FACTOR_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.FACTOR_CUSTNO).toString()): null);
-        workFlowInput.setSellerCustNo(anParam.get(WorkFlowInput.SELLER_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.SELLER_CUSTNO).toString()): null);
-        workFlowInput.setPlatformCustNo(anParam.get(WorkFlowInput.PLATFORM_CUSTNO) != null ? Long.valueOf(anParam.get(WorkFlowInput.PLATFORM_CUSTNO).toString()): null);
+        workFlowInput.setSupplierCustNo(getLongValue(anParam.get(WorkFlowInput.SUPPLIER_CUSTNO)));
+        workFlowInput.setCoreCustNo(getLongValue(anParam.get(WorkFlowInput.CORE_CUSTNO)));
+        workFlowInput.setFactorCustNo(getLongValue(anParam.get(WorkFlowInput.FACTOR_CUSTNO)));
+        workFlowInput.setSellerCustNo(getLongValue(anParam.get(WorkFlowInput.SELLER_CUSTNO)));
+        workFlowInput.setPlatformCustNo(getLongValue(anParam.get(WorkFlowInput.PLATFORM_CUSTNO)));
 
         final String data = (String) anParam.get("data");
         final Map<String, Object> inputParam = JsonMapper.parserJson(data);

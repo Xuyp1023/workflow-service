@@ -152,8 +152,8 @@ public class WorkFlowService {
         workFlowBusiness.setCustName(initCustMechBase.getCustName());
         workFlowBusiness.setOrderId(order.getId());
         workFlowBusiness.setBaseId(workFlowBase.getId());
-        workFlowBusiness.setBusinessId(flowInput.getBusinessId());
-        workFlowBusiness.setBusinessType(flowInput.getBusinessType());
+        workFlowBusiness.setBusinessId(businessId);
+        workFlowBusiness.setBusinessType(businessType);
 
         final WorkFlowBusiness result = workFlowBusinessService.addWorkFlowBusiness(workFlowBusiness);
 
