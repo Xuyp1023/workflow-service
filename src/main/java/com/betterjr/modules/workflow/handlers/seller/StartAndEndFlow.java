@@ -31,14 +31,14 @@ public class StartAndEndFlow implements IProcessHandler{
 	
 	@Override
 	public void processCancel(Map<String, Object> anContext) {
-		Map<String, Object> parmMap = new HashMap<String, Object>();
+		Map<String, Object> parmMap = formartToString((Map<String, Object>)anContext.get("INPUT"));
 		parmMap.put("requestNo", anContext.get("businessId"));
 		scfSellerFlowService.endFlow(parmMap, 1);
 	}
 
 	@Override
 	public void processEnd(Map<String, Object> anContext) {
-		Map<String, Object> parmMap = new HashMap<String, Object>();
+		Map<String, Object> parmMap = formartToString((Map<String, Object>)anContext.get("INPUT"));
 		parmMap.put("requestNo", anContext.get("businessId"));
 		scfSellerFlowService.endFlow(parmMap, 2);
 	}
