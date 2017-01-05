@@ -26,11 +26,13 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.mapper.pagehelper.PageHelper;
 import com.betterjr.modules.cert.entity.CustCertRule;
 import com.betterjr.modules.customer.ICustMechBaseService;
 import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowBaseMapper;
+import com.betterjr.modules.workflow.data.WorkFlowBaseData;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
 
 /**
@@ -83,13 +85,28 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      * @param anCustNo
      * @return
      */
-    public Page<WorkFlowBase> queryWorkFlowBaseByCustNo(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<WorkFlowBaseData> queryWorkFlowBaseByCustNo(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空");
+
+        PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
+        return this.mapper.queryWorkFlowBaseByCustNo(anCustNo);
+    }
+
+    /**
+     *
+     * @param anCustNo
+     * @param anWorkFlowName
+     * @return
+     */
+    public List<WorkFlowBase> queryHistoryWorkFlowBase(final Long anCustNo, final String anWorkFlowName) {
+        BTAssert.notNull(anCustNo, "公司编号不允许为空");
+        BTAssert.notNull(anWorkFlowName, "流程名称不允许为空");
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("custNo", anCustNo);
+        conditionMap.put("name", anWorkFlowName);
 
-        return this.selectPropertyByPage(conditionMap, anPageNum, anPageSize, anFlag == 1);
+        return this.selectByProperty(conditionMap, "version DESC");
     }
 
     /**
@@ -433,4 +450,6 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
             throw new BytterException("启用流程发生错误!");
         }
     }
+
+
 }

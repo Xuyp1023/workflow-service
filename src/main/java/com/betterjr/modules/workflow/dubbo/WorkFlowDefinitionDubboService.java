@@ -72,6 +72,18 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
     /*
      * (non-Javadoc)
      *
+     * @see com.betterjr.modules.workflow.IWorkFlowDefinitionService#webQueryWorkFlowBase(java.lang.Long)
+     */
+    @Override
+    public String webQueryHistoryWorkFlowBase(final Long anCustNo, final String anWorkFlowName) {
+        return AjaxObject.newOk("查询流程定义列表成功！", workFlowBaseService.queryHistoryWorkFlowBase(anCustNo, anWorkFlowName))
+                .toJson();
+    }
+
+
+    /*
+     * (non-Javadoc)
+     *
      * @see com.betterjr.modules.workflow.IWorkFlowDefinitionService#webFindWorkFlowBase(java.lang.Long)
      */
     @Override
