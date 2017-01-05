@@ -116,9 +116,10 @@ public class WorkFlowService {
         final CustMechBase initCustMechBase = custMechBaseService.findBaseInfo(flowInput.getStartCustNo());
         BTAssert.notNull(initCustMechBase, "没有找到启动流程公司！");
 
-
         final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseLatestByName(flowInput.getFlowName(), flowInput.getFlowCustNo());
         BTAssert.notNull(workFlowBase, "没有找到流程定义！");
+
+        BTAssert.isTrue(BetterStringUtils.equals(workFlowBase.getIsDisabled(), WorkFlowConstants.NOT_DISABLED), "该流程已经被停用！请联系相关人员！");
 
         final String handlerName = workFlowBase.getHandler();
 
