@@ -450,6 +450,7 @@ public class WorkFlowService {
         WorkFlowBusiness workFlowBusiness = null;
         final Order order = queryService.getOrder(task.getOrderId());
         if (BetterStringUtils.equals(workFlowBase.getIsSubprocess(), "1")) { // 如果是子流程，需要结束子流程和主流程
+            workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(order.getParentId());
             BTAssert.notNull(workFlowBusiness, "没有找到业务记录！");
             // 终止子流程
             final String handlerName = workFlowBase.getHandler();
@@ -468,8 +469,6 @@ public class WorkFlowService {
 
             // 终止子流程
             orderService.terminate(order.getId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
-
-            workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(order.getParentId());
 
             final WorkFlowBase mainWorkFlowBase = workFlowBaseService.findWorkFlowBaseById(workFlowBusiness.getBaseId());
             BTAssert.notNull(mainWorkFlowBase, "没有找到流程定义！");
