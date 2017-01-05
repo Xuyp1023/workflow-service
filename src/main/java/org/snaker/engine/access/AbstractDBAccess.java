@@ -1085,7 +1085,7 @@ public abstract class AbstractDBAccess implements DBAccess {
 
         if(!filter.isOrderBySetted()) {
             filter.setOrder(QueryFilter.DESC);
-            filter.setOrderBy("t.create_Time");
+            filter.setOrderBy("t.finish_Time");
         }
         return queryList(page, filter, WorkItem.class, sql.toString(), paramList.toArray());
     }
