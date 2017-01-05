@@ -451,6 +451,7 @@ public class WorkFlowService {
         final Order order = queryService.getOrder(task.getOrderId());
         if (BetterStringUtils.equals(workFlowBase.getIsSubprocess(), "1")) { // 如果是子流程，需要结束子流程和主流程
             workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(order.getParentId());
+
             BTAssert.notNull(workFlowBusiness, "没有找到业务记录！");
             // 终止子流程
             final String handlerName = workFlowBase.getHandler();
