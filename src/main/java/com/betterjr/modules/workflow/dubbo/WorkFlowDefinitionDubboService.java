@@ -54,8 +54,8 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
     private BetterSpringSnakerEngine engine;
 
     @Override
-    public String webQueryDefaultWorkFlow() {
-        return AjaxObject.newOk("查询基础流程列表成功！", workFlowBaseService.queryDefaultWorkFlow()).toJson();
+    public String webQueryDefaultWorkFlow(final Long anCustNo) {
+        return AjaxObject.newOk("查询基础流程列表成功！", workFlowBaseService.queryDefaultWorkFlow(anCustNo)).toJson();
     }
 
     /*
@@ -142,6 +142,11 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
         final WorkFlowBase workFlowBase = new WorkFlowBase();
         workFlowBase.setNickname(anNickname);
         return AjaxObject.newOk("添加流程成功！", workFlowBaseService.addWorkFlowBase(workFlowBase, anDefaultBaseId, anCustNo)).toJson();
+    }
+
+    @Override
+    public String webAddNewVersionWorkFlowBase(final String anWorkFlowName, final Long anCustNo) {
+        return AjaxObject.newOk("添加流程成功！", workFlowBaseService.addNewVersionWorkFlowBase(anWorkFlowName, anCustNo)).toJson();
     }
 
     /*

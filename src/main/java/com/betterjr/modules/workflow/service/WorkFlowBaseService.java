@@ -52,10 +52,10 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      *
      * @return
      */
-    public List<SimpleDataEntity> queryDefaultWorkFlow() {
+    public List<SimpleDataEntity> queryDefaultWorkFlow(final Long anCustNo) {
         final CustCertRule custCertRule = Collections3.getFirst(UserUtils.getCertInfo().getCertRuleList());
         BTAssert.notNull(custCertRule, "没有找到相应的证书角色！");
-        return queryDefaultWorkFlow(custCertRule.getRule());
+        return queryDefaultWorkFlow(anCustNo, custCertRule.getRule());
     }
 
     /**
@@ -63,7 +63,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      *
      * @return
      */
-    public List<SimpleDataEntity> queryDefaultWorkFlow(final String anOperRole) {
+    public List<SimpleDataEntity> queryDefaultWorkFlow(final Long anCustNo, final String anOperRole) {
         // 取当前公司operRole
         BTAssert.isTrue(BetterStringUtils.isNotBlank(anOperRole), "机构ROLE不允许为空");
 
@@ -253,22 +253,54 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
             workFlowNodeService.saveCopyWorkFlowNode(workFlowBaseDefault, anWorkFlowBase);
         }
         else {
-            if (BetterStringUtils.equals(workFlowBaseLast.getIsLatest(), WorkFlowConstants.IS_LATEST)) { // 如果已存在最后版本 则为增加版本
-                final Long version = workFlowBaseLast.getVersion() + 1;
-                anWorkFlowBase.setVersion(version);
-
-                anWorkFlowBase.initAddValue(workFlowBaseLast);
-
-                this.insert(anWorkFlowBase);
-
-                workFlowNodeService.saveCopyWorkFlowNode(workFlowBaseLast, anWorkFlowBase);
-            }
-            else {
-                throw new BytterException("已经存在未发布流程，不允许继续添加！");
-            }
-
+            throw new BytterException("流程已经存在，不允许重复创建！");
         }
         return anWorkFlowBase;
+    }
+
+    /**
+     * @param anWorkFlowName
+     * @param anCustNo
+     * @return
+     */
+    public WorkFlowBase addNewVersionWorkFlowBase(final String anWorkFlowName, final Long anCustNo) {
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(anWorkFlowName), "流程名称不允许为空!");
+        BTAssert.notNull(anCustNo, "公司编号不允许为空！");
+
+        final CustMechBase custMechBase = custMechBaseService.findBaseInfo(anCustNo);
+        BTAssert.notNull(custMechBase, "公司信息没有找到！");
+
+        final WorkFlowBase workFlowBaseDefault = findDefaultWorkFlowBaseByName(anWorkFlowName);
+        BTAssert.notNull(workFlowBaseDefault, "没有找到默认流程！");
+        final WorkFlowBase workFlowBaseLast = findWorkFlowBaseLastByName(anWorkFlowName, anCustNo);
+        BTAssert.notNull("没有找到已存在版本！");
+
+        final WorkFlowBase workFlowBase = new WorkFlowBase();
+        workFlowBase.setName(workFlowBaseDefault.getName());// 这个不允许改变 保持与默认模板一致
+        workFlowBase.setNickname(workFlowBaseLast.getNickname());
+        workFlowBase.setCustNo(anCustNo);
+        workFlowBase.setOperRole(workFlowBaseDefault.getOperRole());
+        workFlowBase.setCategoryId(workFlowBaseDefault.getCategoryId());
+        workFlowBase.setCustName(custMechBase.getCustName());
+        workFlowBase.setIsDefault(WorkFlowConstants.NOT_DEFAULT);
+        workFlowBase.setIsDisabled(WorkFlowConstants.NOT_DISABLED);
+        workFlowBase.setIsLatest(WorkFlowConstants.NOT_LATEST);
+        workFlowBase.setOperOrg(custMechBase.getOperOrg());
+
+        if (BetterStringUtils.equals(workFlowBaseLast.getIsLatest(), WorkFlowConstants.IS_LATEST)) { // 如果已存在最后版本 则为增加版本
+            final Long version = workFlowBaseLast.getVersion() + 1;
+            workFlowBase.setVersion(version);
+
+            workFlowBase.initAddValue(workFlowBaseLast);
+
+            this.insert(workFlowBase);
+
+            workFlowNodeService.saveCopyWorkFlowNode(workFlowBaseLast, workFlowBase);
+        }
+        else {
+            throw new BytterException("已经存在未发布流程，不允许继续添加！");
+        }
+        return workFlowBase;
     }
 
     /**
