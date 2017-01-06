@@ -32,7 +32,7 @@ public class WorkFlowBaseServiceTestCase extends BasicServiceTest<WorkFlowBaseSe
     public void testQueryDefaultWorkFlow() {
         final WorkFlowBaseService baseService = this.getServiceObject();
 
-        baseService.queryDefaultWorkFlow("SUPPLIER_USER").forEach(System.out::println);
+        baseService.queryDefaultWorkFlow(0L, "SUPPLIER_USER").forEach(System.out::println);
     }
 
     @Test
