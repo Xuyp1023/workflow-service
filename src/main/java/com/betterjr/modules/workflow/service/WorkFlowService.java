@@ -29,6 +29,7 @@ import org.snaker.engine.entity.Order;
 import org.snaker.engine.entity.Process;
 import org.snaker.engine.entity.Task;
 import org.snaker.engine.entity.WorkItem;
+import org.snaker.engine.helper.AssertHelper;
 import org.snaker.engine.model.ProcessModel;
 import org.snaker.engine.model.TaskModel;
 import org.springframework.stereotype.Service;
@@ -99,6 +100,79 @@ public class WorkFlowService {
     private WorkFlowBusinessService workFlowBusinessService;
 
     /**
+     * @param anFlowInput
+     */
+    private void checkAndInitWorkFlowDefinition(final WorkFlowInput anFlowInput) {
+        // 检查并初始化流程定义
+        final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseLatestByName(anFlowInput.getFlowName(), anFlowInput.getFlowCustNo());
+        BTAssert.notNull(workFlowBase, "没有找到主流程定义！");
+
+        // 检查整条流程
+        final List<WorkFlowNode> workFlowNodes = workFlowNodeService.queryWorkFlowNode(workFlowBase.getId());
+
+        // 子流程可以自动初始化 供应商 经销商 核心企业 流程未定义，否则为它初始化
+        for (final WorkFlowNode workFlowNode : workFlowNodes) {
+            if (BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_SUB)) {
+                final Long custNo = findCustNo(workFlowNode, anFlowInput);
+                final String workFlowName = workFlowNode.getName();
+
+                final WorkFlowBase subWorkFlowBaseLatest = workFlowBaseService.findWorkFlowBaseLatestByName(workFlowName, custNo);
+                if (subWorkFlowBaseLatest == null) { // 继续检查，是否有未发布流程
+                    final CustMechBase subCustMechBase = custMechBaseService.findBaseInfo(custNo);
+                    BTAssert.notNull(subCustMechBase, "没有找到 " + workFlowName + "：子流程所属公司！");
+
+                    final WorkFlowBase subWorkFlowBaseLast = workFlowBaseService.findWorkFlowBaseLastByName(workFlowName, custNo);
+                    if (subWorkFlowBaseLast != null) {
+                        throw new BytterException(subCustMechBase.getCustName() + "：公司  " + workFlowName + "：流程尚未发布。");
+                    }
+                    else { // 创建并发布一条默认流程
+                        final WorkFlowBase defaultWorkFlowBase = workFlowBaseService.findDefaultWorkFlowBaseByName(workFlowName);
+
+                        BTAssert.notNull(defaultWorkFlowBase, "默认流程未找到！");
+
+                        final WorkFlowBase newWorkFlowBase = new WorkFlowBase();
+                        newWorkFlowBase.setNickname(defaultWorkFlowBase.getName());
+
+                        final WorkFlowBase savedWorkFlowBase = workFlowBaseService.addWorkFlowBase(newWorkFlowBase, defaultWorkFlowBase.getId(),
+                                custNo);
+                        BTAssert.notNull(savedWorkFlowBase, "创建子流程未成功！");
+
+                        // 发布
+                        engine.process().deploy(savedWorkFlowBase.getId());
+                    }
+                }
+            }
+        }
+
+    }
+
+    private Long findCustNo(final WorkFlowNode subWorkFlowNode, final WorkFlowInput anFlowInput) {
+        final String operRole = subWorkFlowNode.getOperRole();
+        AssertHelper.notEmpty(operRole);
+
+        Long custNo = null;
+        switch (operRole) { // CORE_USER 、PLATFORM_USER、FACTOR_USER、SUPPLIER_USER、SELLER_USER
+        case "SUPPLIER_USER":
+            custNo = anFlowInput.getSupplierCustNo();
+            break;
+        case "SELLER_USER":
+            custNo = anFlowInput.getSellerCustNo();
+            break;
+        case "CORE_USER":
+            custNo = anFlowInput.getCoreCustNo();
+            break;
+        case "PLATFORM_USER":
+            custNo = anFlowInput.getPlatformCustNo();
+            break;
+        case "FACTOR_USER":
+            custNo = anFlowInput.getFactorCustNo();
+            break;
+        }
+        AssertHelper.notNull(custNo);
+        return custNo;
+    }
+
+    /**
      * 启动流程
      *
      * @param flowInput
@@ -106,6 +180,9 @@ public class WorkFlowService {
      */
     public WorkFlowBusiness saveStart(final WorkFlowInput flowInput) {
         flowInput.checkStartParam();
+
+        // 检查流程
+        checkAndInitWorkFlowDefinition(flowInput);
 
         final ITaskService taskService = engine.task();
         final IQueryService queryService = engine.query();
@@ -188,7 +265,8 @@ public class WorkFlowService {
         final String[] actors = queryService.getTaskActorsByTaskId(task.getId());
         if (actors == null) {
             taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
-        } else if (actors != null && actors.length == 1) {
+        }
+        else if (actors != null && actors.length == 1) {
             if (!BetterStringUtils.equals(actors[0], WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()))) {
                 taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
                 taskService.removeTaskActor(task.getId(), actors);
@@ -255,7 +333,8 @@ public class WorkFlowService {
         final String[] actors = queryService.getTaskActorsByTaskId(task.getId());
         if (actors == null) {
             taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
-        } else if (actors != null && actors.length == 1) {
+        }
+        else if (actors != null && actors.length == 1) {
             if (BetterStringUtils.startsWith(actors[0], WorkFlowConstants.PREFIX_CUST_NO)) {
                 taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
                 taskService.removeTaskActor(task.getId(), actors);
@@ -341,7 +420,8 @@ public class WorkFlowService {
         final String[] actors = queryService.getTaskActorsByTaskId(task.getId());
         if (actors == null) {
             taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
-        } else if (actors != null && actors.length == 1) {
+        }
+        else if (actors != null && actors.length == 1) {
             if (BetterStringUtils.startsWith(actors[0], WorkFlowConstants.PREFIX_CUST_NO)) {
                 taskService.addTaskActor(task.getId(), (new String[1])[0] = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowInput.getOperId()));
                 taskService.removeTaskActor(task.getId(), actors);
