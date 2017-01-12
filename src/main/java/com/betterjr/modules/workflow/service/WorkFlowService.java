@@ -3,6 +3,7 @@
 // CURRENT VERSION
 // ============================================================================
 // CHANGE LOG
+// V2.2.0 : 2017年1月11日，liuwl, BUG-452
 // V2.0 : 2016年11月22日, liuwl, creation
 // ============================================================================
 package com.betterjr.modules.workflow.service;
@@ -534,8 +535,12 @@ public class WorkFlowService {
             workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(order.getParentId());
 
             BTAssert.notNull(workFlowBusiness, "没有找到业务记录！");
+
+            final WorkFlowBase mainWorkFlowBase = workFlowBaseService.findWorkFlowBaseById(workFlowBusiness.getBaseId());
+            BTAssert.notNull(mainWorkFlowBase, "没有找到流程定义！");
+
             // 终止子流程
-            final String handlerName = workFlowBase.getHandler();
+            final String handlerName = mainWorkFlowBase.getHandler();
             if (BetterStringUtils.isNotBlank(handlerName)) {
                 final IProcessHandler handler = SpringContextHolder.getBean(handlerName);
                 if (handler != null) {
@@ -552,8 +557,7 @@ public class WorkFlowService {
             // 终止子流程
             orderService.terminate(order.getId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
 
-            final WorkFlowBase mainWorkFlowBase = workFlowBaseService.findWorkFlowBaseById(workFlowBusiness.getBaseId());
-            BTAssert.notNull(mainWorkFlowBase, "没有找到流程定义！");
+
 
             // 终止主流程
             orderService.terminate(workFlowBusiness.getOrderId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
