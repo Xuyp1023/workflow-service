@@ -108,6 +108,8 @@ public class WorkFlowService {
         final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseLatestByName(anFlowInput.getFlowName(), anFlowInput.getFlowCustNo());
         BTAssert.notNull(workFlowBase, "没有找到主流程定义！");
 
+        BTAssert.isTrue(BetterStringUtils.equals(workFlowBase.getIsDisabled(), WorkFlowConstants.NOT_DISABLED), workFlowBase.getName() + " 流程已经被停用！请联系相关人员！");
+
         // 检查整条流程
         final List<WorkFlowNode> workFlowNodes = workFlowNodeService.queryWorkFlowNode(workFlowBase.getId());
 
@@ -129,18 +131,20 @@ public class WorkFlowService {
                     else { // 创建并发布一条默认流程
                         final WorkFlowBase defaultWorkFlowBase = workFlowBaseService.findDefaultWorkFlowBaseByName(workFlowName);
 
-                        BTAssert.notNull(defaultWorkFlowBase, "默认流程未找到！");
+                        BTAssert.notNull(defaultWorkFlowBase, defaultWorkFlowBase.getName() + " 默认流程未找到！");
 
                         final WorkFlowBase newWorkFlowBase = new WorkFlowBase();
                         newWorkFlowBase.setNickname(defaultWorkFlowBase.getName());
 
                         final WorkFlowBase savedWorkFlowBase = workFlowBaseService.addWorkFlowBase(newWorkFlowBase, defaultWorkFlowBase.getId(),
                                 custNo);
-                        BTAssert.notNull(savedWorkFlowBase, "创建子流程未成功！");
+                        BTAssert.notNull(savedWorkFlowBase, savedWorkFlowBase.getName() + " 创建子流程未成功！");
 
                         // 发布
                         engine.process().deploy(savedWorkFlowBase.getId());
                     }
+                } else {
+                    BTAssert.isTrue(BetterStringUtils.equals(subWorkFlowBaseLatest.getIsDisabled(), WorkFlowConstants.NOT_DISABLED), subWorkFlowBaseLatest.getName() + " 流程已经被停用！请联系相关人员！");
                 }
             }
         }
@@ -196,8 +200,6 @@ public class WorkFlowService {
 
         final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseLatestByName(flowInput.getFlowName(), flowInput.getFlowCustNo());
         BTAssert.notNull(workFlowBase, "没有找到流程定义！");
-
-        BTAssert.isTrue(BetterStringUtils.equals(workFlowBase.getIsDisabled(), WorkFlowConstants.NOT_DISABLED), "该流程已经被停用！请联系相关人员！");
 
         final String handlerName = workFlowBase.getHandler();
 
