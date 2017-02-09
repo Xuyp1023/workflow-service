@@ -1229,6 +1229,13 @@ public class WorkFlowService {
         final String[] actorNames = new String[anActors.length];
 
         for (int i = 0; i < anActors.length; i++) {
+            if (BetterStringUtils.equals(anActors[i], SnakerEngine.ADMIN)) {
+                actorNames[i] = "系统管理执行";
+            }
+            if (BetterStringUtils.equals(anActors[i], SnakerEngine.AUTO)) {
+                actorNames[i] = "系统自动执行";
+            }
+
             if (BetterStringUtils.startsWith(anActors[i], WorkFlowConstants.PREFIX_OPER_ID)) {
                 final Long operId = Long.valueOf(BetterStringUtils.substring(anActors[i], WorkFlowConstants.PREFIX_OPER_ID.length()));
                 final CustOperatorInfo operator = custOperatorService.findCustOperatorById(operId);
