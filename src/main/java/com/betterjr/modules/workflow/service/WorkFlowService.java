@@ -108,7 +108,8 @@ public class WorkFlowService {
         final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseLatestByName(anFlowInput.getFlowName(), anFlowInput.getFlowCustNo());
         BTAssert.notNull(workFlowBase, "没有找到主流程定义！");
 
-        BTAssert.isTrue(BetterStringUtils.equals(workFlowBase.getIsDisabled(), WorkFlowConstants.NOT_DISABLED), workFlowBase.getName() + " 流程已经被停用！请联系相关人员！");
+        BTAssert.isTrue(BetterStringUtils.equals(workFlowBase.getIsDisabled(), WorkFlowConstants.NOT_DISABLED),
+                workFlowBase.getName() + " 流程已经被停用！请联系相关人员！");
 
         // 检查整条流程
         final List<WorkFlowNode> workFlowNodes = workFlowNodeService.queryWorkFlowNode(workFlowBase.getId());
@@ -143,8 +144,10 @@ public class WorkFlowService {
                         // 发布
                         engine.process().deploy(savedWorkFlowBase.getId());
                     }
-                } else {
-                    BTAssert.isTrue(BetterStringUtils.equals(subWorkFlowBaseLatest.getIsDisabled(), WorkFlowConstants.NOT_DISABLED), subWorkFlowBaseLatest.getName() + " 流程已经被停用！请联系相关人员！");
+                }
+                else {
+                    BTAssert.isTrue(BetterStringUtils.equals(subWorkFlowBaseLatest.getIsDisabled(), WorkFlowConstants.NOT_DISABLED),
+                            subWorkFlowBaseLatest.getName() + " 流程已经被停用！请联系相关人员！");
                 }
             }
         }
@@ -1232,11 +1235,10 @@ public class WorkFlowService {
             if (BetterStringUtils.equals(anActors[i], SnakerEngine.ADMIN)) {
                 actorNames[i] = "系统管理执行";
             }
-            if (BetterStringUtils.equals(anActors[i], SnakerEngine.AUTO)) {
+            else if (BetterStringUtils.equals(anActors[i], SnakerEngine.AUTO)) {
                 actorNames[i] = "系统自动执行";
             }
-
-            if (BetterStringUtils.startsWith(anActors[i], WorkFlowConstants.PREFIX_OPER_ID)) {
+            else if (BetterStringUtils.startsWith(anActors[i], WorkFlowConstants.PREFIX_OPER_ID)) {
                 final Long operId = Long.valueOf(BetterStringUtils.substring(anActors[i], WorkFlowConstants.PREFIX_OPER_ID.length()));
                 final CustOperatorInfo operator = custOperatorService.findCustOperatorById(operId);
                 BTAssert.notNull(operator, "没有找到操作员！");
