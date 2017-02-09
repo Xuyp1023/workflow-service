@@ -557,7 +557,7 @@ public class WorkFlowService {
             }
 
             // 终止子流程
-            orderService.terminate(order.getId(), SnakerEngine.AUTO);
+            orderService.terminate(order.getId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
 
             // 终止主流程
             orderService.terminate(workFlowBusiness.getOrderId(), SnakerEngine.AUTO);
@@ -580,7 +580,7 @@ public class WorkFlowService {
                 }
             }
 
-            orderService.terminate(workFlowBusiness.getOrderId(), SnakerEngine.AUTO);
+            orderService.terminate(workFlowBusiness.getOrderId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
         }
 
         // 添加审批记录
