@@ -557,12 +557,10 @@ public class WorkFlowService {
             }
 
             // 终止子流程
-            orderService.terminate(order.getId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
-
-
+            orderService.terminate(order.getId(), SnakerEngine.AUTO);
 
             // 终止主流程
-            orderService.terminate(workFlowBusiness.getOrderId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
+            orderService.terminate(workFlowBusiness.getOrderId(), SnakerEngine.AUTO);
         }
         else {
             // 终止主流程
@@ -582,7 +580,7 @@ public class WorkFlowService {
                 }
             }
 
-            orderService.terminate(workFlowBusiness.getOrderId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
+            orderService.terminate(workFlowBusiness.getOrderId(), SnakerEngine.AUTO);
         }
 
         // 添加审批记录
