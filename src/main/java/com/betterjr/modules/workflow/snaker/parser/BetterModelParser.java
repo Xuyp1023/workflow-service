@@ -595,7 +595,7 @@ public class BetterModelParser {
                         .setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-" + String.valueOf(j));
                         taskModel.setDisplayName(anWorkFlowStep.getNickname());
 
-                        setNodeLayout(taskModel, anCoordinate.getX() + X_INC, anCoordinate.getY() + (Y_INC * (incLevel - i)));
+                        setNodeLayout(taskModel, anCoordinate.getX() + X_INC, anCoordinate.getY() + (Y_INC * (incLevel - j)));
                         taskModel.setWorkFlowBase(anWorkFlowBase);
                         taskModel.setWorkFlowNode(anWorkFlowNode);
                         taskModel.setWorkFlowStep(anWorkFlowStep);
@@ -623,8 +623,7 @@ public class BetterModelParser {
                 joinModel.setOutputs(Collections.singletonList(decisionExitTrans));
                 joinModel.setInputs(joinInputs);
 
-                anCoordinate.setX(anCoordinate.getX() + X_INC);
-                setNodeLayout(joinModel, anCoordinate.getX(), anCoordinate.getY() + (Y_INC * (incMoneyLevel - i)));
+                setNodeLayout(joinModel, anCoordinate.getX() + X_INC * 2, anCoordinate.getY() + (Y_INC * (incMoneyLevel - i)));
 
                 joinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-join");
                 decisionExitTrans.setSource(joinModel);
@@ -643,7 +642,7 @@ public class BetterModelParser {
             decisionJoinModel.setOutputs(Collections.singletonList(nextStep));
             decisionJoinModel.setInputs(decisionJoinInputs);
 
-            anCoordinate.setX(anCoordinate.getX() + X_INC);
+            anCoordinate.setX(anCoordinate.getX() + X_INC * 3);
             setNodeLayout(decisionJoinModel, anCoordinate);
 
             decisionJoinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-decisionJoin");
