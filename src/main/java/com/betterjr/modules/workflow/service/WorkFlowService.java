@@ -1176,8 +1176,13 @@ public class WorkFlowService {
 
         final List<Process> processes = processService.getProcesss(new QueryFilter().setCustNo(anCustNo));
 
+        if (Collections3.isEmpty(processes)) {
+            return com.betterjr.mapper.pagehelper.Page.emptyPage();
+        }
+
         final List<String> processIdList = processes.stream().map(process -> process.getId()).collect(Collectors.toList());
         final String[] processIds = processIdList.toArray(new String[processIdList.size()]);
+
 
         final QueryFilter queryFilter = new QueryFilter().setProcessIds(processIds);
         if (anParam != null) {
