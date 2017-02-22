@@ -310,7 +310,7 @@ public class BetterModelParser {
                         nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList, i, anNodeModels, anCoordinate);
                     }
                     else { // 中间步骤
-                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, i, anNodeModels, anCoordinate);
+                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList, i, anNodeModels, anCoordinate);
                     }
                 }
             }
@@ -364,8 +364,12 @@ public class BetterModelParser {
             taskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(workFlowApprover.getOperId()));
 
             anPrevStep.setTarget(taskModel);
+
             final TransitionModel nextStep = new TransitionModel();
             taskModel.setOutputs(Collections.singletonList(nextStep));
+
+            nextStep.setName(taskModel.getName() + "-outputPath");
+            nextStep.setDisplayName("");
             nextStep.setSource(taskModel);
 
             anStepNodeList.add(taskModel);
