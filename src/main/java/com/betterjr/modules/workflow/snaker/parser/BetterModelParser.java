@@ -368,7 +368,7 @@ public class BetterModelParser {
             final TransitionModel nextStep = new TransitionModel();
             taskModel.setOutputs(Collections.singletonList(nextStep));
 
-            nextStep.setName(taskModel.getName() + "-outputPath");
+            nextStep.setName(anWorkFlowStep.getName()  + "-" + anStep + "-AllExitPath");
             nextStep.setDisplayName("");
             nextStep.setSource(taskModel);
 
@@ -455,7 +455,7 @@ public class BetterModelParser {
             joinModel.setInputs(joinInputs);
             joinModel.setOutputs(Collections.singletonList(nextStep));
             nextStep.setSource(joinModel);
-            nextStep.setName(anWorkFlowStep.getName() + "-money--exitPath");
+            nextStep.setName(anWorkFlowStep.getName()  + "-" + anStep + "-AllExitPath");
             nextStep.setDisplayName("");
             anStepNodeList.add(joinModel);
 
@@ -528,7 +528,7 @@ public class BetterModelParser {
             joinModel.setName(anWorkFlowStep.getName() + "-" + anStep + "-join");
 
             nextStep.setSource(joinModel);
-            nextStep.setName(anWorkFlowStep.getName() + "-parallel--exitPath");
+            nextStep.setName(anWorkFlowStep.getName()  + "-" + anStep + "-AllExitPath");
             nextStep.setDisplayName("");
             anStepNodeList.add(joinModel);
 
@@ -650,7 +650,7 @@ public class BetterModelParser {
             setNodeLayout(decisionJoinModel, anCoordinate);
 
             decisionJoinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-decisionJoin");
-            nextStep.setName(anWorkFlowStep.getName() + "-money--exitPath");
+            nextStep.setName(anWorkFlowStep.getName()  + "-" + anStep + "-AllExitPath");
             nextStep.setDisplayName("");
             nextStep.setSource(decisionJoinModel);
             anStepNodeList.add(decisionJoinModel);
