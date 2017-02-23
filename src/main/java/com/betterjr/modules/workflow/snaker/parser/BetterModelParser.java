@@ -406,7 +406,7 @@ public class BetterModelParser {
                 final TransitionModel enterTrans = new TransitionModel();
                 enterTrans.setSource(decisionModel);
 
-                enterTrans.setName(anWorkFlowStep.getName() + "-money-" + i + "-enterPath");
+                enterTrans.setName(anWorkFlowStep.getName() + "-money-" + anStep + "-" + i + "-enterPath");
                 enterTrans.setDisplayName("");
 
                 String moneyVariable = workFlowNode.getMoneyVariable();
@@ -436,7 +436,7 @@ public class BetterModelParser {
                 final TransitionModel exitTrans = new TransitionModel();
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
                 exitTrans.setSource(taskModel);
-                exitTrans.setName(anWorkFlowStep.getName() + "-money-" + i + "-exitPath");
+                exitTrans.setName(anWorkFlowStep.getName() + "-money-" + anStep + "-" + i + "-exitPath");
                 exitTrans.setDisplayName("");
 
                 joinInputs.add(exitTrans);
@@ -485,13 +485,13 @@ public class BetterModelParser {
 
                 final TransitionModel enterTrans = new TransitionModel();
                 enterTrans.setSource(forkModel);
-                enterTrans.setName(anWorkFlowStep.getName() + "-parallel-" + i + "-enterPath");
+                enterTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anStep + "-" + i + "-enterPath");
                 enterTrans.setDisplayName("");
 
                 final TaskModel taskModel = new TaskModel();
                 taskModel.setHasWeight(true);
                 taskModel.setWeight(workFlowApprover.getWeight());
-                taskModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i));
+                taskModel.setName(anWorkFlowStep.getName() + "-" + anStep + "-" + String.valueOf(i));
                 taskModel.setDisplayName(anWorkFlowStep.getNickname());
 
                 setNodeLayout(taskModel, anCoordinate.getX(), anCoordinate.getY() + (Y_INC * (incLevel - i)));
@@ -509,7 +509,7 @@ public class BetterModelParser {
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
                 joinInputs.add(exitTrans);
                 exitTrans.setSource(taskModel);
-                exitTrans.setName(anWorkFlowStep.getName() + "-parallel-" + i + "-exitPath");
+                exitTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anStep + "-" + i + "-exitPath");
                 exitTrans.setDisplayName("");
 
                 anStepNodeList.add(taskModel);
@@ -517,7 +517,7 @@ public class BetterModelParser {
                 exitTrans.setTarget(joinModel);
             }
             forkModel.setOutputs(forkOutputs);
-            forkModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-fork");
+            forkModel.setName(anWorkFlowStep.getName() + "-" + anStep + "-fork");
             final TransitionModel nextStep = new TransitionModel();
             joinModel.setInputs(joinInputs);
             joinModel.setOutputs(Collections.singletonList(nextStep));
@@ -525,7 +525,7 @@ public class BetterModelParser {
             anCoordinate.setX(anCoordinate.getX() + X_INC); // 递进
             setNodeLayout(joinModel, anCoordinate);
 
-            joinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-join");
+            joinModel.setName(anWorkFlowStep.getName() + "-" + anStep + "-join");
 
             nextStep.setSource(joinModel);
             nextStep.setName(anWorkFlowStep.getName() + "-parallel--exitPath");
@@ -559,7 +559,7 @@ public class BetterModelParser {
                 final WorkFlowMoney workFlowMoney = flowMoneys.get(i);
                 final TransitionModel decisionEnterTrans = new TransitionModel();
                 decisionEnterTrans.setSource(decisionModel);
-                decisionEnterTrans.setName(anWorkFlowStep.getName() + "-money-" + i + "-enterPath");
+                decisionEnterTrans.setName(anWorkFlowStep.getName() + "-money-" + anStep + "-" + i + "-enterPath");
                 decisionEnterTrans.setDisplayName("");
 
                 String moneyVariable = workFlowNode.getMoneyVariable();
@@ -589,7 +589,7 @@ public class BetterModelParser {
                     if (workFlowMoney.getId().equals(flowApprover.getMoneyId())) {
                         final TransitionModel enterTrans = new TransitionModel();
                         enterTrans.setSource(forkModel);
-                        enterTrans.setName(anWorkFlowStep.getName() + "-parallel-" + i + "-" + j + "-enterPath");
+                        enterTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anStep + "-" + i + "-" + j + "-enterPath");
                         enterTrans.setDisplayName("");
 
                         final TaskModel taskModel = new TaskModel();
@@ -612,7 +612,7 @@ public class BetterModelParser {
                         final TransitionModel exitTrans = new TransitionModel();
                         taskModel.setOutputs(Collections.singletonList(exitTrans));
                         exitTrans.setSource(taskModel);
-                        exitTrans.setName(anWorkFlowStep.getName() + "-parallel-" + i + "-" + j + "-exitPath");
+                        exitTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anStep + "-" + i + "-" + j + "-exitPath");
                         exitTrans.setDisplayName("");
                         joinInputs.add(exitTrans);
                         anStepNodeList.add(taskModel);
@@ -631,7 +631,7 @@ public class BetterModelParser {
 
                 joinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-join");
                 decisionExitTrans.setSource(joinModel);
-                decisionExitTrans.setName(anWorkFlowStep.getName() + "-money-" + i + "-exitPath");
+                decisionExitTrans.setName(anWorkFlowStep.getName() + "-money-" + anStep + "-" + i + "-exitPath");
                 decisionExitTrans.setDisplayName("");
 
                 decisionJoinInputs.add(decisionExitTrans);
