@@ -159,7 +159,7 @@ public class BetterModelParser {
                 setNodeLayout(startModel, coordinate);
 
                 prevStep = new TransitionModel();
-                prevStep.setName(startModel.getName() + "-outputPath");
+                prevStep.setName(startModel.getName() + "-" + i + "-outputPath");
                 prevStep.setDisplayName("");
 
                 startModel.setOutputs(Collections.singletonList(prevStep));
@@ -197,7 +197,7 @@ public class BetterModelParser {
                     nextStep.setSource(taskModel);
                     prevStep = nextStep;
 
-                    prevStep.setName(taskModel.getName() + "-outputPath");
+                    prevStep.setName(taskModel.getName() + "-" + i + "-outputPath");
                     prevStep.setDisplayName("");
 
                     nodeModels.add(taskModel);
@@ -205,7 +205,7 @@ public class BetterModelParser {
                 break;
                 case WorkFlowConstants.NODE_TYPE_APP: { // 审批节点 此处可能生成若干节点
                     final List<NodeModel> stepNodeList = new ArrayList<NodeModel>();
-                    prevStep = parseAppNode(anWorkFlowBase, flowNode, prevStep, stepNodeList, nodeModels, coordinate);
+                    prevStep = parseAppNode(anWorkFlowBase, flowNode, prevStep, i, stepNodeList, nodeModels, coordinate);
 
                     nodeModels.addAll(stepNodeList);
                 }
@@ -227,7 +227,7 @@ public class BetterModelParser {
 
                     prevStep = nextStep;
 
-                    prevStep.setName(subProcessModel.getName() + "-outputPath");
+                    prevStep.setName(subProcessModel.getName() + "-" + i + "-outputPath");
                     prevStep.setDisplayName("");
 
                     nodeModels.add(subProcessModel);
@@ -283,7 +283,7 @@ public class BetterModelParser {
      * @param anCoordinate
      * @return
      */
-    private static TransitionModel parseAppNode(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anFlowNode, final TransitionModel anPrevStep,
+    private static TransitionModel parseAppNode(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anFlowNode, final TransitionModel anPrevStep, final int anNodeIndex,
             final List<NodeModel> anStepNodeList, final List<NodeModel> anNodeModels, final Coordinate anCoordinate) {
         BTAssert.notNull(anFlowNode, "流程节点不允许为空");
 
@@ -296,7 +296,7 @@ public class BetterModelParser {
                 final WorkFlowStep flowStep = flowSteps.get(0);
 
                 anCoordinate.setX(anCoordinate.getX() + X_INC);
-                nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, 0, anNodeModels, anCoordinate);
+                nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, anNodeIndex, 0, anNodeModels, anCoordinate);
             }
             else {
                 TransitionModel tempNextStep = null;
@@ -304,19 +304,17 @@ public class BetterModelParser {
                     final WorkFlowStep flowStep = flowSteps.get(i);
                     anCoordinate.setX(anCoordinate.getX() + X_INC);
                     if (i == 0) { // 有多步时 第一步
-                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, i, anNodeModels, anCoordinate);
+                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, anNodeIndex, i, anNodeModels, anCoordinate);
                     }
                     else if (i == flowSteps.size() - 1) { // 有多步时 最后一步
-                        nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList, i, anNodeModels, anCoordinate);
+                        nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList, anNodeIndex, i, anNodeModels, anCoordinate);
                     }
                     else { // 中间步骤
-                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList, i, anNodeModels, anCoordinate);
+                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList, anNodeIndex, i, anNodeModels, anCoordinate);
                     }
                 }
             }
 
-            nextStep.setName(anFlowNode.getName() + "-outputPath");
-            nextStep.setDisplayName("");
         }
         else {
             nextStep = anPrevStep;
@@ -333,7 +331,7 @@ public class BetterModelParser {
      * @param anCoordinate
      */
     private static TransitionModel parseStep(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anWorkFlowNode, final WorkFlowStep anWorkFlowStep,
-            final TransitionModel anPrevStep, final List<NodeModel> anStepNodeList, final int anStep, final List<NodeModel> anNodeModels,
+            final TransitionModel anPrevStep, final List<NodeModel> anStepNodeList, final int anNodeIndex, final int anStepIndex, final List<NodeModel> anNodeModels,
             final Coordinate anCoordinate) {
         final WorkFlowNodeService workFlowNodeService = SpringContextHolder.getBean(WorkFlowNodeService.class);
         final WorkFlowMoneyService workFlowMoneyService = SpringContextHolder.getBean(WorkFlowMoneyService.class);
@@ -351,7 +349,7 @@ public class BetterModelParser {
             BTAssert.isTrue(flowApprovers.size() == 1, "此节点只能拥有1位审批人");
 
             final TaskModel taskModel = new TaskModel();
-            taskModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep));
+            taskModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex);
             taskModel.setDisplayName(anWorkFlowStep.getNickname());
 
             taskModel.setWorkFlowBase(anWorkFlowBase);
@@ -368,7 +366,7 @@ public class BetterModelParser {
             final TransitionModel nextStep = new TransitionModel();
             taskModel.setOutputs(Collections.singletonList(nextStep));
 
-            nextStep.setName(anWorkFlowStep.getName()  + "-" + anStep + "-AllExitPath");
+            nextStep.setName(taskModel.getName()  + anNodeIndex + "-" + anStepIndex + "-outputPath");
             nextStep.setDisplayName("");
             nextStep.setSource(taskModel);
 
@@ -406,7 +404,7 @@ public class BetterModelParser {
                 final TransitionModel enterTrans = new TransitionModel();
                 enterTrans.setSource(decisionModel);
 
-                enterTrans.setName(anWorkFlowStep.getName() + "-money-" + anStep + "-" + i + "-enterPath");
+                enterTrans.setName(anWorkFlowStep.getName() + "-money-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-enterPath");
                 enterTrans.setDisplayName("");
 
                 String moneyVariable = workFlowNode.getMoneyVariable();
@@ -419,7 +417,7 @@ public class BetterModelParser {
 
                 final TaskModel taskModel = new TaskModel();
 
-                taskModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i));
+                taskModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-" + String.valueOf(i));
                 taskModel.setDisplayName(anWorkFlowStep.getNickname());
 
                 setNodeLayout(taskModel, anCoordinate.getX(), anCoordinate.getY() + (Y_INC * (incLevel - i)));
@@ -436,7 +434,7 @@ public class BetterModelParser {
                 final TransitionModel exitTrans = new TransitionModel();
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
                 exitTrans.setSource(taskModel);
-                exitTrans.setName(anWorkFlowStep.getName() + "-money-" + anStep + "-" + i + "-exitPath");
+                exitTrans.setName(anWorkFlowStep.getName() + "-money-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-exitPath");
                 exitTrans.setDisplayName("");
 
                 joinInputs.add(exitTrans);
@@ -444,18 +442,18 @@ public class BetterModelParser {
                 anStepNodeList.add(taskModel);
                 exitTrans.setTarget(joinModel);
             }
-            decisionModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-decision");
+            decisionModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-decision");
             decisionModel.setOutputs(decisionOutputs);
             final TransitionModel nextStep = new TransitionModel();
 
             anCoordinate.setX(anCoordinate.getX() + X_INC);
             setNodeLayout(joinModel, anCoordinate);
 
-            joinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-join");
+            joinModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-join");
             joinModel.setInputs(joinInputs);
             joinModel.setOutputs(Collections.singletonList(nextStep));
             nextStep.setSource(joinModel);
-            nextStep.setName(anWorkFlowStep.getName()  + "-" + anStep + "-AllExitPath");
+            nextStep.setName(anWorkFlowStep.getName()  + anNodeIndex + "-" + anStepIndex + "-money--exitPath");
             nextStep.setDisplayName("");
             anStepNodeList.add(joinModel);
 
@@ -485,13 +483,13 @@ public class BetterModelParser {
 
                 final TransitionModel enterTrans = new TransitionModel();
                 enterTrans.setSource(forkModel);
-                enterTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anStep + "-" + i + "-enterPath");
+                enterTrans.setName(anWorkFlowStep.getName() + "-parallel-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-enterPath");
                 enterTrans.setDisplayName("");
 
                 final TaskModel taskModel = new TaskModel();
                 taskModel.setHasWeight(true);
                 taskModel.setWeight(workFlowApprover.getWeight());
-                taskModel.setName(anWorkFlowStep.getName() + "-" + anStep + "-" + String.valueOf(i));
+                taskModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-" + String.valueOf(i));
                 taskModel.setDisplayName(anWorkFlowStep.getNickname());
 
                 setNodeLayout(taskModel, anCoordinate.getX(), anCoordinate.getY() + (Y_INC * (incLevel - i)));
@@ -509,7 +507,7 @@ public class BetterModelParser {
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
                 joinInputs.add(exitTrans);
                 exitTrans.setSource(taskModel);
-                exitTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anStep + "-" + i + "-exitPath");
+                exitTrans.setName(anWorkFlowStep.getName() + "-parallel-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-exitPath");
                 exitTrans.setDisplayName("");
 
                 anStepNodeList.add(taskModel);
@@ -517,7 +515,7 @@ public class BetterModelParser {
                 exitTrans.setTarget(joinModel);
             }
             forkModel.setOutputs(forkOutputs);
-            forkModel.setName(anWorkFlowStep.getName() + "-" + anStep + "-fork");
+            forkModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-fork");
             final TransitionModel nextStep = new TransitionModel();
             joinModel.setInputs(joinInputs);
             joinModel.setOutputs(Collections.singletonList(nextStep));
@@ -525,10 +523,10 @@ public class BetterModelParser {
             anCoordinate.setX(anCoordinate.getX() + X_INC); // 递进
             setNodeLayout(joinModel, anCoordinate);
 
-            joinModel.setName(anWorkFlowStep.getName() + "-" + anStep + "-join");
+            joinModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-join");
 
             nextStep.setSource(joinModel);
-            nextStep.setName(anWorkFlowStep.getName()  + "-" + anStep + "-AllExitPath");
+            nextStep.setName(anWorkFlowStep.getName()  + anNodeIndex + "-" + anStepIndex + "-parallel--exitPath");
             nextStep.setDisplayName("");
             anStepNodeList.add(joinModel);
 
@@ -559,7 +557,7 @@ public class BetterModelParser {
                 final WorkFlowMoney workFlowMoney = flowMoneys.get(i);
                 final TransitionModel decisionEnterTrans = new TransitionModel();
                 decisionEnterTrans.setSource(decisionModel);
-                decisionEnterTrans.setName(anWorkFlowStep.getName() + "-money-" + anStep + "-" + i + "-enterPath");
+                decisionEnterTrans.setName(anWorkFlowStep.getName() + "-money-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-enterPath");
                 decisionEnterTrans.setDisplayName("");
 
                 String moneyVariable = workFlowNode.getMoneyVariable();
@@ -589,14 +587,13 @@ public class BetterModelParser {
                     if (workFlowMoney.getId().equals(flowApprover.getMoneyId())) {
                         final TransitionModel enterTrans = new TransitionModel();
                         enterTrans.setSource(forkModel);
-                        enterTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anStep + "-" + i + "-" + j + "-enterPath");
+                        enterTrans.setName(anWorkFlowStep.getName() + "-parallel-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-" + j + "-enterPath");
                         enterTrans.setDisplayName("");
 
                         final TaskModel taskModel = new TaskModel();
                         taskModel.setHasWeight(true);
                         taskModel.setWeight(flowApprover.getWeight());
-                        taskModel
-                        .setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-" + String.valueOf(j));
+                        taskModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-" + j);
                         taskModel.setDisplayName(anWorkFlowStep.getNickname());
 
                         setNodeLayout(taskModel, anCoordinate.getX() + X_INC, anCoordinate.getY() + (Y_INC * (incLevel - j)));
@@ -612,7 +609,7 @@ public class BetterModelParser {
                         final TransitionModel exitTrans = new TransitionModel();
                         taskModel.setOutputs(Collections.singletonList(exitTrans));
                         exitTrans.setSource(taskModel);
-                        exitTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anStep + "-" + i + "-" + j + "-exitPath");
+                        exitTrans.setName(anWorkFlowStep.getName() + "-parallel-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-" + j + "-exitPath");
                         exitTrans.setDisplayName("");
                         joinInputs.add(exitTrans);
                         anStepNodeList.add(taskModel);
@@ -622,16 +619,16 @@ public class BetterModelParser {
                 }
 
                 forkModel.setOutputs(forkOutputs);
-                forkModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-fork");
+                forkModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-fork");
                 final TransitionModel decisionExitTrans = new TransitionModel();
                 joinModel.setOutputs(Collections.singletonList(decisionExitTrans));
                 joinModel.setInputs(joinInputs);
 
                 setNodeLayout(joinModel, anCoordinate.getX() + X_INC * 2, anCoordinate.getY() + (Y_INC * (incMoneyLevel - i)));
 
-                joinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-" + String.valueOf(i) + "-join");
+                joinModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-join");
                 decisionExitTrans.setSource(joinModel);
-                decisionExitTrans.setName(anWorkFlowStep.getName() + "-money-" + anStep + "-" + i + "-exitPath");
+                decisionExitTrans.setName(anWorkFlowStep.getName() + "-money-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-exitPath");
                 decisionExitTrans.setDisplayName("");
 
                 decisionJoinInputs.add(decisionExitTrans);
@@ -641,7 +638,7 @@ public class BetterModelParser {
             }
 
             decisionModel.setOutputs(decisionOutputs);
-            decisionModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-decision");
+            decisionModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-decision");
             final TransitionModel nextStep = new TransitionModel();
             decisionJoinModel.setOutputs(Collections.singletonList(nextStep));
             decisionJoinModel.setInputs(decisionJoinInputs);
@@ -649,8 +646,8 @@ public class BetterModelParser {
             anCoordinate.setX(anCoordinate.getX() + X_INC * 3);
             setNodeLayout(decisionJoinModel, anCoordinate);
 
-            decisionJoinModel.setName(anWorkFlowStep.getName() + "-" + String.valueOf(anStep) + "-decisionJoin");
-            nextStep.setName(anWorkFlowStep.getName()  + "-" + anStep + "-AllExitPath");
+            decisionJoinModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-decisionJoin");
+            nextStep.setName(anWorkFlowStep.getName()  + anNodeIndex + "-" + anStepIndex + "-money--exitPath");
             nextStep.setDisplayName("");
             nextStep.setSource(decisionJoinModel);
             anStepNodeList.add(decisionJoinModel);
