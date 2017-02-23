@@ -415,7 +415,7 @@ public class WorkFlowService {
                 && BetterStringUtils.equals(workFlowStep.getAuditType(), "1")) { // 确定是审批 并行节点
             final List<Task> activeTasks = queryService.getActiveTasks(new QueryFilter().setOrderId(task.getOrderId()));
             for (final Task activeTask : activeTasks) {
-                final WorkFlowStep tempWorkFlowStep = activeTask.getModel().getWorkFlowStep();
+                final WorkFlowStep tempWorkFlowStep = taskService.getTaskModel(activeTask.getId()).getWorkFlowStep();
                 if (tempWorkFlowStep.getId().equals(workFlowStep.getId()) && !BetterStringUtils.equals(task.getId(), activeTask.getId())) {
                     taskService.complete(activeTask.getId(), SnakerEngine.AUTO);
                 }
@@ -560,7 +560,7 @@ public class WorkFlowService {
             }
 
             // 终止子流程
-            orderService.terminate(order.getId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
+            orderService.terminate(order.getId(), SnakerEngine.AUTO);
 
             // 终止主流程
             orderService.terminate(workFlowBusiness.getOrderId(), SnakerEngine.AUTO);
@@ -583,7 +583,7 @@ public class WorkFlowService {
                 }
             }
 
-            orderService.terminate(workFlowBusiness.getOrderId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
+            orderService.terminate(workFlowBusiness.getOrderId(), SnakerEngine.AUTO);
         }
 
         // 添加审批记录
