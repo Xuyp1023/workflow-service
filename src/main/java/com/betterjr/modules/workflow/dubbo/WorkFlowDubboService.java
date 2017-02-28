@@ -3,7 +3,8 @@
 // CURRENT VERSION
 // ============================================================================
 // CHANGE LOG
-// V2.0 : 2016年11月14日, liuwl, creation
+// V2.2 : 2017年2月27日，liuwl, task-170
+// V2.2 : 2016年11月14日, liuwl, creation
 // ============================================================================
 package com.betterjr.modules.workflow.dubbo;
 
@@ -41,6 +42,15 @@ public class WorkFlowDubboService implements IWorkFlowService {
     public WorkFlowBusiness startWorkFlow(final WorkFlowInput workFlowInput) {
 
         return workFlowService.saveStart(workFlowInput);
+    }
+
+    // 待办任务数量
+    @Override
+    public String webQueryCurrentTaskCount() {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        BTAssert.notNull(operator, "不能获取当前登陆用户！");
+        final Long operId = operator.getId();
+        return AjaxObject.newOk("查询待办任务数量成功", workFlowService.queryWorkItemCount(operId)).toJson();
     }
 
     // 待办任务
