@@ -3,8 +3,9 @@
 // CURRENT VERSION
 // ============================================================================
 // CHANGE LOG
-// V2.2.0 : 2017年1月11日，liuwl, BUG-452
-// V2.0 : 2016年11月22日, liuwl, creation
+// V2.2 : 2017年2月27日，liuwl, task-170
+// V2.2 : 2017年1月11日，liuwl, BUG-452
+// V2.2 : 2016年11月22日, liuwl, creation
 // ============================================================================
 package com.betterjr.modules.workflow.service;
 
@@ -860,6 +861,30 @@ public class WorkFlowService {
     }
 
     /**
+     * 查询待办工作项数量
+     * @param anOperId
+     * @return
+     */
+    public int queryWorkItemCount(final Long anOperId) {
+        final List<String> operators = new ArrayList<>();
+        final Collection<CustInfo> custInfos = custMechBaseService.queryCustInfoByOperId(anOperId);
+
+        operators.addAll(
+                custInfos.stream().map(custInfo -> WorkFlowConstants.PREFIX_CUST_NO + String.valueOf(custInfo.getId())).collect(Collectors.toList()));
+
+        // 获取当前用户拥有的公司
+        final String operId = WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(anOperId);
+        operators.add(operId);
+
+        final IQueryService queryService = engine.query();
+
+        final QueryFilter queryFilter = new QueryFilter().setOperators(operators.toArray(new String[operators.size()]));
+
+        final List<WorkItem> workItems = queryService.getWorkItems(null, queryFilter);
+        return workItems != null ? workItems.size() : 0;
+    }
+
+    /**
      * 查看待办工作项
      *
      * @param anOperId
@@ -1400,4 +1425,6 @@ public class WorkFlowService {
         workFlowWorkItem.setTaskExpireTime(workItem.getTaskExpireTime());
         workFlowWorkItem.setOperator(workItem.getOperator());
     }
+
+
 }
