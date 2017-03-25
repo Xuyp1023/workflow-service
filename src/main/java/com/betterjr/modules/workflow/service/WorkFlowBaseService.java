@@ -52,6 +52,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      *
      * @return
      */
+    @Deprecated
     public List<SimpleDataEntity> queryDefaultWorkFlow(final Long anCustNo) {
         final CustCertRule custCertRule = Collections3.getFirst(UserUtils.getCertInfo().getCertRuleList());
         BTAssert.notNull(custCertRule, "没有找到相应的证书角色！");
@@ -86,7 +87,7 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      * @return
      */
     public Page<WorkFlowBaseData> queryWorkFlowBaseByCustNo(final Long anCustNo, final String anCustRole,final int anFlag, final int anPageNum, final int anPageSize) {
-    	BTAssert.notNull(anCustNo, "公司编号不允许为空");
+        BTAssert.notNull(anCustNo, "公司编号不允许为空");
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
         return this.mapper.queryWorkFlowBaseByCustNo(anCustNo, anCustRole);

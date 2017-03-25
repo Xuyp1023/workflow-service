@@ -56,7 +56,8 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
 
     @Override
     public String webQueryDefaultWorkFlow(final Long anCustNo) {
-        return AjaxObject.newOk("查询基础流程列表成功！", workFlowBaseService.queryDefaultWorkFlow(anCustNo)).toJson();
+        final String userRole = UserUtils.getUserRole().name();
+        return AjaxObject.newOk("查询基础流程列表成功！", workFlowBaseService.queryDefaultWorkFlow(anCustNo, userRole)).toJson();
     }
 
     /*
@@ -66,7 +67,7 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
      */
     @Override
     public String webQueryWorkFlowBase(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
-    	String userRole = UserUtils.getUserRole().name();
+        final String userRole = UserUtils.getUserRole().name();
         return AjaxObject.newOkWithPage("查询流程定义列表成功！", workFlowBaseService.queryWorkFlowBaseByCustNo(anCustNo, userRole,  anFlag, anPageNum, anPageSize))
                 .toJson();
     }
