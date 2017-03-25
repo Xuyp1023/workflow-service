@@ -85,11 +85,11 @@ public class WorkFlowBaseService extends BaseService<WorkFlowBaseMapper, WorkFlo
      * @param anCustNo
      * @return
      */
-    public Page<WorkFlowBaseData> queryWorkFlowBaseByCustNo(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
-        BTAssert.notNull(anCustNo, "公司编号不允许为空");
+    public Page<WorkFlowBaseData> queryWorkFlowBaseByCustNo(final Long anCustNo, final String anCustRole,final int anFlag, final int anPageNum, final int anPageSize) {
+    	BTAssert.notNull(anCustNo, "公司编号不允许为空");
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
-        return this.mapper.queryWorkFlowBaseByCustNo(anCustNo);
+        return this.mapper.queryWorkFlowBaseByCustNo(anCustNo, anCustRole);
     }
 
     /**
