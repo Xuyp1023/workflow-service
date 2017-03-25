@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.mapper.JsonMapper;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 import com.betterjr.modules.workflow.IWorkFlowDefinitionService;
@@ -65,7 +66,8 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
      */
     @Override
     public String webQueryWorkFlowBase(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
-        return AjaxObject.newOkWithPage("查询流程定义列表成功！", workFlowBaseService.queryWorkFlowBaseByCustNo(anCustNo, anFlag, anPageNum, anPageSize))
+    	String userRole = UserUtils.getUserRole().name();
+        return AjaxObject.newOkWithPage("查询流程定义列表成功！", workFlowBaseService.queryWorkFlowBaseByCustNo(anCustNo, userRole,  anFlag, anPageNum, anPageSize))
                 .toJson();
     }
 
