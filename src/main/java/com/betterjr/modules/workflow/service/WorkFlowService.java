@@ -560,6 +560,7 @@ public class WorkFlowService {
                 }
             }
 
+            taskService.complete(task.getId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
             // 终止子流程
             orderService.terminate(order.getId(), SnakerEngine.AUTO);
 
@@ -584,6 +585,7 @@ public class WorkFlowService {
                 }
             }
 
+            taskService.complete(task.getId(), WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(operId));
             orderService.terminate(workFlowBusiness.getOrderId(), SnakerEngine.AUTO);
         }
 
