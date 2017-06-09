@@ -31,7 +31,7 @@ public class ReceFactorAcceptApplicationHandler implements INodeHandler{
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		receApprovalDubboService.applictionAccept(anContext);
+		receApprovalDubboService.applictionAccept((Map<String, Object>)anContext.get("INPUT"));
 		
 	}
 

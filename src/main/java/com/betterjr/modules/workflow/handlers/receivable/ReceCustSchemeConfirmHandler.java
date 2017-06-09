@@ -16,12 +16,12 @@ public class ReceCustSchemeConfirmHandler implements INodeHandler {
 	
 	@Override
 	public void processPass(Map<String, Object> anContext) {
-		receApprovalDubboService.schemeConfirm(anContext, 1);
+		receApprovalDubboService.schemeConfirm((Map<String, Object>)anContext.get("INPUT"), 1);
 	}
 
 	@Override
 	public void processReject(Map<String, Object> anContext) {
-		receApprovalDubboService.schemeConfirm(anContext, 0);
+		receApprovalDubboService.schemeConfirm((Map<String, Object>)anContext.get("INPUT"), 0);
 	}
 
 	@Override

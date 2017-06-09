@@ -15,12 +15,12 @@ public class RreceCoreConfirmTradingBackgrand implements INodeHandler {
 	
 	@Override
 	public void processPass(Map<String, Object> anContext) {
-		receCoreApprovalDubboService.confirmTradingBackgrand(anContext, 1);
+		receCoreApprovalDubboService.confirmTradingBackgrand((Map<String, Object>)anContext.get("INPUT"), 1);
 	}
 
 	@Override
 	public void processReject(Map<String, Object> anContext) {
-		receCoreApprovalDubboService.confirmTradingBackgrand(anContext, 0);
+		receCoreApprovalDubboService.confirmTradingBackgrand((Map<String, Object>)anContext.get("INPUT"), 0);
 	}
 
 	@Override

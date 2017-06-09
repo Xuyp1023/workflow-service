@@ -22,12 +22,12 @@ public class ReceFactorLoanHandler implements INodeHandler {
 	
 	@Override
 	public void processPass(Map<String, Object> anContext) {
-		receApprovalDubboService.loanReview(anContext, 1);
+		receApprovalDubboService.loanReview((Map<String, Object>)anContext.get("INPUT"), 1);
 	}
 
 	@Override
 	public void processReject(Map<String, Object> anContext) {
-		receApprovalDubboService.loanReview(anContext, 0);
+		receApprovalDubboService.loanReview((Map<String, Object>)anContext.get("INPUT"), 0);
 	}
 
 	@Override

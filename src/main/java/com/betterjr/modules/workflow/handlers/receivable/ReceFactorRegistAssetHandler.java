@@ -32,7 +32,7 @@ public class ReceFactorRegistAssetHandler implements INodeHandler {
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		receApprovalDubboService.registerAsset(anContext);
+		receApprovalDubboService.registerAsset((Map<String, Object>)anContext.get("INPUT"));
 	}
 
 	@Override

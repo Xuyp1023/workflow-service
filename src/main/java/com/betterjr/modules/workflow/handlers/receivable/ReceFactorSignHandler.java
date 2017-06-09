@@ -32,7 +32,7 @@ public class ReceFactorSignHandler implements INodeHandler {
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		receApprovalDubboService.sign(anContext);
+		receApprovalDubboService.sign((Map<String, Object>)anContext.get("INPUT"));
 	}
 
 	@Override

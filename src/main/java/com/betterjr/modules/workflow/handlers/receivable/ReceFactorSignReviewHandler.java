@@ -22,12 +22,12 @@ public class ReceFactorSignReviewHandler implements INodeHandler {
 	
 	@Override
 	public void processPass(Map<String, Object> anContext) {
-		receApprovalDubboService.signReview(anContext, 1);	
+		receApprovalDubboService.signReview((Map<String, Object>)anContext.get("INPUT"), 1);	
 	}
 
 	@Override
 	public void processReject(Map<String, Object> anContext) {
-		receApprovalDubboService.signReview(anContext, 0);			
+		receApprovalDubboService.signReview((Map<String, Object>)anContext.get("INPUT"), 0);			
 	}
 
 	@Override

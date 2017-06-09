@@ -26,7 +26,7 @@ public class ReceFactorSchemeReplyHandler implements INodeHandler {
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		receApprovalDubboService.schemeReply(anContext);
+		receApprovalDubboService.schemeReply((Map<String, Object>)anContext.get("INPUT"));
 	}
 
 	@Override

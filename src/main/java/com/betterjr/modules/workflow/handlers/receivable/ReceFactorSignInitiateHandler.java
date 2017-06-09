@@ -30,7 +30,7 @@ public class ReceFactorSignInitiateHandler implements INodeHandler{
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		receApprovalDubboService.signInitiate(anContext);
+		receApprovalDubboService.signInitiate((Map<String, Object>)anContext.get("INPUT"));
 	}
 
 	@Override

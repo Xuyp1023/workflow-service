@@ -15,7 +15,7 @@ public class ReceCustAppliactonHandler implements INodeHandler {
 
 	@Override
 	public void processPass(Map<String, Object> anContext) {
-		scfReceApprovalFlowDubboService.application(anContext);	
+		scfReceApprovalFlowDubboService.application((Map<String, Object>)anContext.get("INPUT"));	
 	}
 
 	@Override
