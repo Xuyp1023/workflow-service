@@ -32,7 +32,6 @@ public class ReceFactorSchemeReviewHandler implements INodeHandler {
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		
 	}
 
 	@Override
