@@ -26,14 +26,10 @@ public class ReceCustSchemeConfirmHandler implements INodeHandler {
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void processSave(Map<String, Object> anContext) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

@@ -25,12 +25,11 @@ public class ReceFactorRiskControlHandler implements INodeHandler {
 
 	@Override
 	public void processReject(Map<String, Object> anContext) {
-		receApprovalDubboService.riskControl((Map<String, Object>)anContext.get("INPUT"), 1);
+		receApprovalDubboService.riskControl((Map<String, Object>)anContext.get("INPUT"), 0);
 	}
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		
 	}
 
 	@Override

@@ -26,12 +26,11 @@ public class ReceCustAppliactonReviewHandler implements INodeHandler {
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-		receApprovalDubboService.applicationReview((Map<String, Object>)anContext.get("INPUT"), 1);
+		
 	}
 
 	@Override
 	public void processSave(Map<String, Object> anContext) {
-		receApprovalDubboService.applicationReview((Map<String, Object>)anContext.get("INPUT"), 0);
 	}
 
 }

@@ -25,7 +25,6 @@ public class RreceCoreConfirmTradingBackgrand implements INodeHandler {
 
 	@Override
 	public void processHandle(Map<String, Object> anContext) {
-
 	}
 
 	@Override
