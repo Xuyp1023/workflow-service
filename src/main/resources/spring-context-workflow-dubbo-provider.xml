@@ -30,6 +30,8 @@
 	<bean class="com.betterjr.common.utils.PropertiesHolder">
 		<property name="properties" value="workflow-service-config.properties" />
 	</bean>
+   
+   <bean class="org.snaker.engine.impl.GeneralAccessStrategy"/>
 
 	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
 		init-method="init" destroy-method="close">

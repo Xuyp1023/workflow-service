@@ -15,11 +15,13 @@
 package org.snaker.engine.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
 import org.snaker.engine.Assignment;
 import org.snaker.engine.AssignmentHandler;
 import org.snaker.engine.Completion;
@@ -94,7 +96,8 @@ public class TaskService extends AccessService implements ITaskService {
             for(int i = 0; i < actors.size(); i++) {
                 actorIds[i] = actors.get(i).getActorId();
             }
-            history.setActorIds(actorIds);
+            //history.setActorIds(actorIds);
+            history.setActorIds(createStringArray(actorIds,operator));
         }
         access().saveHistory(history);
         access().deleteTask(task);
@@ -104,7 +107,18 @@ public class TaskService extends AccessService implements ITaskService {
         }
         return task;
     }
-
+    
+    private String[] createStringArray(String[] sourceArray,String source){
+        
+        String[] descArray=new String[sourceArray.length+1];
+        for (int i = 0; i < sourceArray.length; i++) {
+            descArray[i]=sourceArray[i];
+        }
+        descArray[sourceArray.length]=source;
+        return descArray;
+        
+    }
+    
     /**
      * 更新任务对象的finish_Time、operator、expire_Time、version、variable
      * @param task 任务对象
