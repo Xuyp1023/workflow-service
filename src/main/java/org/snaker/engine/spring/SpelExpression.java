@@ -29,13 +29,14 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
  * @since 1.2.2
  */
 public class SpelExpression implements Expression {
-	ExpressionParser parser = new SpelExpressionParser();
-	
-	public <T> T eval(Class<T> T, String expr, Map<String, Object> args) {
-		EvaluationContext context = new StandardEvaluationContext();
-		for(Entry<String, Object> entry : args.entrySet()) {
-			context.setVariable(entry.getKey(), entry.getValue());
-		}
-		return parser.parseExpression(expr).getValue(context, T);
-	}
+    ExpressionParser parser = new SpelExpressionParser();
+
+    @Override
+    public <T> T eval(Class<T> T, String expr, Map<String, Object> args) {
+        EvaluationContext context = new StandardEvaluationContext();
+        for (Entry<String, Object> entry : args.entrySet()) {
+            context.setVariable(entry.getKey(), entry.getValue());
+        }
+        return parser.parseExpression(expr).getValue(context, T);
+    }
 }

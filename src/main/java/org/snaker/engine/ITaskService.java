@@ -42,6 +42,7 @@ public interface ITaskService {
      * @return Task 任务对象
      */
     Task complete(String taskId);
+
     /**
      * 完成指定的任务，删除活动任务记录，创建历史任务
      * @param taskId 任务id
@@ -64,6 +65,7 @@ public interface ITaskService {
      * @param task 任务对象
      */
     void updateTask(Task task);
+
     /**
      * 根据执行对象、自定义节点模型创建历史任务记录
      * @param execution 执行对象

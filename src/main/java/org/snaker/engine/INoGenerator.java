@@ -23,10 +23,10 @@ import org.snaker.engine.model.ProcessModel;
  * @since 1.0
  */
 public interface INoGenerator {
-	/**
-	 * 生成器方法
-	 * @param model
-	 * @return String 编号
-	 */
-	String generate(ProcessModel model);
+    /**
+     * 生成器方法
+     * @param model
+     * @return String 编号
+     */
+    String generate(ProcessModel model);
 }

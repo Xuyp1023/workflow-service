@@ -20,9 +20,9 @@ package org.snaker.engine.cache;
  * @since 1.3
  */
 public interface CacheManagerAware {
-	/**
-	 * 设置cache管理器
-	 * @param cacheManager
-	 */
-	void setCacheManager(CacheManager cacheManager);
+    /**
+     * 设置cache管理器
+     * @param cacheManager
+     */
+    void setCacheManager(CacheManager cacheManager);
 }

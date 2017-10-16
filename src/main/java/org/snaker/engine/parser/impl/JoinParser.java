@@ -24,10 +24,11 @@ import org.snaker.engine.parser.AbstractNodeParser;
  * @since 1.0
  */
 public class JoinParser extends AbstractNodeParser {
-	/**
-	 * 产生JoinModel模型对象
-	 */
-	protected NodeModel newModel() {
-		return new JoinModel();
-	}
+    /**
+     * 产生JoinModel模型对象
+     */
+    @Override
+    protected NodeModel newModel() {
+        return new JoinModel();
+    }
 }

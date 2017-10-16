@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.snaker.engine.SnakerEngine;
 import org.snaker.engine.SnakerException;
 import org.snaker.engine.access.QueryFilter;
@@ -31,7 +32,6 @@ import org.snaker.engine.model.ProcessModel;
 import org.snaker.engine.model.SubProcessModel;
 
 import com.betterjr.common.service.SpringContextHolder;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.modules.workflow.entity.WorkFlowBase;
 import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
 import com.betterjr.modules.workflow.handler.IProcessHandler;
@@ -53,17 +53,17 @@ public class EndProcessHandler implements IHandler {
 
         final WorkFlowBase workFlowBase = processModel.getWorkFlowBase();
         final String handlerName = workFlowBase.getHandler();
-        if (BetterStringUtils.isNotBlank(handlerName)) {
+        if (StringUtils.isNotBlank(handlerName)) {
             final IProcessHandler handler = SpringContextHolder.getBean(handlerName);
-            final WorkFlowBusinessService workFlowBusinessService = SpringContextHolder.getBean(WorkFlowBusinessService.class);
+            final WorkFlowBusinessService workFlowBusinessService = SpringContextHolder
+                    .getBean(WorkFlowBusinessService.class);
             if (handler != null && workFlowBusinessService != null) {
                 final Order order = execution.getOrder();
 
                 WorkFlowBusiness workFlowBusiness = null;
-                if (BetterStringUtils.equals(workFlowBase.getIsSubprocess(), "1")) {
+                if (StringUtils.equals(workFlowBase.getIsSubprocess(), "1")) {
                     workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(order.getParentId());
-                }
-                else {
+                } else {
                     workFlowBusiness = workFlowBusinessService.findWorkFlowBusinessByOrderId(order.getId());
                 }
 

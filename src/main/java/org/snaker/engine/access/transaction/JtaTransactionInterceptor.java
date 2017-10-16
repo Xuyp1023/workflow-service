@@ -28,68 +28,67 @@ import org.snaker.engine.SnakerException;
  * @since 1.0
  */
 public class JtaTransactionInterceptor extends TransactionInterceptor {
-	private static final Logger log = LoggerFactory.getLogger(JtaTransactionInterceptor.class);
-	
-	public void initialize(Object accessObject) {
-		//ignore
-	}
+    private static final Logger log = LoggerFactory.getLogger(JtaTransactionInterceptor.class);
 
-	protected TransactionStatus getTransaction() {
-		UserTransaction userTransaction = JtaTransactionHelper
-				.lookupJeeUserTransaction();
-		int status = JtaTransactionHelper
-				.getUserTransactionStatus(userTransaction);
-    	if(log.isInfoEnabled()) {
-    		log.info("begin transaction=" + status);
-    	}
-		if (status == Status.STATUS_ACTIVE) {
-			return new TransactionStatus(null, false);
-		}
+    @Override
+    public void initialize(Object accessObject) {
+        // ignore
+    }
 
-		if ((status != Status.STATUS_NO_TRANSACTION)
-				&& (status != Status.STATUS_COMMITTED)
-				&& (status != Status.STATUS_ROLLEDBACK)) {
-			throw new SnakerException("无效的事务状态:" + status);
-		}
+    @Override
+    protected TransactionStatus getTransaction() {
+        UserTransaction userTransaction = JtaTransactionHelper.lookupJeeUserTransaction();
+        int status = JtaTransactionHelper.getUserTransactionStatus(userTransaction);
+        if (log.isInfoEnabled()) {
+            log.info("begin transaction=" + status);
+        }
+        if (status == Status.STATUS_ACTIVE) {
+            return new TransactionStatus(null, false);
+        }
 
-		Transaction suspendedTransaction = null;
-		if ((status == Status.STATUS_ACTIVE)
-				|| (status == Status.STATUS_COMMITTED)
-				|| (status == Status.STATUS_ROLLEDBACK)) {
-			suspendedTransaction = JtaTransactionHelper.suspend();
-		}
+        if ((status != Status.STATUS_NO_TRANSACTION) && (status != Status.STATUS_COMMITTED)
+                && (status != Status.STATUS_ROLLEDBACK)) {
+            throw new SnakerException("无效的事务状态:" + status);
+        }
 
-		try {
-			JtaTransactionHelper.begin();
-			return new TransactionStatus(null, true);
-		} catch (RuntimeException e) {
-			throw e;
-		} finally {
-			if (suspendedTransaction != null) {
-				JtaTransactionHelper.resume(suspendedTransaction);
-			}
-		}
-	}
+        Transaction suspendedTransaction = null;
+        if ((status == Status.STATUS_ACTIVE) || (status == Status.STATUS_COMMITTED)
+                || (status == Status.STATUS_ROLLEDBACK)) {
+            suspendedTransaction = JtaTransactionHelper.suspend();
+        }
 
-	protected void commit(TransactionStatus status) {
-    	if(log.isInfoEnabled()) {
-    		log.info("commit transaction=");
-    	}
-		JtaTransactionHelper.commit();
-	}
+        try {
+            JtaTransactionHelper.begin();
+            return new TransactionStatus(null, true);
+        }
+        catch (RuntimeException e) {
+            throw e;
+        }
+        finally {
+            if (suspendedTransaction != null) {
+                JtaTransactionHelper.resume(suspendedTransaction);
+            }
+        }
+    }
 
-	protected void rollback(TransactionStatus status) {
-		UserTransaction userTransaction = JtaTransactionHelper
-				.lookupJeeUserTransaction();
-		int txStatus = JtaTransactionHelper
-				.getUserTransactionStatus(userTransaction);
-    	if(log.isInfoEnabled()) {
-    		log.info("rollback transaction=" + txStatus);
-    	}
-		if ((txStatus != Status.STATUS_NO_TRANSACTION)
-				&& (txStatus != Status.STATUS_COMMITTED)
-				&& (txStatus != Status.STATUS_ROLLEDBACK)) {
-			JtaTransactionHelper.rollback();
-		}
-	}
+    @Override
+    protected void commit(TransactionStatus status) {
+        if (log.isInfoEnabled()) {
+            log.info("commit transaction=");
+        }
+        JtaTransactionHelper.commit();
+    }
+
+    @Override
+    protected void rollback(TransactionStatus status) {
+        UserTransaction userTransaction = JtaTransactionHelper.lookupJeeUserTransaction();
+        int txStatus = JtaTransactionHelper.getUserTransactionStatus(userTransaction);
+        if (log.isInfoEnabled()) {
+            log.info("rollback transaction=" + txStatus);
+        }
+        if ((txStatus != Status.STATUS_NO_TRANSACTION) && (txStatus != Status.STATUS_COMMITTED)
+                && (txStatus != Status.STATUS_ROLLEDBACK)) {
+            JtaTransactionHelper.rollback();
+        }
+    }
 }

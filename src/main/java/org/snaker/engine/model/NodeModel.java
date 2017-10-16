@@ -105,10 +105,11 @@ public abstract class NodeModel extends BaseModel implements Action {
      */
     private void intercept(final List<SnakerInterceptor> interceptorList, final Execution execution) {
         try {
-            for(final SnakerInterceptor interceptor : interceptorList) {
+            for (final SnakerInterceptor interceptor : interceptorList) {
                 interceptor.intercept(execution);
             }
-        } catch(final Exception e) {
+        }
+        catch (final Exception e) {
             log.error("拦截器执行失败=" + e.getMessage());
             throw new SnakerException(e);
         }
@@ -122,18 +123,16 @@ public abstract class NodeModel extends BaseModel implements Action {
      * @return 是否可以退回
      */
     public static boolean canRejected(final NodeModel current, final NodeModel parent) {
-        if(parent instanceof TaskModel && !((TaskModel)parent).isPerformAny()) {
+        if (parent instanceof TaskModel && !((TaskModel) parent).isPerformAny()) {
             return false;
         }
         boolean result = false;
-        for(final TransitionModel tm : current.getInputs()) {
+        for (final TransitionModel tm : current.getInputs()) {
             final NodeModel source = tm.getSource();
-            if(source == parent) {
+            if (source == parent) {
                 return true;
             }
-            if(source instanceof ForkModel
-                    || source instanceof JoinModel
-                    || source instanceof SubProcessModel
+            if (source instanceof ForkModel || source instanceof JoinModel || source instanceof SubProcessModel
                     || source instanceof StartModel) {
                 continue;
             }
@@ -144,17 +143,17 @@ public abstract class NodeModel extends BaseModel implements Action {
 
     public <T> List<T> getNextModels(final Class<T> clazz) {
         final List<T> models = new ArrayList<T>();
-        for(final TransitionModel tm : this.getOutputs()) {
+        for (final TransitionModel tm : this.getOutputs()) {
             addNextModels(models, tm, clazz);
         }
         return models;
     }
 
     protected <T> void addNextModels(final List<T> models, final TransitionModel tm, final Class<T> clazz) {
-        if(clazz.isInstance(tm.getTarget())) {
-            models.add((T)tm.getTarget());
+        if (clazz.isInstance(tm.getTarget())) {
+            models.add((T) tm.getTarget());
         } else {
-            for(final TransitionModel tm2 : tm.getTarget().getOutputs()) {
+            for (final TransitionModel tm2 : tm.getTarget().getOutputs()) {
                 addNextModels(models, tm2, clazz);
             }
         }
@@ -163,12 +162,15 @@ public abstract class NodeModel extends BaseModel implements Action {
     public List<TransitionModel> getInputs() {
         return inputs;
     }
+
     public void setInputs(final List<TransitionModel> inputs) {
         this.inputs = inputs;
     }
+
     public List<TransitionModel> getOutputs() {
         return outputs;
     }
+
     public void setOutputs(final List<TransitionModel> outputs) {
         this.outputs = outputs;
     }
@@ -207,10 +209,10 @@ public abstract class NodeModel extends BaseModel implements Action {
 
     public void setPreInterceptors(final String preInterceptors) {
         this.preInterceptors = preInterceptors;
-        if(StringHelper.isNotEmpty(preInterceptors)) {
-            for(final String interceptor : preInterceptors.split(",")) {
-                final SnakerInterceptor instance = (SnakerInterceptor)ClassHelper.newInstance(interceptor);
-                if(instance != null) {
+        if (StringHelper.isNotEmpty(preInterceptors)) {
+            for (final String interceptor : preInterceptors.split(",")) {
+                final SnakerInterceptor instance = (SnakerInterceptor) ClassHelper.newInstance(interceptor);
+                if (instance != null) {
                     this.preInterceptorList.add(instance);
                 }
             }
@@ -223,10 +225,10 @@ public abstract class NodeModel extends BaseModel implements Action {
 
     public void setPostInterceptors(final String postInterceptors) {
         this.postInterceptors = postInterceptors;
-        if(StringHelper.isNotEmpty(postInterceptors)) {
-            for(final String interceptor : postInterceptors.split(",")) {
-                final SnakerInterceptor instance = (SnakerInterceptor)ClassHelper.newInstance(interceptor);
-                if(instance != null) {
+        if (StringHelper.isNotEmpty(postInterceptors)) {
+            for (final String interceptor : postInterceptors.split(",")) {
+                final SnakerInterceptor instance = (SnakerInterceptor) ClassHelper.newInstance(interceptor);
+                if (instance != null) {
                     this.postInterceptorList.add(instance);
                 }
             }

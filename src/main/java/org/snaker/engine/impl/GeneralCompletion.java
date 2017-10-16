@@ -31,10 +31,12 @@ import org.snaker.engine.entity.HistoryTask;
 public class GeneralCompletion implements Completion {
     private static final Logger log = LoggerFactory.getLogger(GeneralCompletion.class);
 
+    @Override
     public void complete(HistoryTask task) {
         log.info("The task[{}] has been user[{}] has completed", task.getId(), task.getOperator());
     }
 
+    @Override
     public void complete(HistoryOrder order) {
         log.info("The order[{}] has completed", order.getId());
     }

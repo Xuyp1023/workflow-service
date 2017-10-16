@@ -31,11 +31,12 @@ import org.snaker.engine.helper.StringHelper;
  * @since 1.3
  */
 public class EhCacheManager implements CacheManager {
-	private static final Logger log = LoggerFactory.getLogger(EhCacheManager.class);
-	protected net.sf.ehcache.CacheManager manager;
-	private String configFile = "org/snaker/engine/cache/ehcache/ehcache.xml";
-	
-	public <K, V> Cache<K, V> getCache(String name) throws CacheException {
+    private static final Logger log = LoggerFactory.getLogger(EhCacheManager.class);
+    protected net.sf.ehcache.CacheManager manager;
+    private String configFile = "org/snaker/engine/cache/ehcache/ehcache.xml";
+
+    @Override
+    public <K, V> Cache<K, V> getCache(String name) throws CacheException {
         try {
             net.sf.ehcache.Ehcache cache = ensureCacheManager().getEhcache(name);
             if (cache == null) {
@@ -55,18 +56,21 @@ public class EhCacheManager implements CacheManager {
                 }
             }
             return new EhCache<K, V>(cache);
-        } catch (net.sf.ehcache.CacheException e) {
+        }
+        catch (net.sf.ehcache.CacheException e) {
             throw new CacheException(e);
         }
-	}
+    }
 
+    @Override
     public void destroy() throws CacheException {
         try {
             manager.shutdown();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             if (log.isWarnEnabled()) {
-                log.warn("Unable to cleanly shutdown implicitly created CacheManager instance.  " +
-                        "Ignoring (shutting down)...");
+                log.warn("Unable to cleanly shutdown implicitly created CacheManager instance.  "
+                        + "Ignoring (shutting down)...");
             }
         }
     }
@@ -78,8 +82,8 @@ public class EhCacheManager implements CacheManager {
                     log.debug("cacheManager property not set.  Constructing CacheManager instance... ");
                 }
                 String cacheConfig = ConfigHelper.getProperty("cache.config");
-                if(StringHelper.isNotEmpty(cacheConfig)) {
-                	configFile = cacheConfig;
+                if (StringHelper.isNotEmpty(cacheConfig)) {
+                    configFile = cacheConfig;
                 }
                 InputStream input = StreamHelper.getStreamFromClasspath(configFile);
                 this.manager = new net.sf.ehcache.CacheManager(input);
@@ -91,7 +95,8 @@ public class EhCacheManager implements CacheManager {
                 }
             }
             return this.manager;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new CacheException(e);
         }
     }

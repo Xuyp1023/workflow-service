@@ -34,6 +34,7 @@ public abstract class Assignment implements AssignmentHandler {
      */
     public abstract Object assign(TaskModel model, Execution execution);
 
+    @Override
     public Object assign(Execution execution) {
         return assign(null, execution);
     }

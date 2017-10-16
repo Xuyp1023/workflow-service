@@ -34,6 +34,7 @@ public class FieldModel extends BaseModel {
      * 字段模型对应的属性key/value数据
      */
     private Map<String, String> attrMap = new HashMap<String, String>();
+
     public String getType() {
         return type;
     }
@@ -41,6 +42,7 @@ public class FieldModel extends BaseModel {
     public void setType(String type) {
         this.type = type;
     }
+
     /**
      * 向属性集合添加key/value数据
      * @param name 属性名称

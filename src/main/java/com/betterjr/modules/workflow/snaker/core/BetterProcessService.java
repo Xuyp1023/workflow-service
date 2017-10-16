@@ -65,8 +65,7 @@ public class BetterProcessService extends ProcessService {
             entity.setModel(BetterModelParser.parse(anBaseId));
             if (version == null || version < 0) {
                 entity.setVersion(0);
-            }
-            else {
+            } else {
                 entity.setVersion(version + 1);
             }
             entity.setState(STATE_ACTIVE);

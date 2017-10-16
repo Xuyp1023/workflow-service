@@ -31,18 +31,23 @@ import org.snaker.engine.helper.StringHelper;
  * @since 1.4
  */
 public class SurrogateInterceptor implements SnakerInterceptor {
-	public void intercept(Execution execution) {
-		SnakerEngine engine = execution.getEngine();
-		for(Task task : execution.getTasks()) {
-			if(task.getActorIds() == null) continue;
-			for(String actor : task.getActorIds()) {
-				if(StringHelper.isEmpty(actor)) continue;
-				String agent = engine.manager().getSurrogate(actor, execution.getProcess().getName());
-				if(StringHelper.isNotEmpty(agent) && !actor.equals(agent)) {
-					engine.task().addTaskActor(task.getId(), agent);
-				}
-			}
-		}
-	}
+    @Override
+    public void intercept(final Execution execution) {
+        final SnakerEngine engine = execution.getEngine();
+        for (final Task task : execution.getTasks()) {
+            if (task.getActorIds() == null) {
+                continue;
+            }
+            for (final String actor : task.getActorIds()) {
+                if (StringHelper.isEmpty(actor)) {
+                    continue;
+                }
+                final String agent = engine.manager().getSurrogate(actor, execution.getProcess().getName());
+                if (StringHelper.isNotEmpty(agent) && !actor.equals(agent)) {
+                    engine.task().addTaskActor(task.getId(), agent);
+                }
+            }
+        }
+    }
 
 }

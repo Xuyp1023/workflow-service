@@ -10,27 +10,27 @@ import com.betterjr.modules.workflow.handler.INodeHandler;
 
 @Service("receCustAppliactonHandler")
 public class ReceCustAppliactonHandler implements INodeHandler {
-	@Reference(interfaceClass = IScfReceApprovalFlowDubboService.class)
+    @Reference(interfaceClass = IScfReceApprovalFlowDubboService.class)
     private IScfReceApprovalFlowDubboService scfReceApprovalFlowDubboService;
 
-	@Override
-	public void processPass(Map<String, Object> anContext) {
-		scfReceApprovalFlowDubboService.application((Map<String, Object>)anContext.get("INPUT"));	
-	}
+    @Override
+    public void processPass(Map<String, Object> anContext) {
+        scfReceApprovalFlowDubboService.application((Map<String, Object>) anContext.get("INPUT"));
+    }
 
-	@Override
-	public void processReject(Map<String, Object> anContext) {
-		
-	}
+    @Override
+    public void processReject(Map<String, Object> anContext) {
 
-	@Override
-	public void processHandle(Map<String, Object> anContext) {
-		scfReceApprovalFlowDubboService.application((Map<String, Object>)anContext.get("INPUT"));
-	}
+    }
 
-	@Override
-	public void processSave(Map<String, Object> anContext) {
-		
-	}
+    @Override
+    public void processHandle(Map<String, Object> anContext) {
+        scfReceApprovalFlowDubboService.application((Map<String, Object>) anContext.get("INPUT"));
+    }
+
+    @Override
+    public void processSave(Map<String, Object> anContext) {
+
+    }
 
 }

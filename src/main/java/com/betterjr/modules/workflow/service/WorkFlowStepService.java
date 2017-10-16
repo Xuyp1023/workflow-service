@@ -14,12 +14,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowStepMapper;
@@ -55,7 +55,8 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
         // 先检查节点是可修改
         final WorkFlowNode workFlowNode = workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
 
-        BTAssert.isTrue(BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_APP), "只允许审批节点删除步骤");
+        BTAssert.isTrue(StringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_APP),
+                "只允许审批节点删除步骤");
 
         final WorkFlowStep workFlowStep = findWorkFlowStep(anNodeId, anStepId);
 
@@ -90,7 +91,8 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
         // 检查当前步骤对应的流程是否有操作权限
         final WorkFlowNode workFlowNode = workFlowNodeService.checkWorkFlowNode(anBaseId, anNodeId);
 
-        BTAssert.isTrue(BetterStringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_APP), "只允许审批节点创建步骤");
+        BTAssert.isTrue(StringUtils.equals(workFlowNode.getType(), WorkFlowConstants.NODE_TYPE_APP),
+                "只允许审批节点创建步骤");
 
         final WorkFlowStep workFlowStep = new WorkFlowStep();
 
@@ -114,7 +116,8 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      * @param anWorkFlowStep
      * @return
      */
-    public WorkFlowStep saveWorkFlowStep(final Long anBaseId, final Long anNodeId, final Long anStepId, final WorkFlowStep anWorkFlowStep) {
+    public WorkFlowStep saveWorkFlowStep(final Long anBaseId, final Long anNodeId, final Long anStepId,
+            final WorkFlowStep anWorkFlowStep) {
         final WorkFlowStep workFlowStep = checkWorkFlowStep(anBaseId, anNodeId, anStepId);
 
         workFlowStep.setNickname(anWorkFlowStep.getNickname());
@@ -274,8 +277,9 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
         result.put("auditType", auditType);
         result.put("isMoney", isMoney);
 
-        if (BetterStringUtils.isNotBlank(auditType) && BetterStringUtils.isNotBlank(isMoney)) {
-            if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType) && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
+        if (StringUtils.isNotBlank(auditType) && StringUtils.isNotBlank(isMoney)) {
+            if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType)
+                    && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
                 final List<WorkFlowApprover> approvers = workFlowApproverService.queryApproverByStep(stepId);
 
                 if (Collections3.isEmpty(approvers) == false) {
@@ -283,12 +287,12 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
 
                     result.put("approver", approvers.get(0).getOperId());
                 }
-            }
-            else if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType) && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
+            } else if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType)
+                    && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
                 final List<WorkFlowApprover> approvers = workFlowApproverService.queryApproverByStep(stepId);
                 if (Collections3.isEmpty(approvers) == false) {
                     final List<Map<String, Object>> _temp = new ArrayList<>();
-                    for (final WorkFlowApprover workFlowApprover: approvers) {
+                    for (final WorkFlowApprover workFlowApprover : approvers) {
                         final Map<String, Object> approver = new HashMap<>();
                         approver.put("moneyId", workFlowApprover.getMoneyId());
                         approver.put("operId", workFlowApprover.getOperId());
@@ -296,12 +300,12 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
                     }
                     result.put("approver", _temp);
                 }
-            }
-            else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType) && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
+            } else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType)
+                    && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
                 final List<WorkFlowApprover> approvers = workFlowApproverService.queryApproverByStep(stepId);
                 if (Collections3.isEmpty(approvers) == false) {
                     final List<Map<String, Object>> _temp = new ArrayList<>();
-                    for (final WorkFlowApprover workFlowApprover: approvers) {
+                    for (final WorkFlowApprover workFlowApprover : approvers) {
                         final Map<String, Object> approver = new HashMap<>();
                         approver.put("operId", workFlowApprover.getOperId());
                         approver.put("weight", workFlowApprover.getWeight());
@@ -309,19 +313,19 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
                     }
                     result.put("approver", _temp);
                 }
-            }
-            else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType) && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
+            } else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType)
+                    && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
                 final List<WorkFlowApprover> approvers = workFlowApproverService.queryApproverByStep(stepId);
                 final List<WorkFlowMoney> workFlowMoneys = workFlowMoneyService.queryWorkFlowMoneyByBaseId(anBaseId);
 
                 if (Collections3.isEmpty(workFlowMoneys) == false) {
                     final List<Map<String, Object>> _tempMoney = new ArrayList<>();
-                    for(final WorkFlowMoney workFlowMoney: workFlowMoneys) {
+                    for (final WorkFlowMoney workFlowMoney : workFlowMoneys) {
                         final Map<String, Object> moneySection = new HashMap<>();
                         moneySection.put("moneyId", workFlowMoney.getId());
 
                         final List<Map<String, Object>> _temp = new ArrayList<>();
-                        for(final WorkFlowApprover workFlowApprover: approvers) {
+                        for (final WorkFlowApprover workFlowApprover : approvers) {
                             if (workFlowApprover.getMoneyId().equals(workFlowMoney.getId())) {
                                 final Map<String, Object> appr = new HashMap<>();
 
@@ -337,8 +341,7 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
                     }
                     result.put("approver", _tempMoney);
                 }
-            }
-            else {
+            } else {
                 throw new BytterException("审批方式和金额段标识不正确！");
             }
         }
@@ -359,15 +362,16 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      * 1,0并行未启用金额段 approver:[ {operId: ,weight:},{operId: , weight: } ]
      * 1,1并行启用金额段 approver:[ {moneyId: , opers:[ {operId: , weight: }, {operId: , weight: } ]}, {moneyId: , opers:[{operId: ,weight: }, {operId: , weight: } ]} ] }
      */
-    public void saveStepDefinition(final Long anBaseId, final Long anNodeId, final Long anStepId, final Map<String, Object> anDefMap) {
+    public void saveStepDefinition(final Long anBaseId, final Long anNodeId, final Long anStepId,
+            final Map<String, Object> anDefMap) {
         // 检查当前步骤对应的流程是否有操作权限
         final WorkFlowStep workFlowStep = checkWorkFlowStep(anBaseId, anNodeId, anStepId);
 
         final String auditType = (String) anDefMap.get("auditType");
         final String isMoney = (String) anDefMap.get("isMoney");
 
-        BTAssert.isTrue(BetterStringUtils.isNotBlank(auditType), "审批方式不允许为空！");
-        BTAssert.isTrue(BetterStringUtils.isNotBlank(isMoney), "金额段启用标识不允许为空！");
+        BTAssert.isTrue(StringUtils.isNotBlank(auditType), "审批方式不允许为空！");
+        BTAssert.isTrue(StringUtils.isNotBlank(isMoney), "金额段启用标识不允许为空！");
 
         workFlowStep.setAuditType(auditType);
         workFlowStep.setIsMoney(isMoney);
@@ -381,9 +385,9 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
             // 如果是 串行审批 并且未启用金额段 只接受一个 审批操作员, 否则报错
             Long operId = null;
             if (anDefMap.get("approver") instanceof Integer) {
-                operId = Long.valueOf((Integer)anDefMap.get("approver"));
-            } else  if (anDefMap.get("approver") instanceof String) {
-                operId = Long.valueOf((String)anDefMap.get("approver"));
+                operId = Long.valueOf((Integer) anDefMap.get("approver"));
+            } else if (anDefMap.get("approver") instanceof String) {
+                operId = Long.valueOf((String) anDefMap.get("approver"));
             }
             BTAssert.notNull(operId, "操作员编号未找到！");
 
@@ -391,20 +395,20 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
             approver.setOperId(operId);
 
             workFlowApproverService.addApproverByStep(anStepId, approver);
-        }
-        else if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType) && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
+        } else if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType)
+                && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
             // 如果是 串行审批 并且启用金额段 这时候需要根据金额段来匹配 每个金额段 只能一个审批操作员
             final List<Map<String, Object>> approvers = (List<Map<String, Object>>) anDefMap.get("approver");
 
             BTAssert.isTrue(approvers.size() == workFlowMoneys.size(), "金额段不匹配");
 
             for (final Map<String, Object> tempApprover : approvers) {
-                final Long moneyId = Long.valueOf((Integer)tempApprover.get("moneyId"));
+                final Long moneyId = Long.valueOf((Integer) tempApprover.get("moneyId"));
                 Long operId = null; // 允许为空，为空为所有人
                 if (tempApprover.get("operId") instanceof Integer) {
-                    operId = Long.valueOf((Integer)tempApprover.get("operId"));
-                } else  if (tempApprover.get("operId") instanceof String) {
-                    operId = Long.valueOf((String)tempApprover.get("operId"));
+                    operId = Long.valueOf((Integer) tempApprover.get("operId"));
+                } else if (tempApprover.get("operId") instanceof String) {
+                    operId = Long.valueOf((String) tempApprover.get("operId"));
                 }
                 checkWorkFlowMoney(moneyId, workFlowMoneys); // 检查moneyId 是否在当前流程定义金额段内
 
@@ -414,23 +418,23 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
 
                 workFlowApproverService.addApproverByStep(anStepId, approver);
             }
-        }
-        else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType) && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
+        } else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType)
+                && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
             // 如果是并行审批，并且未启用金额段 可以选择多个审批操作员 并且每个操作员需要有权重值
             final List<Map<String, Object>> approvers = (List<Map<String, Object>>) anDefMap.get("approver");
 
             for (final Map<String, Object> tempApprover : approvers) {
                 Long operId = null; // 允许为空，为空为所有人
                 if (tempApprover.get("operId") instanceof Integer) {
-                    operId = Long.valueOf((Integer)tempApprover.get("operId"));
-                } else  if (tempApprover.get("operId") instanceof String) {
-                    operId = Long.valueOf((String)tempApprover.get("operId"));
+                    operId = Long.valueOf((Integer) tempApprover.get("operId"));
+                } else if (tempApprover.get("operId") instanceof String) {
+                    operId = Long.valueOf((String) tempApprover.get("operId"));
                 }
                 Integer weight = null;
                 if (tempApprover.get("weight") instanceof Integer) {
-                    weight = (Integer)tempApprover.get("weight");
-                } else  if (tempApprover.get("weight") instanceof String) {
-                    weight = Integer.valueOf((String)tempApprover.get("weight"));
+                    weight = (Integer) tempApprover.get("weight");
+                } else if (tempApprover.get("weight") instanceof String) {
+                    weight = Integer.valueOf((String) tempApprover.get("weight"));
                 }
                 final WorkFlowApprover approver = new WorkFlowApprover();
                 approver.setOperId(operId);
@@ -438,13 +442,13 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
 
                 workFlowApproverService.addApproverByStep(anStepId, approver);
             }
-        }
-        else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType) && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
+        } else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType)
+                && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
             // 如果是并行审批，并且启用金额段 每个金额段可以选择多个审批操作员 并且每个操作员需要有权重值
             final List<Map<String, Object>> approvers = (List<Map<String, Object>>) anDefMap.get("approver");
 
             for (final Map<String, Object> tempApprover : approvers) {
-                final Long moneyId = Long.valueOf((Integer)tempApprover.get("moneyId"));
+                final Long moneyId = Long.valueOf((Integer) tempApprover.get("moneyId"));
 
                 checkWorkFlowMoney(moneyId, workFlowMoneys); // 检查moneyId 是否在当前流程定义金额段内
 
@@ -453,15 +457,15 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
                 for (final Map<String, Object> oper : opers) {
                     Long operId = null; // 允许为空，为空为所有人
                     if (oper.get("operId") instanceof Integer) {
-                        operId = Long.valueOf((Integer)oper.get("operId"));
-                    } else  if (oper.get("operId") instanceof String) {
-                        operId = Long.valueOf((String)oper.get("operId"));
+                        operId = Long.valueOf((Integer) oper.get("operId"));
+                    } else if (oper.get("operId") instanceof String) {
+                        operId = Long.valueOf((String) oper.get("operId"));
                     }
                     Integer weight = null;
                     if (oper.get("weight") instanceof Integer) {
-                        weight = (Integer)oper.get("weight");
-                    } else  if (oper.get("weight") instanceof String) {
-                        weight = Integer.valueOf((String)oper.get("weight"));
+                        weight = (Integer) oper.get("weight");
+                    } else if (oper.get("weight") instanceof String) {
+                        weight = Integer.valueOf((String) oper.get("weight"));
                     }
 
                     final WorkFlowApprover approver = new WorkFlowApprover();
@@ -472,8 +476,7 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
                     workFlowApproverService.addApproverByStep(anStepId, approver);
                 }
             }
-        }
-        else {
+        } else {
             throw new BytterException("审批方式和金额段标识不正确！");
         }
 
@@ -507,7 +510,8 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
      * @param anWorkFlowNode
      * @param anTempWorkFlowNode
      */
-    public void saveCopyWorkFlowStep(final WorkFlowNode anSourceNode, final WorkFlowNode anTargetNode, final Map<Long, Long> anWorkFlowMoneyMapping) {
+    public void saveCopyWorkFlowStep(final WorkFlowNode anSourceNode, final WorkFlowNode anTargetNode,
+            final Map<Long, Long> anWorkFlowMoneyMapping) {
         // copy 节点
         queryWorkFlowStepByNodeId(anSourceNode.getId()).forEach(tempWorkFlowStep -> {
             final WorkFlowStep workFlowStep = new WorkFlowStep();
@@ -516,7 +520,8 @@ public class WorkFlowStepService extends BaseService<WorkFlowStepMapper, WorkFlo
             workFlowStep.setNodeId(anTargetNode.getId());
 
             // copy审批员
-            workFlowApproverService.saveCopyWorkFlowApproverByStep(tempWorkFlowStep, workFlowStep, anWorkFlowMoneyMapping);
+            workFlowApproverService.saveCopyWorkFlowApproverByStep(tempWorkFlowStep, workFlowStep,
+                    anWorkFlowMoneyMapping);
             this.insert(workFlowStep);
         });
     }

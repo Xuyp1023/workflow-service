@@ -12,13 +12,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
@@ -59,7 +59,9 @@ public class WorkFlowDubboService implements IWorkFlowService {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         BTAssert.notNull(operator, "不能获取当前登陆用户！");
         final Long operId = operator.getId();
-        return AjaxObject.newOkWithPage("查询待办任务成功", workFlowService.queryWorkItem(operId, anPageNo, anPageSize, anParam)).toJson();
+        return AjaxObject
+                .newOkWithPage("查询待办任务成功", workFlowService.queryWorkItem(operId, anPageNo, anPageSize, anParam))
+                .toJson();
     }
 
     // 已办任务
@@ -68,15 +70,19 @@ public class WorkFlowDubboService implements IWorkFlowService {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         BTAssert.notNull(operator, "不能获取当前登陆用户！");
         final Long operId = operator.getId();
-        return AjaxObject.newOkWithPage("查询已办任务成功", workFlowService.queryHistoryWorkItem(operId, anPageNo, anPageSize, anParam)).toJson();
+        return AjaxObject
+                .newOkWithPage("查询已办任务成功", workFlowService.queryHistoryWorkItem(operId, anPageNo, anPageSize, anParam))
+                .toJson();
     }
 
     // 监控任务
     @Override
-    public String webQueryMonitorTask(final long anCustNo, final int anPageNo, final int anPageSize, final Map<String, Object> anParam) {
+    public String webQueryMonitorTask(final long anCustNo, final int anPageNo, final int anPageSize,
+            final Map<String, Object> anParam) {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         BTAssert.notNull(operator, "不能获取当前登陆用户！");
-        return AjaxObject.newOkWithPage("查询监控任务成功", workFlowService.queryMonitorWorkItem(anCustNo, anPageNo, anPageSize, anParam)).toJson();
+        return AjaxObject.newOkWithPage("查询监控任务成功",
+                workFlowService.queryMonitorWorkItem(anCustNo, anPageNo, anPageSize, anParam)).toJson();
     }
 
     // 加载节点
@@ -89,18 +95,20 @@ public class WorkFlowDubboService implements IWorkFlowService {
         Long result = null;
         if (anObject != null) {
             final String temp = anObject.toString();
-            if (BetterStringUtils.isNotBlank(temp)) {
+            if (StringUtils.isNotBlank(temp)) {
                 result = Long.valueOf(temp);
             }
         }
 
         return result;
     }
+
     // 开始流程
     @Override
-    public String webStartWorkFlow(final String anWorkFlowName, final Long anCustNo, final Map<String, Object> anParam) {
-        final WorkFlowInput workFlowInput = new WorkFlowInput(getLongValue(anParam.get(WorkFlowInput.START_CUSTNO)), UserUtils.getOperatorInfo().getId(), anWorkFlowName,
-                anCustNo);
+    public String webStartWorkFlow(final String anWorkFlowName, final Long anCustNo,
+            final Map<String, Object> anParam) {
+        final WorkFlowInput workFlowInput = new WorkFlowInput(getLongValue(anParam.get(WorkFlowInput.START_CUSTNO)),
+                UserUtils.getOperatorInfo().getId(), anWorkFlowName, anCustNo);
         workFlowInput.setSupplierCustNo(getLongValue(anParam.get(WorkFlowInput.SUPPLIER_CUSTNO)));
         workFlowInput.setCoreCustNo(getLongValue(anParam.get(WorkFlowInput.CORE_CUSTNO)));
         workFlowInput.setFactorCustNo(getLongValue(anParam.get(WorkFlowInput.FACTOR_CUSTNO)));
@@ -146,7 +154,7 @@ public class WorkFlowDubboService implements IWorkFlowService {
         BTAssert.isTrue(result == 1, "审批类型不正确！");
 
         final String rejectNode = (String) anParam.get("rejectNode");
-        BTAssert.isTrue(BetterStringUtils.isNotBlank(rejectNode), "驳回节点不允许为空！");
+        BTAssert.isTrue(StringUtils.isNotBlank(rejectNode), "驳回节点不允许为空！");
 
         final Long operId = operator.getId();
         final String data = (String) anParam.get("data");
@@ -206,7 +214,6 @@ public class WorkFlowDubboService implements IWorkFlowService {
         return AjaxObject.newOk("经办数据保存成功！").toJson();
     }
 
-
     // 作废提交
     @Override
     public String webCancelWorkFlow(final String anTaskId, final Map<String, Object> anParam) {
@@ -231,8 +238,10 @@ public class WorkFlowDubboService implements IWorkFlowService {
 
     // 审批记录
     @Override
-    public String webQueryAudit(final String anBusinessId, final int anFlag, final int anPageNum, final int anPageSize) {
-        return AjaxObject.newOkWithPage("审批记录查询成功！", workFlowService.queryWorkFlowAudit(anBusinessId, anFlag, anPageNum, anPageSize)).toJson();
+    public String webQueryAudit(final String anBusinessId, final int anFlag, final int anPageNum,
+            final int anPageSize) {
+        return AjaxObject.newOkWithPage("审批记录查询成功！",
+                workFlowService.queryWorkFlowAudit(anBusinessId, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     // 查询当前可驳回节点列表 第一项为上一步

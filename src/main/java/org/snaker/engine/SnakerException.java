@@ -20,26 +20,26 @@ package org.snaker.engine;
  * @since 1.0
  */
 public class SnakerException extends RuntimeException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5220859421440167454L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5220859421440167454L;
 
-	public SnakerException() {
-		super();
-	}
+    public SnakerException() {
+        super();
+    }
 
-	public SnakerException(String msg, Throwable cause) {
-		super(msg);
-		super.initCause(cause);
-	}
+    public SnakerException(String msg, Throwable cause) {
+        super(msg);
+        super.initCause(cause);
+    }
 
-	public SnakerException(String msg) {
-		super(msg);
-	}
+    public SnakerException(String msg) {
+        super(msg);
+    }
 
-	public SnakerException(Throwable cause) {
-		super();
-		super.initCause(cause);
-	}
+    public SnakerException(Throwable cause) {
+        super();
+        super.initCause(cause);
+    }
 }

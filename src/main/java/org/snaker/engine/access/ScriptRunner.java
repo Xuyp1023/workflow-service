@@ -17,13 +17,19 @@
 
 package org.snaker.engine.access;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snaker.engine.helper.AssertHelper;
 import org.snaker.engine.helper.StreamHelper;
-
-import java.io.*;
-import java.sql.*;
 
 /**
  * SQL脚本运行类
@@ -33,12 +39,13 @@ import java.sql.*;
 public class ScriptRunner {
     private static final Logger log = LoggerFactory.getLogger(ScriptRunner.class);
     private static final String DEFAULT_DELIMITER = ";";
-    //数据库连接对象
+    // 数据库连接对象
     private Connection connection;
-    //是否自动提交
+    // 是否自动提交
     private boolean autoCommit;
-    //默认的分隔符;
+    // 默认的分隔符;
     private String delimiter = DEFAULT_DELIMITER;
+
     public ScriptRunner(Connection connection, boolean autoCommit) {
         this.connection = connection;
         this.autoCommit = autoCommit;
@@ -68,14 +75,18 @@ public class ScriptRunner {
                     connection.setAutoCommit(this.autoCommit);
                 }
                 runScript(connection, reader);
-            } finally {
+            }
+            finally {
                 connection.setAutoCommit(originalAutoCommit);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw e;
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new RuntimeException("Error running script.  Cause: " + e, e);
         }
     }
@@ -87,8 +98,7 @@ public class ScriptRunner {
      * @throws IOException io异常
      * @throws SQLException sql异常
      */
-    private void runScript(Connection conn, Reader reader)
-            throws IOException, SQLException {
+    private void runScript(Connection conn, Reader reader) throws IOException, SQLException {
         StringBuffer command = null;
         try {
             LineNumberReader lineReader = new LineNumberReader(reader);
@@ -101,9 +111,9 @@ public class ScriptRunner {
                 if (trimmedLine.startsWith("--")) {
                     log.info(trimmedLine);
                 } else if (trimmedLine.length() < 1 || trimmedLine.startsWith("//")) {
-                    //Do nothing
+                    // Do nothing
                 } else if (trimmedLine.length() < 1 || trimmedLine.startsWith("--")) {
-                    //Do nothing
+                    // Do nothing
                 } else if (trimmedLine.equals(getDelimiter()) || trimmedLine.endsWith(getDelimiter())) {
                     command.append(line.substring(0, line.lastIndexOf(getDelimiter())));
                     command.append(" ");
@@ -112,7 +122,8 @@ public class ScriptRunner {
                     log.info(command.toString());
                     try {
                         statement.execute(command.toString());
-                    } catch (SQLException e) {
+                    }
+                    catch (SQLException e) {
                         e.fillInStackTrace();
                         log.error("Error executing: " + command);
                     }
@@ -123,8 +134,9 @@ public class ScriptRunner {
                     command = null;
                     try {
                         statement.close();
-                    } catch (Exception e) {
-                        //ignore
+                    }
+                    catch (Exception e) {
+                        // ignore
                     }
                     Thread.yield();
                 } else {
@@ -135,10 +147,12 @@ public class ScriptRunner {
             if (!autoCommit) {
                 conn.commit();
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             e.fillInStackTrace();
             throw e;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.fillInStackTrace();
             throw e;
         }

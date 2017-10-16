@@ -216,9 +216,9 @@ public class Task implements Serializable, Cloneable {
     }
 
     public String[] getActorIds() {
-        if(actorIds == null) {
-            final String actorStr = (String)getVariableMap().get(KEY_ACTOR);
-            if(actorStr != null) {
+        if (actorIds == null) {
+            final String actorStr = (String) getVariableMap().get(KEY_ACTOR);
+            if (actorStr != null) {
                 actorIds = actorStr.split(",");
             }
         }
@@ -272,7 +272,7 @@ public class Task implements Serializable, Cloneable {
     @SuppressWarnings("unchecked")
     public Map<String, Object> getVariableMap() {
         final Map<String, Object> map = JsonHelper.fromJson(this.variable, Map.class);
-        if(map == null) {
+        if (map == null) {
             return Collections.emptyMap();
         }
         return map;

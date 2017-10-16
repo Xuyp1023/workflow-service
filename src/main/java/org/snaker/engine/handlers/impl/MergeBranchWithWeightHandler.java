@@ -25,7 +25,7 @@ public class MergeBranchWithWeightHandler extends MergeBranchHandler {
 
     public MergeBranchWithWeightHandler(final JoinModel model) {
         super(model);
-        this.model=model;
+        this.model = model;
     }
 
     @Override
@@ -41,49 +41,47 @@ public class MergeBranchWithWeightHandler extends MergeBranchHandler {
         boolean isSubProcessMerged = false;
         boolean isTaskMerged = false;
 
-        if(model.containsNodeNames(SubProcessModel.class, activeNodes)) {
+        if (model.containsNodeNames(SubProcessModel.class, activeNodes)) {
             final QueryFilter filter = new QueryFilter().setParentId(order.getId())
-                    .setExcludedIds(new String[]{execution.getChildOrderId()});
+                    .setExcludedIds(new String[] { execution.getChildOrderId() });
             final List<Order> orders = queryService.getActiveOrders(filter);
-            //如果所有子流程都已完成，则表示可合并
-            if(orders == null || orders.isEmpty()) {
+            // 如果所有子流程都已完成，则表示可合并
+            if (orders == null || orders.isEmpty()) {
                 isSubProcessMerged = true;
             }
         } else {
             isSubProcessMerged = true;
         }
-        if(isSubProcessMerged && model.containsNodeNames(TaskModel.class, activeNodes)) {
-            final QueryFilter filter = new QueryFilter().
-                    setOrderId(order.getId()).
-                    setExcludedIds(new String[]{execution.getTask().getId() }).
-                    setNames(activeNodes);
+        if (isSubProcessMerged && model.containsNodeNames(TaskModel.class, activeNodes)) {
+            final QueryFilter filter = new QueryFilter().setOrderId(order.getId())
+                    .setExcludedIds(new String[] { execution.getTask().getId() }).setNames(activeNodes);
             final List<Task> tasks = queryService.getActiveTasks(filter);
-            if(tasks == null || tasks.isEmpty()) {
-                //如果所有task都已完成，则表示可合并
+            if (tasks == null || tasks.isEmpty()) {
+                // 如果所有task都已完成，则表示可合并
                 isTaskMerged = true;
-            }else{
-                isTaskMerged = mergeWithWeight(execution,tasks);
+            } else {
+                isTaskMerged = mergeWithWeight(execution, tasks);
             }
         }
         execution.setMerged(isSubProcessMerged && isTaskMerged);
     }
 
-    private boolean mergeWithWeight(final Execution execution,final List<Task> unFinishedTasks) {
-        final String nodeName=execution.getTask().getTaskName();
-        final Map<String,Task> unFinishedTaskMap=Collections3.extractToMap(unFinishedTasks, "taskName");
-        final List<TaskModel> activeNodes=new ArrayList<TaskModel>();
+    private boolean mergeWithWeight(final Execution execution, final List<Task> unFinishedTasks) {
+        final String nodeName = execution.getTask().getTaskName();
+        final Map<String, Task> unFinishedTaskMap = Collections3.extractToMap(unFinishedTasks, "taskName");
+        final List<TaskModel> activeNodes = new ArrayList<TaskModel>();
         this.findForkTaskNames(this.model, activeNodes);
-        int totalWeight=0;
-        for(final TaskModel model:activeNodes){
-            final String activeName=model.getName();
-            if(!unFinishedTaskMap.containsKey(activeName)){
-                totalWeight=totalWeight+model.getWeight();
+        int totalWeight = 0;
+        for (final TaskModel model : activeNodes) {
+            final String activeName = model.getName();
+            if (!unFinishedTaskMap.containsKey(activeName)) {
+                totalWeight = totalWeight + model.getWeight();
             }
         }
-        if(totalWeight>=100){
-            //如果总审批权重超过100，则通过审批，进入下一步， 其他任务由系统自动完成跟进。
-            for(final Task task:unFinishedTasks){
-                execution.getEngine().task().complete(task.getId(),SnakerEngine.AUTO,execution.getArgs());
+        if (totalWeight >= 100) {
+            // 如果总审批权重超过100，则通过审批，进入下一步， 其他任务由系统自动完成跟进。
+            for (final Task task : unFinishedTasks) {
+                execution.getEngine().task().complete(task.getId(), SnakerEngine.AUTO, execution.getArgs());
             }
             return true;
         }
@@ -96,13 +94,13 @@ public class MergeBranchWithWeightHandler extends MergeBranchHandler {
      * @param buffer
      */
     private void findForkTaskNames(final NodeModel node, final List<TaskModel> activeNodes) {
-        if(node instanceof ForkModel) {
+        if (node instanceof ForkModel) {
             return;
         }
         final List<TransitionModel> inputs = node.getInputs();
-        for(final TransitionModel tm : inputs) {
-            if(tm.getSource() instanceof TaskModel) {
-                activeNodes.add((TaskModel)tm.getSource());
+        for (final TransitionModel tm : inputs) {
+            if (tm.getSource() instanceof TaskModel) {
+                activeNodes.add((TaskModel) tm.getSource());
             }
             findForkTaskNames(tm.getSource(), activeNodes);
         }

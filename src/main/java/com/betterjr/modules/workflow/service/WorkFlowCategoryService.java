@@ -30,7 +30,8 @@ public class WorkFlowCategoryService extends BaseService<WorkFlowCategoryMapper,
      */
     public List<SimpleDataEntity> queryWorkFlowCategory() {
         // 查询分类
-        return this.selectAll().stream().map(category -> new SimpleDataEntity(String.valueOf(category.getId()), category.getName()))
+        return this.selectAll().stream()
+                .map(category -> new SimpleDataEntity(String.valueOf(category.getId()), category.getName()))
                 .collect(Collectors.toList());
     }
 }

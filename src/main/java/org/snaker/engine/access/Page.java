@@ -29,18 +29,18 @@ public class Page<T> {
     public static final int NON_PAGE = -1;
     public static final int PAGE_SIZE = 15;
 
-    //当前页
+    // 当前页
     private int pageNo = 1;
-    //每页记录数
+    // 每页记录数
     private int pageSize = -1;
-    //总记录数
+    // 总记录数
     private long totalCount = 0;
-    //查询结果集
+    // 查询结果集
     private List<T> result;
 
     public Page() {
         this.pageSize = ConfigHelper.getNumerProperty("jdbc.pageSize");
-        if(pageSize <= 0) {
+        if (pageSize <= 0) {
             pageSize = PAGE_SIZE;
         }
     }

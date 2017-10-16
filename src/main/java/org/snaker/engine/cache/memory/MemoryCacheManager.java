@@ -28,15 +28,17 @@ import org.snaker.engine.helper.StringHelper;
  * @since 1.3
  */
 public class MemoryCacheManager implements CacheManager {
-	private final ConcurrentMap<String, Cache> caches;
-	
-	public MemoryCacheManager() {
-		this.caches = new ConcurrentHashMap<String, Cache>();
-	}
-	public <K, V> Cache<K, V> getCache(String name) throws CacheException {
-		if(StringHelper.isEmpty(name)) {
-			throw new IllegalArgumentException("Cache名称不能为空.");
-		}
+    private final ConcurrentMap<String, Cache> caches;
+
+    public MemoryCacheManager() {
+        this.caches = new ConcurrentHashMap<String, Cache>();
+    }
+
+    @Override
+    public <K, V> Cache<K, V> getCache(String name) throws CacheException {
+        if (StringHelper.isEmpty(name)) {
+            throw new IllegalArgumentException("Cache名称不能为空.");
+        }
         Cache cache;
 
         cache = caches.get(name);
@@ -48,8 +50,9 @@ public class MemoryCacheManager implements CacheManager {
             }
         }
         return cache;
-	}
+    }
 
+    @Override
     public void destroy() throws CacheException {
         while (!caches.isEmpty()) {
             caches.clear();

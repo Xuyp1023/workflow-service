@@ -66,9 +66,11 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
      * @see com.betterjr.modules.workflow.IWorkFlowDefinitionService#webQueryWorkFlowBase(java.lang.Long)
      */
     @Override
-    public String webQueryWorkFlowBase(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryWorkFlowBase(final Long anCustNo, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         final String userRole = UserUtils.getUserRole().name();
-        return AjaxObject.newOkWithPage("查询流程定义列表成功！", workFlowBaseService.queryWorkFlowBaseByCustNo(anCustNo, userRole,  anFlag, anPageNum, anPageSize))
+        return AjaxObject.newOkWithPage("查询流程定义列表成功！",
+                workFlowBaseService.queryWorkFlowBaseByCustNo(anCustNo, userRole, anFlag, anPageNum, anPageSize))
                 .toJson();
     }
 
@@ -82,7 +84,6 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
         return AjaxObject.newOk("查询流程定义列表成功！", workFlowBaseService.queryHistoryWorkFlowBase(anCustNo, anWorkFlowName))
                 .toJson();
     }
-
 
     /*
      * (non-Javadoc)
@@ -140,16 +141,19 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
      * @see com.betterjr.modules.workflow.IWorkFlowDefinitionService#webAddWorkFlowBase(java.util.Map)
      */
     @Override
-    public String webAddWorkFlowBase(final Map<String, Object> anParam, final Long anDefaultBaseId, final Long anCustNo, final String anNickname) {
-        //final WorkFlowBase workFlowBase = RuleServiceDubboFilterInvoker.getInputObj();
+    public String webAddWorkFlowBase(final Map<String, Object> anParam, final Long anDefaultBaseId, final Long anCustNo,
+            final String anNickname) {
+        // final WorkFlowBase workFlowBase = RuleServiceDubboFilterInvoker.getInputObj();
         final WorkFlowBase workFlowBase = new WorkFlowBase();
         workFlowBase.setNickname(anNickname);
-        return AjaxObject.newOk("添加流程成功！", workFlowBaseService.addWorkFlowBase(workFlowBase, anDefaultBaseId, anCustNo)).toJson();
+        return AjaxObject.newOk("添加流程成功！", workFlowBaseService.addWorkFlowBase(workFlowBase, anDefaultBaseId, anCustNo))
+                .toJson();
     }
 
     @Override
     public String webAddNewVersionWorkFlowBase(final String anWorkFlowName, final Long anCustNo) {
-        return AjaxObject.newOk("添加流程成功！", workFlowBaseService.addNewVersionWorkFlowBase(anWorkFlowName, anCustNo)).toJson();
+        return AjaxObject.newOk("添加流程成功！", workFlowBaseService.addNewVersionWorkFlowBase(anWorkFlowName, anCustNo))
+                .toJson();
     }
 
     /*
@@ -168,8 +172,10 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
      * @see com.betterjr.modules.workflow.IWorkFlowDefinitionService#webAddWorkFlowStep(java.util.Map)
      */
     @Override
-    public String webAddWorkFlowStep(final Map<String, Object> anParam, final Long anBaseId, final Long anNodeId, final String anNickname) {
-        return AjaxObject.newOk("添加步骤成功！", workFlowStepService.addWorkFlowStep(anBaseId, anNodeId, anNickname)).toJson();
+    public String webAddWorkFlowStep(final Map<String, Object> anParam, final Long anBaseId, final Long anNodeId,
+            final String anNickname) {
+        return AjaxObject.newOk("添加步骤成功！", workFlowStepService.addWorkFlowStep(anBaseId, anNodeId, anNickname))
+                .toJson();
     }
 
     /*
@@ -178,9 +184,12 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
      * @see com.betterjr.modules.workflow.IWorkFlowDefinitionService#webSaveWorkFlowStep(java.util.Map)
      */
     @Override
-    public String webSaveWorkFlowStep(final Map<String, Object> anParam, final Long anBaseId, final Long anNodeId, final Long anStepId) {
+    public String webSaveWorkFlowStep(final Map<String, Object> anParam, final Long anBaseId, final Long anNodeId,
+            final Long anStepId) {
         final WorkFlowStep workFlowStep = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("修改步骤成功!", workFlowStepService.saveWorkFlowStep(anBaseId, anNodeId, anStepId, workFlowStep)).toJson();
+        return AjaxObject
+                .newOk("修改步骤成功!", workFlowStepService.saveWorkFlowStep(anBaseId, anNodeId, anStepId, workFlowStep))
+                .toJson();
     }
 
     /*
@@ -200,7 +209,8 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
      * @see com.betterjr.modules.workflow.IWorkFlowDefinitionService#webSaveWorkFlowStepDefine(java.util.Map)
      */
     @Override
-    public String webSaveWorkFlowStepDefine(final Map<String, Object> anParam, final Long anBaseId, final Long anNodeId, final Long anStepId) {
+    public String webSaveWorkFlowStepDefine(final Map<String, Object> anParam, final Long anBaseId, final Long anNodeId,
+            final Long anStepId) {
 
         final String data = (String) anParam.get("data");
         final Map<String, Object> param = JsonMapper.parserJson(data);
@@ -268,12 +278,14 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
 
     @Override
     public String webSaveWorkFlowMoneySection(final Long anBaseId, final String anMoneySection) {
-        return AjaxObject.newOk("保存金额段成功！", workFlowMoneyService.saveWorkFlowMoneySection(anBaseId, anMoneySection)).toJson();
+        return AjaxObject.newOk("保存金额段成功！", workFlowMoneyService.saveWorkFlowMoneySection(anBaseId, anMoneySection))
+                .toJson();
     }
 
     @Override
     public String webAssigneeWorkFlowNodeApprover(final Long anBaseId, final Long anNodeId, final Long anOperId) {
-        return AjaxObject.newOk("分配经办人成功！", workFlowApproverService.addApproverByNode(anBaseId, anNodeId, anOperId)).toJson();
+        return AjaxObject.newOk("分配经办人成功！", workFlowApproverService.addApproverByNode(anBaseId, anNodeId, anOperId))
+                .toJson();
     }
 
     @Override
@@ -301,6 +313,7 @@ public class WorkFlowDefinitionDubboService implements IWorkFlowDefinitionServic
      */
     @Override
     public String webFindWorkFlowStepDefine(final Long anBaseId, final Long anNodeId, final Long anStepId) {
-        return AjaxObject.newOk("查询流程定义成功！", workFlowStepService.findStepDefinition(anBaseId, anNodeId, anStepId)).toJson();
+        return AjaxObject.newOk("查询流程定义成功！", workFlowStepService.findStepDefinition(anBaseId, anNodeId, anStepId))
+                .toJson();
     }
 }

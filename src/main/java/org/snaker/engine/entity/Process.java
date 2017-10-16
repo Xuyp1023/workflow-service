@@ -90,30 +90,39 @@ public class Process implements Serializable {
     public String getName() {
         return name;
     }
+
     public void setName(final String name) {
         this.name = name;
     }
+
     public String getDisplayName() {
         return displayName;
     }
+
     public void setDisplayName(final String displayName) {
         this.displayName = displayName;
     }
+
     public String getType() {
         return type;
     }
+
     public void setType(final String type) {
         this.type = type;
     }
+
     public Integer getState() {
         return state;
     }
+
     public void setState(final Integer state) {
         this.state = state;
     }
+
     public String getId() {
         return id;
     }
+
     public void setId(final String id) {
         this.id = id;
     }
@@ -132,21 +141,26 @@ public class Process implements Serializable {
         this.displayName = processModel.getDisplayName();
         this.instanceUrl = processModel.getInstanceUrl();
     }
+
     public String getInstanceUrl() {
         return instanceUrl;
     }
+
     public void setInstanceUrl(final String instanceUrl) {
         this.instanceUrl = instanceUrl;
     }
+
     public byte[] getDBContent() {
-        if(this.content != null) {
+        if (this.content != null) {
             try {
                 return this.content.getBytes(1L, Long.valueOf(this.content.length()).intValue());
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 try {
                     final InputStream is = content.getBinaryStream();
                     return StreamHelper.readBytes(is);
-                } catch (final Exception e1) {
+                }
+                catch (final Exception e1) {
                     throw new SnakerException("couldn't extract stream out of blob", e1);
                 }
             }
@@ -154,24 +168,31 @@ public class Process implements Serializable {
 
         return bytes;
     }
+
     public Blob getContent() {
         return content;
     }
+
     public void setContent(final Blob content) {
         this.content = content;
     }
+
     public byte[] getBytes() {
         return bytes;
     }
+
     public void setBytes(final byte[] bytes) {
         this.bytes = bytes;
     }
+
     public Integer getVersion() {
         return version;
     }
+
     public void setVersion(final Integer version) {
         this.version = version;
     }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
@@ -183,15 +204,19 @@ public class Process implements Serializable {
         sb.append(",custNo=").append(this.custNo).append(")");
         return sb.toString();
     }
+
     public String getCreateTime() {
         return createTime;
     }
+
     public void setCreateTime(final String createTime) {
         this.createTime = createTime;
     }
+
     public String getCreator() {
         return creator;
     }
+
     public void setCreator(final String creator) {
         this.creator = creator;
     }

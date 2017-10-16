@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.workflow.entity.WorkFlowMoney;
 
 @BetterjrMapper
-public interface WorkFlowMoneyMapper extends Mapper<WorkFlowMoney> {
-}
+public interface WorkFlowMoneyMapper extends Mapper<WorkFlowMoney> {}

@@ -10,36 +10,35 @@ import com.betterjr.modules.approval.IScfSellerApprovalService;
 import com.betterjr.modules.workflow.handler.INodeHandler;
 
 @Service("sellerOfferSchemeHandler")
-public class OfferScheme implements INodeHandler  {
-	@Reference(interfaceClass = IScfSellerApprovalService.class)
+public class OfferScheme implements INodeHandler {
+    @Reference(interfaceClass = IScfSellerApprovalService.class)
     private IScfSellerApprovalService scfSellerFlowService;
-	
-	@Override
-	public void processPass(Map<String, Object> anContext) {
-	}
-	
-	@Override
-	public void processReject(Map<String, Object> anContext) {
-		scfSellerFlowService.offerScheme(formartToString((Map<String, Object>)anContext.get("INPUT")), 2);
-	}
 
-	@Override
-	public void processHandle(Map<String, Object> anContext) {
-		scfSellerFlowService.offerScheme(formartToString((Map<String, Object>)anContext.get("INPUT")), 1);
-	}
+    @Override
+    public void processPass(Map<String, Object> anContext) {}
 
-	@Override
-	public void processSave(Map<String, Object> anContext) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void processReject(Map<String, Object> anContext) {
+        scfSellerFlowService.offerScheme(formartToString((Map<String, Object>) anContext.get("INPUT")), 2);
+    }
 
-	private Map<String, Object> formartToString(Map<String, Object> anContext){
-		Map<String, Object> parm = new HashMap<String, Object>();
-		for(Map.Entry<String, Object> entry: anContext.entrySet()){    
-			parm.put(entry.getKey(), entry.getValue().toString().replaceAll("-", ""));
-		}
-		return parm;
-	} 
+    @Override
+    public void processHandle(Map<String, Object> anContext) {
+        scfSellerFlowService.offerScheme(formartToString((Map<String, Object>) anContext.get("INPUT")), 1);
+    }
+
+    @Override
+    public void processSave(Map<String, Object> anContext) {
+        // TODO Auto-generated method stub
+
+    }
+
+    private Map<String, Object> formartToString(Map<String, Object> anContext) {
+        Map<String, Object> parm = new HashMap<String, Object>();
+        for (Map.Entry<String, Object> entry : anContext.entrySet()) {
+            parm.put(entry.getKey(), entry.getValue().toString().replaceAll("-", ""));
+        }
+        return parm;
+    }
 
 }

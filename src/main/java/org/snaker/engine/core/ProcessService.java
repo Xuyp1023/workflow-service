@@ -65,9 +65,9 @@ public class ProcessService extends AccessService implements IProcessService, Ca
     @Override
     public void check(final Process process, final String idOrName) {
         AssertHelper.notNull(process, "指定的流程定义[id/name=" + idOrName + "]不存在");
-        if(process.getState() != null && process.getState() == 0) {
-            throw new IllegalArgumentException("指定的流程定义[id/name=" + idOrName +
-                    ",custNo" + process.getCustNo() + ",version=" + process.getVersion() + "]为非活动状态");
+        if (process.getState() != null && process.getState() == 0) {
+            throw new IllegalArgumentException("指定的流程定义[id/name=" + idOrName + ",custNo" + process.getCustNo()
+                    + ",version=" + process.getVersion() + "]为非活动状态");
         }
     }
 
@@ -101,21 +101,21 @@ public class ProcessService extends AccessService implements IProcessService, Ca
         String processName;
         final Cache<String, String> nameCache = ensureAvailableNameCache();
         final Cache<String, Process> entityCache = ensureAvailableEntityCache();
-        if(nameCache != null && entityCache != null) {
+        if (nameCache != null && entityCache != null) {
             processName = nameCache.get(id);
-            if(StringHelper.isNotEmpty(processName)) {
+            if (StringHelper.isNotEmpty(processName)) {
                 entity = entityCache.get(processName);
             }
         }
-        if(entity != null) {
-            if(log.isDebugEnabled()) {
+        if (entity != null) {
+            if (log.isDebugEnabled()) {
                 log.debug("obtain process[id={}] from cache.", id);
             }
             return entity;
         }
         entity = access().getProcess(id);
-        if(entity != null) {
-            if(log.isDebugEnabled()) {
+        if (entity != null) {
+            if (log.isDebugEnabled()) {
                 log.debug("obtain process[id={}] from database.", id);
             }
             cache(entity);
@@ -142,28 +142,29 @@ public class ProcessService extends AccessService implements IProcessService, Ca
     public Process getProcessByVersion(final String name, final Long custNo, Integer version) {
         AssertHelper.notEmpty(name);
         AssertHelper.notNull(custNo);
-        if(version == null) {
+        if (version == null) {
             version = access().getLatestProcessVersion(name, custNo);
         }
-        if(version == null) {
+        if (version == null) {
             version = 0;
         }
         Process entity = null;
         final String processName = name + DEFAULT_SEPARATOR + custNo + DEFAULT_SEPARATOR + version;
         final Cache<String, Process> entityCache = ensureAvailableEntityCache();
-        if(entityCache != null) {
+        if (entityCache != null) {
             entity = entityCache.get(processName);
         }
-        if(entity != null) {
-            if(log.isDebugEnabled()) {
+        if (entity != null) {
+            if (log.isDebugEnabled()) {
                 log.debug("obtain process[name={}] from cache.", processName);
             }
             return entity;
         }
 
-        final List<Process> processs = access().getProcesss(null, new QueryFilter().setName(name).setCustNo(custNo).setVersion(version));
-        if(processs != null && !processs.isEmpty()) {
-            if(log.isDebugEnabled()) {
+        final List<Process> processs = access().getProcesss(null,
+                new QueryFilter().setName(name).setCustNo(custNo).setVersion(version));
+        if (processs != null && !processs.isEmpty()) {
+            if (log.isDebugEnabled()) {
                 log.debug("obtain process[name={}] from database.", processName);
             }
             entity = processs.get(0);
@@ -190,7 +191,7 @@ public class ProcessService extends AccessService implements IProcessService, Ca
     @Override
     public String deploy(final InputStream input, final Long custNo) {
         throw new AssertException("不可使用！");
-        //        return deploy(input, custNo, null);
+        // return deploy(input, custNo, null);
     }
 
     /**
@@ -283,7 +284,7 @@ public class ProcessService extends AccessService implements IProcessService, Ca
         final Process entity = access().getProcess(id);
         final List<HistoryOrder> historyOrders = access().getHistoryOrders(null, new QueryFilter().setProcessId(id));
 
-        for(final HistoryOrder historyOrder : historyOrders) {
+        for (final HistoryOrder historyOrder : historyOrders) {
             ServiceContext.getEngine().order().cascadeRemove(historyOrder.getId());
         }
         access().deleteProcess(entity);
@@ -295,7 +296,7 @@ public class ProcessService extends AccessService implements IProcessService, Ca
      */
     @Override
     public List<Process> getProcesss(QueryFilter filter) {
-        if(filter == null) {
+        if (filter == null) {
             filter = new QueryFilter();
         }
         return access().getProcesss(null, filter);
@@ -317,18 +318,19 @@ public class ProcessService extends AccessService implements IProcessService, Ca
     protected void cache(final Process entity) {
         final Cache<String, String> nameCache = ensureAvailableNameCache();
         final Cache<String, Process> entityCache = ensureAvailableEntityCache();
-        if(entity.getModel() == null) {
+        if (entity.getModel() == null) {
             entity.setModel(BetterModelParser.parse(entity.getId()));
         }
-        final String processName = entity.getName() + DEFAULT_SEPARATOR  + entity.getCustNo() + DEFAULT_SEPARATOR + entity.getVersion();
-        if(nameCache != null && entityCache != null) {
-            if(log.isDebugEnabled()) {
+        final String processName = entity.getName() + DEFAULT_SEPARATOR + entity.getCustNo() + DEFAULT_SEPARATOR
+                + entity.getVersion();
+        if (nameCache != null && entityCache != null) {
+            if (log.isDebugEnabled()) {
                 log.debug("cache process id is[{}],name is[{}]", entity.getId(), processName);
             }
             entityCache.put(processName, entity);
             nameCache.put(entity.getId(), processName);
         } else {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("no cache implementation class");
             }
         }
@@ -341,8 +343,9 @@ public class ProcessService extends AccessService implements IProcessService, Ca
     protected void clear(final Process entity) {
         final Cache<String, String> nameCache = ensureAvailableNameCache();
         final Cache<String, Process> entityCache = ensureAvailableEntityCache();
-        final String processName = entity.getName() + DEFAULT_SEPARATOR  + entity.getCustNo() + DEFAULT_SEPARATOR + entity.getVersion();
-        if(nameCache != null && entityCache != null) {
+        final String processName = entity.getName() + DEFAULT_SEPARATOR + entity.getCustNo() + DEFAULT_SEPARATOR
+                + entity.getVersion();
+        if (nameCache != null && entityCache != null) {
             nameCache.remove(entity.getId());
             entityCache.remove(processName);
         }
@@ -355,7 +358,7 @@ public class ProcessService extends AccessService implements IProcessService, Ca
 
     protected Cache<String, Process> ensureAvailableEntityCache() {
         Cache<String, Process> entityCache = ensureEntityCache();
-        if(entityCache == null && this.cacheManager != null) {
+        if (entityCache == null && this.cacheManager != null) {
             entityCache = this.cacheManager.getCache(CACHE_ENTITY);
         }
         return entityCache;
@@ -363,7 +366,7 @@ public class ProcessService extends AccessService implements IProcessService, Ca
 
     protected Cache<String, String> ensureAvailableNameCache() {
         Cache<String, String> nameCache = ensureNameCache();
-        if(nameCache == null && this.cacheManager != null) {
+        if (nameCache == null && this.cacheManager != null) {
             nameCache = this.cacheManager.getCache(CACHE_NAME);
         }
         return nameCache;

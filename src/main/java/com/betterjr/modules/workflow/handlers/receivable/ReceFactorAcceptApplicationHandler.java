@@ -14,30 +14,30 @@ import com.betterjr.modules.workflow.handler.INodeHandler;
  *
  */
 @Service("receFactorAcceptApplicationHandler")
-public class ReceFactorAcceptApplicationHandler implements INodeHandler{
+public class ReceFactorAcceptApplicationHandler implements INodeHandler {
 
-	@Reference(interfaceClass = IScfReceApprovalFlowDubboService.class)
+    @Reference(interfaceClass = IScfReceApprovalFlowDubboService.class)
     private IScfReceApprovalFlowDubboService receApprovalDubboService;
-	
-	@Override
-	public void processPass(Map<String, Object> anContext) {
-		
-	}
 
-	@Override
-	public void processReject(Map<String, Object> anContext) {
-		
-	}
+    @Override
+    public void processPass(Map<String, Object> anContext) {
 
-	@Override
-	public void processHandle(Map<String, Object> anContext) {
-		receApprovalDubboService.applictionAccept((Map<String, Object>)anContext.get("INPUT"));
-		
-	}
+    }
 
-	@Override
-	public void processSave(Map<String, Object> anContext) {
-		
-	}
-	
+    @Override
+    public void processReject(Map<String, Object> anContext) {
+
+    }
+
+    @Override
+    public void processHandle(Map<String, Object> anContext) {
+        receApprovalDubboService.applictionAccept((Map<String, Object>) anContext.get("INPUT"));
+
+    }
+
+    @Override
+    public void processSave(Map<String, Object> anContext) {
+
+    }
+
 }

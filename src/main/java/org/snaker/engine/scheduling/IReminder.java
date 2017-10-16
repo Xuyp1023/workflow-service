@@ -17,10 +17,10 @@
 
 package org.snaker.engine.scheduling;
 
+import java.util.Map;
+
 import org.snaker.engine.entity.Process;
 import org.snaker.engine.model.NodeModel;
-
-import java.util.Map;
 
 /**
  * 提醒接口
@@ -36,6 +36,5 @@ public interface IReminder {
      * @param nodeModel 节点模型
      * @param data 数据
      */
-    void remind(Process process, String orderId,
-                String taskId, NodeModel nodeModel, Map<String, Object> data);
+    void remind(Process process, String orderId, String taskId, NodeModel nodeModel, Map<String, Object> data);
 }

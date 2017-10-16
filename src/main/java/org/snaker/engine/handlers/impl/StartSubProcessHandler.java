@@ -63,7 +63,7 @@ public class StartSubProcessHandler implements IHandler {
      */
     @Override
     public void handle(final Execution execution) {
-        //根据子流程模型名称获取子流程定义对象
+        // 根据子流程模型名称获取子流程定义对象
         final SnakerEngine engine = execution.getEngine();
 
         final Map<String, Object> param = execution.getArgs();
@@ -77,16 +77,18 @@ public class StartSubProcessHandler implements IHandler {
         final Execution child = execution.createSubExecution(execution, process, model.getName());
         Order order = null;
         if (isFutureRunning) {
-            //创建单个线程执行器来执行启动子流程的任务
+            // 创建单个线程执行器来执行启动子流程的任务
             final ExecutorService es = Executors.newSingleThreadExecutor();
-            //提交执行任务，并返回future
+            // 提交执行任务，并返回future
             final Future<Order> future = es.submit(new ExecuteTask(execution, process, model.getName()));
             try {
                 es.shutdown();
                 order = future.get();
-            } catch (final InterruptedException e) {
+            }
+            catch (final InterruptedException e) {
                 throw new SnakerException("创建子流程线程被强制终止执行", e.getCause());
-            } catch (final ExecutionException e) {
+            }
+            catch (final ExecutionException e) {
                 throw new SnakerException("创建子流程线程执行异常.", e.getCause());
             }
         } else {
@@ -101,7 +103,7 @@ public class StartSubProcessHandler implements IHandler {
         AssertHelper.notEmpty(operRole);
 
         Long custNo = null;
-        switch (operRole) { //CORE_USER 、PLATFORM_USER、FACTOR_USER、SUPPLIER_USER、SELLER_USER
+        switch (operRole) { // CORE_USER 、PLATFORM_USER、FACTOR_USER、SUPPLIER_USER、SELLER_USER
         case "CORE_USER":
             custNo = getCustNo(args, WorkFlowInput.CORE_CUSTNO);
             break;
