@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.workflow.entity.WorkFlowStep;
 
 @BetterjrMapper
-public interface WorkFlowStepMapper extends Mapper<WorkFlowStep> {
-}
+public interface WorkFlowStepMapper extends Mapper<WorkFlowStep> {}

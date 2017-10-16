@@ -41,6 +41,7 @@ public interface DBAccess {
      * @param accessObject 数据库访问对象(Connection等)
      */
     public void initialize(Object accessObject);
+
     /**
      * 保存任务对象
      * @param task 任务对象

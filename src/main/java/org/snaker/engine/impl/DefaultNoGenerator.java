@@ -27,10 +27,11 @@ import org.snaker.engine.model.ProcessModel;
  * @since 1.0
  */
 public class DefaultNoGenerator implements INoGenerator {
-	public String generate(ProcessModel model) {
-		DateTime dateTime = new DateTime();
-		String time = dateTime.toString("yyyyMMdd-HH:mm:ss-SSS");
-		Random random = new Random();
-		return time + "-" + random.nextInt(1000);
-	}
+    @Override
+    public String generate(ProcessModel model) {
+        DateTime dateTime = new DateTime();
+        String time = dateTime.toString("yyyyMMdd-HH:mm:ss-SSS");
+        Random random = new Random();
+        return time + "-" + random.nextInt(1000);
+    }
 }

@@ -24,10 +24,11 @@ import org.snaker.engine.parser.AbstractNodeParser;
  * @since 1.0
  */
 public class StartParser extends AbstractNodeParser {
-	/**
-	 * 产生StartModel模型对象
-	 */
-	protected NodeModel newModel() {
-		return new StartModel();
-	}
+    /**
+     * 产生StartModel模型对象
+     */
+    @Override
+    protected NodeModel newModel() {
+        return new StartModel();
+    }
 }

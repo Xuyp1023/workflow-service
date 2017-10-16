@@ -16,12 +16,12 @@
  */
 package org.snaker.engine.access.mybatis;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.snaker.engine.access.jdbc.JdbcAccess;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * mybatis方式的数据库访问
@@ -29,35 +29,39 @@ import java.sql.SQLException;
  * @since 1.0
  */
 public class MybatisAccess extends JdbcAccess {
-	/**
-	 * mybatis的sqlSessionFactory
-	 */
-	private SqlSessionFactory sqlSessionFactory;
-	/**
-	 * setter
-	 * @param sqlSessionFactory
-	 */
-	public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
-		this.sqlSessionFactory = sqlSessionFactory;
-	}
-	
-	public void initialize(Object accessObject) {
-		if(accessObject == null) return;
-		if(accessObject instanceof SqlSessionFactory) {
-			this.sqlSessionFactory = (SqlSessionFactory)accessObject;
-			setDataSource(this.sqlSessionFactory.getConfiguration().getEnvironment().getDataSource());
-		}
-	}
-	
-	private SqlSession getSession() {
-		return MybatisHelper.getSession(sqlSessionFactory);
-	}
+    /**
+     * mybatis的sqlSessionFactory
+     */
+    private SqlSessionFactory sqlSessionFactory;
 
-	public boolean isORM() {
-		return false;
-	}
+    /**
+     * setter
+     * @param sqlSessionFactory
+     */
+    public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
+    }
 
-	protected Connection getConnection() throws SQLException {
-		return getSession().getConnection();
-	}
+    @Override
+    public void initialize(Object accessObject) {
+        if (accessObject == null) return;
+        if (accessObject instanceof SqlSessionFactory) {
+            this.sqlSessionFactory = (SqlSessionFactory) accessObject;
+            setDataSource(this.sqlSessionFactory.getConfiguration().getEnvironment().getDataSource());
+        }
+    }
+
+    private SqlSession getSession() {
+        return MybatisHelper.getSession(sqlSessionFactory);
+    }
+
+    @Override
+    public boolean isORM() {
+        return false;
+    }
+
+    @Override
+    protected Connection getConnection() throws SQLException {
+        return getSession().getConnection();
+    }
 }

@@ -16,15 +16,16 @@
  */
 package org.snaker.engine.access.mybatis;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.apache.ibatis.transaction.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snaker.engine.access.transaction.TransactionObjectHolder;
 import org.snaker.engine.helper.AssertHelper;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * mybatis事务对象，仅提供connection对象及事务操作 这里取消了对事务的commit、rooback操作
@@ -32,49 +33,53 @@ import java.sql.SQLException;
  * @since 1.0
  */
 public class MybatisTransaction implements Transaction {
-	private static final Logger log = LoggerFactory.getLogger(MybatisTransaction.class);
-	private DataSource dataSource;
-	protected Connection connection;
-	protected boolean autoCommit;
+    private static final Logger log = LoggerFactory.getLogger(MybatisTransaction.class);
+    private DataSource dataSource;
+    protected Connection connection;
+    protected boolean autoCommit;
 
-	public MybatisTransaction(DataSource dataSource) {
-		AssertHelper.notNull(dataSource, "No DataSource specified");
-		this.dataSource = dataSource;
-	}
+    public MybatisTransaction(DataSource dataSource) {
+        AssertHelper.notNull(dataSource, "No DataSource specified");
+        this.dataSource = dataSource;
+    }
 
-	public Connection getConnection() throws SQLException {
-		this.connection = (Connection) TransactionObjectHolder.get();
-		if (this.connection == null) {
-			this.connection = dataSource.getConnection();
-		}
-		this.autoCommit = this.connection.getAutoCommit();
-		return this.connection;
-	}
-	
-	public void commit() throws SQLException {
-		if (this.connection != null && !this.autoCommit && !isConnectionTransactional()) {
-			if (log.isDebugEnabled()) {
-				log.debug("Committing JDBC Connection [" + this.connection.hashCode() + "]");
-			}
-			this.connection.commit();
-		}
-	}
-	
-	public void rollback() throws SQLException {
-		if (this.connection != null && !this.autoCommit && !isConnectionTransactional()) {
-			if (log.isDebugEnabled()) {
-				log.debug("Rolling back JDBC Connection [" + this.connection.hashCode() + "]");
-			}
-			this.connection.rollback();
-		}
-	}
-	
-	private boolean isConnectionTransactional() {
-		Connection holdCon = (Connection)TransactionObjectHolder.get();
-		return (holdCon == connection || holdCon.equals(connection));
-	}
+    @Override
+    public Connection getConnection() throws SQLException {
+        this.connection = (Connection) TransactionObjectHolder.get();
+        if (this.connection == null) {
+            this.connection = dataSource.getConnection();
+        }
+        this.autoCommit = this.connection.getAutoCommit();
+        return this.connection;
+    }
 
-	public void close() throws SQLException {
-		// not needed in this version
-	}
+    @Override
+    public void commit() throws SQLException {
+        if (this.connection != null && !this.autoCommit && !isConnectionTransactional()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Committing JDBC Connection [" + this.connection.hashCode() + "]");
+            }
+            this.connection.commit();
+        }
+    }
+
+    @Override
+    public void rollback() throws SQLException {
+        if (this.connection != null && !this.autoCommit && !isConnectionTransactional()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Rolling back JDBC Connection [" + this.connection.hashCode() + "]");
+            }
+            this.connection.rollback();
+        }
+    }
+
+    private boolean isConnectionTransactional() {
+        Connection holdCon = (Connection) TransactionObjectHolder.get();
+        return (holdCon == connection || holdCon.equals(connection));
+    }
+
+    @Override
+    public void close() throws SQLException {
+        // not needed in this version
+    }
 }

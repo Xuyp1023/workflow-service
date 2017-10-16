@@ -92,14 +92,14 @@ public class SnakerEngineImpl implements SnakerEngine {
         /*
          * 无spring环境，DBAccess的实现类通过服务上下文获取
          */
-        if(!this.configuration.isCMB()) {
+        if (!this.configuration.isCMB()) {
             final DBAccess access = ServiceContext.find(DBAccess.class);
             AssertHelper.notNull(access);
             final TransactionInterceptor interceptor = ServiceContext.find(TransactionInterceptor.class);
-            //如果初始化配置时提供了访问对象，就对DBAccess进行初始化
+            // 如果初始化配置时提供了访问对象，就对DBAccess进行初始化
             final Object accessObject = this.configuration.getAccessDBObject();
-            if(accessObject != null) {
-                if(interceptor != null) {
+            if (accessObject != null) {
+                if (interceptor != null) {
                     interceptor.initialize(accessObject);
                 }
                 access.initialize(accessObject);
@@ -108,12 +108,12 @@ public class SnakerEngineImpl implements SnakerEngine {
             access.runScript();
         }
         CacheManager cacheManager = ServiceContext.find(CacheManager.class);
-        if(cacheManager == null) {
-            //默认使用内存缓存管理器
+        if (cacheManager == null) {
+            // 默认使用内存缓存管理器
             cacheManager = new MemoryCacheManager();
         }
         final List<CacheManagerAware> cacheServices = ServiceContext.findList(CacheManagerAware.class);
-        for(final CacheManagerAware cacheService : cacheServices) {
+        for (final CacheManagerAware cacheService : cacheServices) {
             cacheService.setCacheManager(cacheManager);
         }
         return this;
@@ -125,7 +125,7 @@ public class SnakerEngineImpl implements SnakerEngine {
      */
     protected void setDBAccess(final DBAccess access) {
         final List<AccessService> services = ServiceContext.findList(AccessService.class);
-        for(final AccessService service : services) {
+        for (final AccessService service : services) {
             service.setAccess(access);
         }
     }
@@ -199,7 +199,7 @@ public class SnakerEngineImpl implements SnakerEngine {
      */
     @Override
     public Order startInstanceById(final String id, final String operator, Map<String, Object> args) {
-        if(args == null) {
+        if (args == null) {
             args = new HashMap<String, Object>();
         }
         final Process process = process().getProcessById(id);
@@ -240,9 +240,9 @@ public class SnakerEngineImpl implements SnakerEngine {
      * @since 1.3
      */
     @Override
-    public Order startInstanceByName(final String name, final Long custNo, final Integer version,
-            final String operator, Map<String, Object> args) {
-        if(args == null) {
+    public Order startInstanceByName(final String name, final Long custNo, final Integer version, final String operator,
+            Map<String, Object> args) {
+        if (args == null) {
             args = new HashMap<String, Object>();
         }
         final Process process = process().getProcessByVersion(name, custNo, version);
@@ -252,9 +252,10 @@ public class SnakerEngineImpl implements SnakerEngine {
 
     private Order startProcess(final Process process, final String operator, final Map<String, Object> args) {
         final Execution execution = execute(process, operator, args, null, null);
-        if(process.getModel() != null) {
+        if (process.getModel() != null) {
             final StartModel start = process.getModel().getStart();
-            AssertHelper.notNull(start, "流程定义[name=" + process.getName() + ", version=" + process.getVersion() + "]没有开始节点");
+            AssertHelper.notNull(start,
+                    "流程定义[name=" + process.getName() + ", version=" + process.getVersion() + "]没有开始节点");
             start.execute(execution);
         }
 
@@ -288,7 +289,7 @@ public class SnakerEngineImpl implements SnakerEngine {
     private Execution execute(final Process process, final String operator, final Map<String, Object> args,
             final String parentId, final String parentNodeName) {
         final Order order = order().createOrder(process, operator, args, parentId, parentNodeName);
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("创建流程实例对象:" + order);
         }
         final Execution current = new Execution(this, process, order, args);
@@ -317,15 +318,15 @@ public class SnakerEngineImpl implements SnakerEngine {
      */
     @Override
     public List<Task> executeTask(final String taskId, final String operator, final Map<String, Object> args) {
-        //完成任务，并且构造执行对象
+        // 完成任务，并且构造执行对象
         final Execution execution = execute(taskId, operator, args);
-        if(execution == null) {
+        if (execution == null) {
             return Collections.emptyList();
         }
         final ProcessModel model = execution.getProcess().getModel();
-        if(model != null) {
+        if (model != null) {
             final NodeModel nodeModel = model.getNode(execution.getTask().getTaskName());
-            //将执行对象交给该任务对应的节点模型执行
+            // 将执行对象交给该任务对应的节点模型执行
             nodeModel.execute(execution);
         }
         return execution.getTasks();
@@ -337,20 +338,21 @@ public class SnakerEngineImpl implements SnakerEngine {
      * 2、nodeName不为null时，则任意跳转，即动态创建转移
      */
     @Override
-    public List<Task> executeAndJumpTask(final String taskId, final String operator, final Map<String, Object> args, final String nodeName) {
+    public List<Task> executeAndJumpTask(final String taskId, final String operator, final Map<String, Object> args,
+            final String nodeName) {
         final Execution execution = execute(taskId, operator, args);
-        if(execution == null) {
+        if (execution == null) {
             return Collections.emptyList();
         }
         final ProcessModel model = execution.getProcess().getModel();
         AssertHelper.notNull(model, "当前任务未找到流程定义模型");
-        if(StringHelper.isEmpty(nodeName)) {
+        if (StringHelper.isEmpty(nodeName)) {
             final Task newTask = task().rejectTask(model, execution.getTask());
             execution.addTask(newTask);
         } else {
             final NodeModel nodeModel = model.getNode(nodeName);
             AssertHelper.notNull(nodeModel, "根据节点名称[" + nodeName + "]无法找到节点模型");
-            //动态创建转移对象，由转移对象执行execution实例
+            // 动态创建转移对象，由转移对象执行execution实例
             final TransitionModel tm = new TransitionModel();
             tm.setTarget(nodeModel);
             tm.setEnabled(true);
@@ -364,7 +366,8 @@ public class SnakerEngineImpl implements SnakerEngine {
      * 根据流程实例ID，操作人ID，参数列表按照节点模型model创建新的自由任务
      */
     @Override
-    public List<Task> createFreeTask(final String orderId, final String operator, final Map<String, Object> args, final TaskModel model) {
+    public List<Task> createFreeTask(final String orderId, final String operator, final Map<String, Object> args,
+            final TaskModel model) {
         final Order order = query().getOrder(orderId);
         AssertHelper.notNull(order, "指定的流程实例[id=" + orderId + "]已完成或不存在");
         order.setLastUpdator(operator);
@@ -383,11 +386,11 @@ public class SnakerEngineImpl implements SnakerEngine {
      * @return Execution
      */
     protected Execution execute(final String taskId, final String operator, Map<String, Object> args) {
-        if(args == null) {
+        if (args == null) {
             args = new HashMap<String, Object>();
         }
         final Task task = task().complete(taskId, operator, args);
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("任务[taskId=" + taskId + "]已完成");
         }
         final Order order = query().getOrder(task.getOrderId());
@@ -395,14 +398,14 @@ public class SnakerEngineImpl implements SnakerEngine {
         order.setLastUpdator(operator);
         order.setLastUpdateTime(DateHelper.getTime());
         order().updateOrder(order);
-        //协办任务完成不产生执行对象
-        if(!task.isMajor()) {
+        // 协办任务完成不产生执行对象
+        if (!task.isMajor()) {
             return null;
         }
         final Map<String, Object> orderMaps = order.getVariableMap();
-        if(orderMaps != null) {
-            for(final Map.Entry<String, Object> entry : orderMaps.entrySet()) {
-                if(args.containsKey(entry.getKey())) {
+        if (orderMaps != null) {
+            for (final Map.Entry<String, Object> entry : orderMaps.entrySet()) {
+                if (args.containsKey(entry.getKey())) {
                     continue;
                 }
                 args.put(entry.getKey(), entry.getValue());

@@ -37,7 +37,7 @@ public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper,
     @Inject
     private WorkFlowNodeService workFlowNodeService;
 
-    @Reference(interfaceClass=ICustOperatorService.class)
+    @Reference(interfaceClass = ICustOperatorService.class)
     private ICustOperatorService custOperatorService;
 
     /**
@@ -172,7 +172,7 @@ public class WorkFlowApproverService extends BaseService<WorkFlowApproverMapper,
             final Map<Long, Long> anWorkFlowMoneyMapping) {
         final List<WorkFlowApprover> workFlowApprovers = queryApproverByStep(anSourceStep.getId());
         if (Collections3.isEmpty(workFlowApprovers) == false) {
-            for (final WorkFlowApprover workFlowApprover: workFlowApprovers) {
+            for (final WorkFlowApprover workFlowApprover : workFlowApprovers) {
                 final WorkFlowApprover approver = new WorkFlowApprover();
 
                 final Long moneyId = workFlowApprover.getMoneyId();

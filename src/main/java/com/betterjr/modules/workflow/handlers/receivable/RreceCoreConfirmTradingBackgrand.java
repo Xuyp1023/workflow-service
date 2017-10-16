@@ -10,26 +10,25 @@ import com.betterjr.modules.workflow.handler.INodeHandler;
 
 @Service("receCoreConfirmTradingBackgrand")
 public class RreceCoreConfirmTradingBackgrand implements INodeHandler {
-	@Reference(interfaceClass = IScfReceApprovalFlowDubboService.class)
+    @Reference(interfaceClass = IScfReceApprovalFlowDubboService.class)
     private IScfReceApprovalFlowDubboService receCoreApprovalDubboService;
-	
-	@Override
-	public void processPass(Map<String, Object> anContext) {
-		receCoreApprovalDubboService.confirmTradingBackgrand((Map<String, Object>)anContext.get("INPUT"), 1);
-	}
 
-	@Override
-	public void processReject(Map<String, Object> anContext) {
-		receCoreApprovalDubboService.confirmTradingBackgrand((Map<String, Object>)anContext.get("INPUT"), 0);
-	}
+    @Override
+    public void processPass(Map<String, Object> anContext) {
+        receCoreApprovalDubboService.confirmTradingBackgrand((Map<String, Object>) anContext.get("INPUT"), 1);
+    }
 
-	@Override
-	public void processHandle(Map<String, Object> anContext) {
-	}
+    @Override
+    public void processReject(Map<String, Object> anContext) {
+        receCoreApprovalDubboService.confirmTradingBackgrand((Map<String, Object>) anContext.get("INPUT"), 0);
+    }
 
-	@Override
-	public void processSave(Map<String, Object> anContext) {
+    @Override
+    public void processHandle(Map<String, Object> anContext) {}
 
-	}
+    @Override
+    public void processSave(Map<String, Object> anContext) {
+
+    }
 
 }

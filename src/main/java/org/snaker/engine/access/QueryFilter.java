@@ -32,9 +32,9 @@ public class QueryFilter implements Serializable {
     public static final String ASC = "asc";
     public static final String DESC = "desc";
 
-    //排序字段
+    // 排序字段
     private String orderBy;
-    //排序类型ASC/DESC
+    // 排序类型ASC/DESC
     private String order;
 
     /*********common parameters***********/
@@ -116,154 +116,191 @@ public class QueryFilter implements Serializable {
     public String getProcessId() {
         return processId;
     }
+
     public QueryFilter setProcessId(final String processId) {
         AssertHelper.notEmpty(processId);
         this.processId = processId;
         return this;
     }
+
     public String[] getProcessIds() {
         return processIds;
     }
+
     public QueryFilter setProcessIds(final String[] anProcessIds) {
         AssertHelper.notNull(anProcessIds);
         processIds = anProcessIds;
         return this;
     }
+
     public String getOrderId() {
         return orderId;
     }
+
     public QueryFilter setOrderId(final String orderId) {
         AssertHelper.notEmpty(orderId);
         this.orderId = orderId;
         return this;
     }
+
     public String getTaskId() {
         return taskId;
     }
+
     public QueryFilter setTaskId(final String taskId) {
         AssertHelper.notEmpty(taskId);
         this.taskId = taskId;
         return this;
     }
+
     public String getCreateTimeStart() {
         return createTimeStart;
     }
+
     public QueryFilter setCreateTimeStart(final String createTimeStart) {
         AssertHelper.notEmpty(createTimeStart);
         this.createTimeStart = createTimeStart;
         return this;
     }
+
     public String getCreateTimeEnd() {
         return createTimeEnd;
     }
+
     public QueryFilter setCreateTimeEnd(final String createTimeEnd) {
         AssertHelper.notEmpty(createTimeEnd);
         this.createTimeEnd = createTimeEnd;
         return this;
     }
+
     public String[] getOperators() {
         return operators;
     }
+
     public QueryFilter setOperators(final String[] operators) {
         AssertHelper.notNull(operators);
         this.operators = operators;
         return this;
     }
+
     public QueryFilter setOperator(final String operator) {
         AssertHelper.notEmpty(operator);
         this.operators = new String[1];
         this.operators[0] = operator;
         return this;
     }
+
     public String[] getNames() {
         return names;
     }
+
     public QueryFilter setNames(final String[] names) {
         AssertHelper.notNull(names);
         this.names = names;
         return this;
     }
+
     public QueryFilter setName(final String name) {
         AssertHelper.notEmpty(name);
         this.names = new String[1];
         this.names[0] = name;
         return this;
     }
+
     public String getDisplayName() {
         return displayName;
     }
+
     public QueryFilter setDisplayName(final String displayName) {
         AssertHelper.notEmpty(displayName);
         this.displayName = displayName;
         return this;
     }
+
     public Integer getState() {
         return state;
     }
+
     public QueryFilter setState(final Integer state) {
         AssertHelper.notNull(state);
         this.state = state;
         return this;
     }
+
     public String getParentId() {
         return parentId;
     }
+
     public QueryFilter setParentId(final String parentId) {
         AssertHelper.notEmpty(parentId);
         this.parentId = parentId;
         return this;
     }
+
     public String getOrderNo() {
         return orderNo;
     }
+
     public QueryFilter setOrderNo(final String orderNo) {
         AssertHelper.notEmpty(orderNo);
         this.orderNo = orderNo;
         return this;
     }
+
     public Integer getTaskType() {
         return taskType;
     }
+
     public QueryFilter setTaskType(final Integer taskType) {
         AssertHelper.notNull(taskType);
         this.taskType = taskType;
         return this;
     }
+
     public Integer getPerformType() {
         return performType;
     }
+
     public QueryFilter setPerformType(final Integer performType) {
         AssertHelper.notNull(performType);
         this.performType = performType;
         return this;
     }
+
     public String[] getExcludedIds() {
         return excludedIds;
     }
+
     public QueryFilter setExcludedIds(final String[] excludedIds) {
         AssertHelper.notNull(excludedIds);
         this.excludedIds = excludedIds;
         return this;
     }
+
     public Integer getVersion() {
         return version;
     }
+
     public QueryFilter setVersion(final Integer version) {
         AssertHelper.notNull(version);
         this.version = version;
         return this;
     }
+
     public String getOperateTime() {
         return operateTime;
     }
+
     public QueryFilter setOperateTime(final String operateTime) {
         AssertHelper.notEmpty(operateTime);
         this.operateTime = operateTime;
         return this;
     }
+
     public String getProcessType() {
         return processType;
     }
+
     public QueryFilter setProcessType(final String processType) {
         AssertHelper.notEmpty(processType);
         this.processType = processType;
@@ -283,23 +320,27 @@ public class QueryFilter implements Serializable {
     public String getOrderBy() {
         return orderBy;
     }
+
     public void setOrderBy(final String orderBy) {
         this.orderBy = orderBy;
     }
+
     public QueryFilter orderBy(final String theOrderBy) {
         setOrderBy(theOrderBy);
         return this;
     }
+
     public String getOrder() {
         return order;
     }
+
     /**
      * 设置排序类型.
      * @param order 可选值为desc或asc,多个排序字段时用','分隔.
      */
     public void setOrder(final String order) {
         final String lowcaseOrder = StringUtils.lowerCase(order);
-        //检查order字符串的合法值
+        // 检查order字符串的合法值
         final String[] orders = StringUtils.split(lowcaseOrder, ',');
         for (final String orderStr : orders) {
             if (!StringUtils.equals(DESC, orderStr) && !StringUtils.equals(ASC, orderStr)) {
@@ -308,10 +349,12 @@ public class QueryFilter implements Serializable {
         }
         this.order = lowcaseOrder;
     }
+
     public QueryFilter order(final String theOrder) {
         setOrder(theOrder);
         return this;
     }
+
     /**
      * 是否已设置排序字段,无默认值.
      */

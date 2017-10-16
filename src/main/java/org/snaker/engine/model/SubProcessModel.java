@@ -23,60 +23,61 @@ import org.snaker.engine.core.Execution;
  * @since 1.0
  */
 public class SubProcessModel extends WorkModel {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -3923955459202018147L;
-	/**
-	 * 子流程名称
-	 */
-	private String processName;
-	/**
-	 * 流程所属角色 CORE_USER 、PLATFORM_USER、FACTOR_USER、SUPPLIER_USER、SELLER_USER
-	 */
-	private String operRole;
-	/**
-	 * 子流程版本号
-	 */
-	private Integer version;
-	/**
-	 * 子流程定义引用
-	 */
-	private ProcessModel subProcess;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -3923955459202018147L;
+    /**
+     * 子流程名称
+     */
+    private String processName;
+    /**
+     * 流程所属角色 CORE_USER 、PLATFORM_USER、FACTOR_USER、SUPPLIER_USER、SELLER_USER
+     */
+    private String operRole;
+    /**
+     * 子流程版本号
+     */
+    private Integer version;
+    /**
+     * 子流程定义引用
+     */
+    private ProcessModel subProcess;
 
-	protected void exec(Execution execution) {
-		runOutTransition(execution);
-	}
+    @Override
+    protected void exec(Execution execution) {
+        runOutTransition(execution);
+    }
 
-	public ProcessModel getSubProcess() {
-		return subProcess;
-	}
+    public ProcessModel getSubProcess() {
+        return subProcess;
+    }
 
-	public void setSubProcess(ProcessModel subProcess) {
-		this.subProcess = subProcess;
-	}
+    public void setSubProcess(ProcessModel subProcess) {
+        this.subProcess = subProcess;
+    }
 
-	public String getProcessName() {
-		return processName;
-	}
+    public String getProcessName() {
+        return processName;
+    }
 
-	public void setProcessName(String processName) {
-		this.processName = processName;
-	}
+    public void setProcessName(String processName) {
+        this.processName = processName;
+    }
 
-	public Integer getVersion() {
-		return version;
-	}
+    public Integer getVersion() {
+        return version;
+    }
 
-	public void setVersion(Integer version) {
-		this.version = version;
-	}
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 
-	public String getOperRole() {
-		return operRole;
-	}
+    public String getOperRole() {
+        return operRole;
+    }
 
-	public void setOperRole(String operRole) {
-		this.operRole = operRole;
-	}
+    public void setOperRole(String operRole) {
+        this.operRole = operRole;
+    }
 }

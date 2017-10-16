@@ -69,17 +69,18 @@ public class SnakerHelper {
     public static String getProcessName(final String anProcessId) {
         final SnakerEngine engine = ServiceContext.getEngine();
         final org.snaker.engine.entity.Process process = engine.process().getProcessById(anProcessId);
-        if(process == null) {
+        if (process == null) {
             return anProcessId;
         }
         return process.getDisplayName();
     }
 
-    public static String getStateJson(final ProcessModel model, final List<Task> activeTasks, final List<HistoryTask> historyTasks) {
+    public static String getStateJson(final ProcessModel model, final List<Task> activeTasks,
+            final List<HistoryTask> historyTasks) {
         final StringBuffer buffer = new StringBuffer();
         buffer.append("{'activeRects':{'rects':[");
-        if(activeTasks != null && activeTasks.size() > 0) {
-            for(final Task task : activeTasks) {
+        if (activeTasks != null && activeTasks.size() > 0) {
+            for (final Task task : activeTasks) {
                 buffer.append("{'paths':[],'name':'");
                 buffer.append(task.getTaskName());
                 buffer.append("'},");
@@ -87,10 +88,10 @@ public class SnakerHelper {
             buffer.deleteCharAt(buffer.length() - 1);
         }
         buffer.append("]}, 'historyRects':{'rects':[");
-        if(historyTasks != null && historyTasks.size() > 0) {
-            for(final HistoryTask historyTask : historyTasks) {
+        if (historyTasks != null && historyTasks.size() > 0) {
+            for (final HistoryTask historyTask : historyTasks) {
                 final NodeModel parentModel = model.getNode(historyTask.getTaskName());
-                if(parentModel == null) {
+                if (parentModel == null) {
                     continue;
                 }
                 buffer.append("{'name':'").append(parentModel.getName()).append("','paths':[");
@@ -105,8 +106,8 @@ public class SnakerHelper {
     public static String getModelJson(final ProcessModel model) {
         final StringBuffer buffer = new StringBuffer();
         final List<TransitionModel> tms = new ArrayList<TransitionModel>();
-        for(final NodeModel node : model.getNodes()) {
-            for(final TransitionModel tm : node.getOutputs()) {
+        for (final NodeModel node : model.getNodes()) {
+            for (final TransitionModel tm : node.getOutputs()) {
                 tms.add(tm);
             }
         }
@@ -126,10 +127,11 @@ public class SnakerHelper {
         buffer.append("'}}}}");
         return buffer.toString();
     }
+
     public static String getNodeJson(final List<NodeModel> nodes) {
         final StringBuffer buffer = new StringBuffer();
         buffer.append("'states': {");
-        for(final NodeModel node : nodes) {
+        for (final NodeModel node : nodes) {
             buffer.append("'");
             buffer.append(node.getName()).append("'");
             buffer.append(getBase(node));
@@ -145,7 +147,7 @@ public class SnakerHelper {
     public static String getPathJson(final List<TransitionModel> tms) {
         final StringBuffer buffer = new StringBuffer();
         buffer.append("'paths':{");
-        for(final TransitionModel tm : tms) {
+        for (final TransitionModel tm : tms) {
             buffer.append("'");
             buffer.append(tm.getName()).append("'");
             buffer.append(":{'from':'");
@@ -153,9 +155,9 @@ public class SnakerHelper {
             buffer.append("','to':'");
             buffer.append(tm.getTarget().getName());
             buffer.append("', 'dots':[");
-            if(StringUtils.isNotEmpty(tm.getG())) {
+            if (StringUtils.isNotEmpty(tm.getG())) {
                 final String[] bendpoints = tm.getG().split(";");
-                for (final String bendpoint: bendpoints) {
+                for (final String bendpoint : bendpoints) {
                     buffer.append("{");
                     final String[] xy = bendpoint.split(",");
                     buffer.append("'x':").append(getNumber(xy[0]));
@@ -167,12 +169,13 @@ public class SnakerHelper {
             buffer.append("],'text':{'text':'");
             buffer.append(tm.getDisplayName());
             buffer.append("'},'textPos':{");
-            if(StringUtils.isNotEmpty(tm.getOffset())) {
+            if (StringUtils.isNotEmpty(tm.getOffset())) {
                 final String[] values = tm.getOffset().split(",");
                 buffer.append("'x':").append(values[0]).append(",");
                 buffer.append("'y':").append(values[1]).append("");
             }
-            buffer.append("}, 'props':{'name':{'value':'" + tm.getName() + "'},'expr':{'value':'" + tm.getExpr() + "'}}}");
+            buffer.append(
+                    "}, 'props':{'name':{'value':'" + tm.getName() + "'},'expr':{'value':'" + tm.getExpr() + "'}}}");
             buffer.append(",");
         }
         buffer.deleteCharAt(buffer.length() - 1);
@@ -196,17 +199,17 @@ public class SnakerHelper {
         try {
             final PropertyDescriptor[] beanProperties = PropertyUtils.getPropertyDescriptors(node);
             for (final PropertyDescriptor propertyDescriptor : beanProperties) {
-                if(propertyDescriptor.getReadMethod() == null || propertyDescriptor.getWriteMethod() == null) {
+                if (propertyDescriptor.getReadMethod() == null || propertyDescriptor.getWriteMethod() == null) {
                     continue;
                 }
                 final String name = propertyDescriptor.getName();
                 String value = "";
-                if(propertyDescriptor.getPropertyType() == String.class) {
+                if (propertyDescriptor.getPropertyType() == String.class) {
                     value = BeanUtils.getProperty(node, name);
                 } else {
                     continue;
                 }
-                if(value == null || value.equals("")) {
+                if (value == null || value.equals("")) {
                     continue;
                 }
                 buffer.append("'");
@@ -215,7 +218,8 @@ public class SnakerHelper {
                 buffer.append(convert(value));
                 buffer.append("'},");
             }
-        } catch(final Exception e) {
+        }
+        catch (final Exception e) {
             e.printStackTrace();
         }
         buffer.deleteCharAt(buffer.length() - 1);
@@ -229,14 +233,14 @@ public class SnakerHelper {
         final String[] values = node.getLayout().split(",");
         buffer.append("'x':").append(getNumber(values[0])).append(",");
         buffer.append("'y':").append(values[1]).append(",");
-        if("-1".equals(values[2])) {
-            if(node instanceof TaskModel || node instanceof CustomModel || node instanceof SubProcessModel) {
+        if ("-1".equals(values[2])) {
+            if (node instanceof TaskModel || node instanceof CustomModel || node instanceof SubProcessModel) {
                 values[2] = "100";
             } else {
                 values[2] = "50";
             }
         }
-        if("-1".equals(values[3])) {
+        if ("-1".equals(values[3])) {
             values[3] = "50";
         }
         buffer.append("'width':").append(values[2]).append(",");
@@ -274,31 +278,32 @@ public class SnakerHelper {
     }
 
     public static String convertXml(String value) {
-        if(value.indexOf("#1") != -1) {
+        if (value.indexOf("#1") != -1) {
             value = value.replaceAll("#1", "'");
         }
-        if(value.indexOf("#2") != -1) {
+        if (value.indexOf("#2") != -1) {
             value = value.replaceAll("#2", "\"");
         }
-        if(value.indexOf("#5") != -1) {
+        if (value.indexOf("#5") != -1) {
             value = value.replaceAll("#5", "&gt;");
         }
-        if(value.indexOf("#6") != -1) {
+        if (value.indexOf("#6") != -1) {
             value = value.replaceAll("#6", "&lt;");
         }
-        if(value.indexOf("&") != -1) {
+        if (value.indexOf("&") != -1) {
             value = value.replaceAll("#7", "&amp;");
         }
         return value;
     }
 
     private static int getNumber(final String value) {
-        if(value == null) {
+        if (value == null) {
             return 0;
         }
         try {
             return Integer.parseInt(value) + 180;
-        } catch(final Exception e) {
+        }
+        catch (final Exception e) {
             return 0;
         }
     }

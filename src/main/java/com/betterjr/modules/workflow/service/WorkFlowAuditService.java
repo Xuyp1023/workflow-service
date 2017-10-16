@@ -42,7 +42,8 @@ public class WorkFlowAuditService extends BaseService<WorkFlowAuditMapper, WorkF
      * @param anOrderId
      * @return
      */
-    public com.betterjr.mapper.pagehelper.Page<WorkFlowAudit> queryWorkFlowAuditByBusinessId(final Long anBusinessId, final int anFlag, final int anPageNum, final int anPageSize) {
+    public com.betterjr.mapper.pagehelper.Page<WorkFlowAudit> queryWorkFlowAuditByBusinessId(final Long anBusinessId,
+            final int anFlag, final int anPageNum, final int anPageSize) {
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("businessId", anBusinessId);

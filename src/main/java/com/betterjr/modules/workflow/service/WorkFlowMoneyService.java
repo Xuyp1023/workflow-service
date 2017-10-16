@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.dao.WorkFlowMoneyMapper;
@@ -58,7 +58,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
         final WorkFlowBase workFlowBase = workFlowBaseService.findWorkFlowBaseById(anBaseId);
         BTAssert.notNull(workFlowBase, "没有找到流程");
         // 检查是否为未发布流程 (不能修改已发布的流程)
-        if (BetterStringUtils.equals(workFlowBase.getIsPublished(), WorkFlowConstants.IS_PUBLISHED)) {
+        if (StringUtils.equals(workFlowBase.getIsPublished(), WorkFlowConstants.IS_PUBLISHED)) {
             throw new BytterException("已发布流程不允许修改！");
         }
 
@@ -92,7 +92,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
      * @param anMoneySection
      */
     private List<WorkFlowMoney> checkMoneySection(final String anMoneySection) {
-        if (BetterStringUtils.isBlank(anMoneySection)) {
+        if (StringUtils.isBlank(anMoneySection)) {
             return Collections.EMPTY_LIST;
         }
         // 0,100,200,-1
@@ -120,8 +120,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
                 workFlowMoney.setEndMoney(new BigDecimal(previous));
                 workFlowMoney.setSeq(0);
                 workFlowMoneys.add(workFlowMoney);
-            }
-            else {
+            } else {
                 current = Long.valueOf(values[i]);
                 if (current.longValue() <= previous) {
                     throw new BytterException("金额段数值顺序错误！");
@@ -167,7 +166,7 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
         // 将读取到的金额段 组成 金额段字符串
         final List<WorkFlowMoney> workFlowMoneys = queryWorkFlowMoneyByBaseId(anBaseId);
 
-        if (Collections3.isEmpty(workFlowMoneys))  {
+        if (Collections3.isEmpty(workFlowMoneys)) {
             return "";
         }
         final StringBuilder moneySection = new StringBuilder("0,");
@@ -197,8 +196,10 @@ public class WorkFlowMoneyService extends BaseService<WorkFlowMoneyMapper, WorkF
      */
     public List<SimpleDataEntity> queryWorkFlowMoney(final Long anBaseId) {
         // 读取当前流程金额段
-        return queryWorkFlowMoneyByBaseId(anBaseId).stream().map(workFlowMoney -> new SimpleDataEntity(String.valueOf(workFlowMoney.getId()),
-                workFlowMoney.getBeginMoney() + " - " + workFlowMoney.getEndMoney())).collect(Collectors.toList());
+        return queryWorkFlowMoneyByBaseId(anBaseId).stream()
+                .map(workFlowMoney -> new SimpleDataEntity(String.valueOf(workFlowMoney.getId()),
+                        workFlowMoney.getBeginMoney() + " - " + workFlowMoney.getEndMoney()))
+                .collect(Collectors.toList());
     }
 
     /**

@@ -49,7 +49,7 @@ public class SpringJdbcAccess extends AbstractDBAccess implements DBAccess {
     @Override
     public void saveProcess(final Process process) {
         super.saveProcess(process);
-        if(process.getBytes() != null) {
+        if (process.getBytes() != null) {
             template.execute(PROCESS_UPDATE_BLOB, new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
 
                 @Override
@@ -58,7 +58,8 @@ public class SpringJdbcAccess extends AbstractDBAccess implements DBAccess {
                     try {
                         lobCreator.setBlobAsBytes(ps, 1, process.getBytes());
                         StatementCreatorUtils.setParameterValue(ps, 2, Types.VARCHAR, process.getId());
-                    } catch (final Exception e) {
+                    }
+                    catch (final Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -69,7 +70,7 @@ public class SpringJdbcAccess extends AbstractDBAccess implements DBAccess {
     @Override
     public void updateProcess(final Process process) {
         super.updateProcess(process);
-        if(process.getBytes() != null) {
+        if (process.getBytes() != null) {
             template.execute(PROCESS_UPDATE_BLOB, new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
 
                 @Override
@@ -78,7 +79,8 @@ public class SpringJdbcAccess extends AbstractDBAccess implements DBAccess {
                     try {
                         lobCreator.setBlobAsBytes(ps, 1, process.getBytes());
                         StatementCreatorUtils.setParameterValue(ps, 2, Types.VARCHAR, process.getId());
-                    } catch (final Exception e) {
+                    }
+                    catch (final Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -93,10 +95,10 @@ public class SpringJdbcAccess extends AbstractDBAccess implements DBAccess {
 
     @Override
     public void saveOrUpdate(final Map<String, Object> map) {
-        final String sql = (String)map.get(KEY_SQL);
-        final Object[] args = (Object[])map.get(KEY_ARGS);
-        final int[] type = (int[])map.get(KEY_TYPE);
-        if(log.isDebugEnabled()) {
+        final String sql = (String) map.get(KEY_SQL);
+        final Object[] args = (Object[]) map.get(KEY_ARGS);
+        final int[] type = (int[]) map.get(KEY_TYPE);
+        if (log.isDebugEnabled()) {
             log.debug("增删改数据(Spring托管事务)=\n" + sql);
         }
         template.update(sql, args, type);
@@ -104,19 +106,20 @@ public class SpringJdbcAccess extends AbstractDBAccess implements DBAccess {
 
     public Integer getLatestProcessVersion(final String name) {
         final String where = " where name = ?";
-        final Number number = template.queryForObject(QUERY_VERSION + where, new Object[]{name }, Integer.class);
+        final Number number = template.queryForObject(QUERY_VERSION + where, new Object[] { name }, Integer.class);
         return (number != null ? number.intValue() : -1);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T queryObject(final Class<T> clazz, final String sql, final Object... args) {
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("查询单条数据=\n" + sql);
         }
         try {
-            return (T)template.queryForObject(sql, args, new BeanPropertyRowMapper(clazz));
-        } catch(final Exception e) {
+            return (T) template.queryForObject(sql, args, new BeanPropertyRowMapper(clazz));
+        }
+        catch (final Exception e) {
             log.error("查询单条数据=\n" + e.getMessage());
             return null;
         }
@@ -125,7 +128,7 @@ public class SpringJdbcAccess extends AbstractDBAccess implements DBAccess {
     @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> queryList(final Class<T> clazz, final String sql, final Object... args) {
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("查询多条数据=\n" + sql);
         }
         return template.query(sql, args, new BeanPropertyRowMapper(clazz));

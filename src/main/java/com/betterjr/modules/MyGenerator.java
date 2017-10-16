@@ -15,7 +15,8 @@ import org.mybatis.generator.internal.DefaultShellCallback;
 
 public class MyGenerator {
 
-    public static void main(final String[] args) throws SQLException, IOException, InterruptedException, XMLParserException, InvalidConfigurationException {
+    public static void main(final String[] args)
+            throws SQLException, IOException, InterruptedException, XMLParserException, InvalidConfigurationException {
         final List<String> warnings = new ArrayList<String>();
         final boolean overwrite = true;
         final File configFile = new File("E:\\new\\workflow-service\\src\\main\\resources\\generatorConfig.xml");

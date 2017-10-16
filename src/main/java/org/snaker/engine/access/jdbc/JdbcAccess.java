@@ -62,11 +62,11 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
 
     @Override
     public void initialize(final Object accessObject) {
-        if(accessObject == null) {
+        if (accessObject == null) {
             return;
         }
-        if(accessObject instanceof DataSource) {
-            this.dataSource = (DataSource)accessObject;
+        if (accessObject instanceof DataSource) {
+            this.dataSource = (DataSource) accessObject;
         }
     }
 
@@ -86,7 +86,7 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
     @Override
     public void saveProcess(final Process process) {
         super.saveProcess(process);
-        if(process.getBytes() != null) {
+        if (process.getBytes() != null) {
             Connection conn = null;
             PreparedStatement pstmt = null;
             try {
@@ -95,12 +95,15 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
                 pstmt.setBytes(1, process.getBytes());
                 pstmt.setString(2, process.getId());
                 pstmt.execute();
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 throw new SnakerException(e.getMessage(), e.getCause());
-            } finally {
+            }
+            finally {
                 try {
                     JdbcHelper.close(pstmt);
-                } catch (final SQLException e) {
+                }
+                catch (final SQLException e) {
                     throw new SnakerException(e.getMessage(), e.getCause());
                 }
             }
@@ -113,7 +116,7 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
     @Override
     public void updateProcess(final Process process) {
         super.updateProcess(process);
-        if(process.getBytes() != null) {
+        if (process.getBytes() != null) {
             Connection conn = null;
             PreparedStatement pstmt = null;
             try {
@@ -122,12 +125,15 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
                 pstmt.setBytes(1, process.getBytes());
                 pstmt.setString(2, process.getId());
                 pstmt.execute();
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 throw new SnakerException(e.getMessage(), e.getCause());
-            } finally {
+            }
+            finally {
                 try {
                     JdbcHelper.close(pstmt);
-                } catch (final SQLException e) {
+                }
+                catch (final SQLException e) {
                     throw new SnakerException(e.getMessage(), e.getCause());
                 }
             }
@@ -144,11 +150,12 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
     public Object query(final int column, final String sql, final Object... params) {
         Object result;
         try {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("查询单列数据=\n" + sql);
             }
             result = runner.query(getConnection(), sql, new ScalarHandler(column), params);
-        } catch (final SQLException e) {
+        }
+        catch (final SQLException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -169,14 +176,15 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
 
     @Override
     public void saveOrUpdate(final Map<String, Object> map) {
-        final String sql = (String)map.get(KEY_SQL);
-        final Object[] args = (Object[])map.get(KEY_ARGS);
+        final String sql = (String) map.get(KEY_SQL);
+        final Object[] args = (Object[]) map.get(KEY_ARGS);
         try {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("增删改数据(需手动提交事务)=\n" + sql);
             }
             runner.update(getConnection(), sql, args);
-        } catch (final SQLException e) {
+        }
+        catch (final SQLException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -186,12 +194,13 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
     public <T> T queryObject(final Class<T> clazz, final String sql, final Object... args) {
         List<T> result = null;
         try {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("查询单条记录=\n" + sql);
             }
             result = runner.query(getConnection(), sql, new BeanPropertyHandler<T>(clazz), args);
             return JdbcHelper.requiredSingleResult(result);
-        } catch (final SQLException e) {
+        }
+        catch (final SQLException e) {
             log.error(e.getMessage(), e);
             return null;
         }
@@ -200,11 +209,12 @@ public class JdbcAccess extends AbstractDBAccess implements DBAccess {
     @Override
     public <T> List<T> queryList(final Class<T> clazz, final String sql, final Object... args) {
         try {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("查询多条记录=\n" + sql);
             }
             return runner.query(getConnection(), sql, new BeanPropertyHandler<T>(clazz), args);
-        } catch (final SQLException e) {
+        }
+        catch (final SQLException e) {
             log.error(e.getMessage(), e);
             return Collections.emptyList();
         }

@@ -16,13 +16,14 @@
  */
 package org.snaker.engine.access.mybatis;
 
+import java.sql.Connection;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.util.Properties;
 
 /**
  * mybatis自定义的事务工厂
@@ -30,16 +31,19 @@ import java.util.Properties;
  * @since 1.0
  */
 public class MybatisTransactionFactory implements TransactionFactory {
-	
-	public void setProperties(Properties props) {
-		// not needed in this version
-	}
 
-	public Transaction newTransaction(Connection conn) {
-		throw new UnsupportedOperationException("New transactions require a DataSource");
-	}
+    @Override
+    public void setProperties(Properties props) {
+        // not needed in this version
+    }
 
-	public Transaction newTransaction(DataSource dataSource, TransactionIsolationLevel level, boolean autoCommit) {
-		return new MybatisTransaction(dataSource);
-	}
+    @Override
+    public Transaction newTransaction(Connection conn) {
+        throw new UnsupportedOperationException("New transactions require a DataSource");
+    }
+
+    @Override
+    public Transaction newTransaction(DataSource dataSource, TransactionIsolationLevel level, boolean autoCommit) {
+        return new MybatisTransaction(dataSource);
+    }
 }

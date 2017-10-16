@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.snaker.engine.core.Execution;
 import org.snaker.engine.entity.Task;
 import org.snaker.engine.helper.AssertHelper;
@@ -21,7 +22,6 @@ import org.snaker.engine.model.TransitionModel;
 import org.snaker.engine.spring.SpringSnakerEngine;
 
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 
 /**
  * @author liuwl
@@ -29,8 +29,9 @@ import com.betterjr.common.utils.BetterStringUtils;
  */
 public class BetterSpringSnakerEngine extends SpringSnakerEngine {
 
-    public List<Task> executeAndJumpTask(final String anTaskId, final String anOperator, final Map<String, Object> anArgs, final List<String> parallelNodes, final String anNodeName) {
-        BTAssert.isTrue(BetterStringUtils.isNotBlank(anNodeName), "驳回节点名不允许为空！");
+    public List<Task> executeAndJumpTask(final String anTaskId, final String anOperator,
+            final Map<String, Object> anArgs, final List<String> parallelNodes, final String anNodeName) {
+        BTAssert.isTrue(StringUtils.isNotBlank(anNodeName), "驳回节点名不允许为空！");
         // XXX 在当前系统不存在驳回上一步的概念
 
         final Execution execution = execute(anTaskId, anOperator, anArgs);
@@ -42,8 +43,7 @@ public class BetterSpringSnakerEngine extends SpringSnakerEngine {
         if (StringHelper.isEmpty(anNodeName)) {
             final Task newTask = task().rejectTask(model, execution.getTask());
             execution.addTask(newTask);
-        }
-        else {
+        } else {
             for (final String nodeName : parallelNodes) {
                 // 把所有并行节点找出来 全部驳回
                 final NodeModel nodeModel = model.getNode(nodeName);

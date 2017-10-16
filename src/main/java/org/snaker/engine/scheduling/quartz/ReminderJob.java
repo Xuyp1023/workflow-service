@@ -30,14 +30,15 @@ import org.snaker.engine.scheduling.IReminder;
  * @since 1.4
  */
 public class ReminderJob extends AbstractJob {
-	private static final Logger log = LoggerFactory.getLogger(ReminderJob.class);
-	public void exec(Process process, String orderId,
-			String taskId, NodeModel nodeModel, Map<String, Object> data) 
-			throws JobExecutionException {
-		log.info("\nReminderJob execute taskId:{}\n", taskId);
+    private static final Logger log = LoggerFactory.getLogger(ReminderJob.class);
+
+    @Override
+    public void exec(Process process, String orderId, String taskId, NodeModel nodeModel, Map<String, Object> data)
+            throws JobExecutionException {
+        log.info("\nReminderJob execute taskId:{}\n", taskId);
         IReminder reminder = ServiceContext.find(IReminder.class);
-        if(reminder != null) {
+        if (reminder != null) {
             reminder.remind(process, orderId, taskId, nodeModel, data);
         }
-	}
+    }
 }

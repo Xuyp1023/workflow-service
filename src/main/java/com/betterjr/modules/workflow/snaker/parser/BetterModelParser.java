@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.snaker.engine.model.DecisionModel;
 import org.snaker.engine.model.EndModel;
 import org.snaker.engine.model.ExtJoinModel;
@@ -27,7 +28,6 @@ import org.snaker.engine.model.TransitionModel;
 import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.service.SpringContextHolder;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.workflow.constants.WorkFlowConstants;
 import com.betterjr.modules.workflow.entity.WorkFlowApprover;
@@ -113,7 +113,8 @@ public class BetterModelParser {
      * @param nodeModels
      * @param anCoordinate
      */
-    private static void adjustNodeLayout(final List<NodeModel> nodeModels, final Coordinate anCoordinate, final int incLevel) {
+    private static void adjustNodeLayout(final List<NodeModel> nodeModels, final Coordinate anCoordinate,
+            final int incLevel) {
         final int orginLevel = anCoordinate.getLevel();
         if (orginLevel < incLevel) {
             anCoordinate.setLevel(incLevel);
@@ -151,7 +152,8 @@ public class BetterModelParser {
             final WorkFlowNode flowNode = flowNodes.get(i);
             BTAssert.notNull(flowNode, "流程节点不允许为空！");
             if (i == 0) { // 第一步
-                BTAssert.isTrue(BetterStringUtils.equals(flowNode.getType(), WorkFlowConstants.NODE_TYPE_START), "第一个节点必须为开始节点");
+                BTAssert.isTrue(StringUtils.equals(flowNode.getType(), WorkFlowConstants.NODE_TYPE_START),
+                        "第一个节点必须为开始节点");
                 final StartModel startModel = new StartModel();
                 startModel.setName("开始");
                 startModel.setDisplayName("开始");
@@ -166,9 +168,9 @@ public class BetterModelParser {
                 prevStep.setSource(startModel);
 
                 nodeModels.add(startModel);
-            }
-            else if (i == flowNodes.size() - 1) {// 最后一步
-                BTAssert.isTrue(BetterStringUtils.equals(flowNode.getType(), WorkFlowConstants.NODE_TYPE_END), "最后一个节点必须为结束节点");
+            } else if (i == flowNodes.size() - 1) {// 最后一步
+                BTAssert.isTrue(StringUtils.equals(flowNode.getType(), WorkFlowConstants.NODE_TYPE_END),
+                        "最后一个节点必须为结束节点");
                 final EndModel endModel = new EndModel();
                 endModel.setName("结束");
                 endModel.setDisplayName("结束");
@@ -182,8 +184,7 @@ public class BetterModelParser {
                 endModel.setInputs(Collections.singletonList(prevStep));
 
                 nodeModels.add(endModel);
-            }
-            else {
+            } else {
                 switch (flowNode.getType()) {
                 case WorkFlowConstants.NODE_TYPE_OPER: { // 经办节点
                     final TaskModel taskModel = parseOperNode(anWorkFlowBase, flowNode);
@@ -202,14 +203,15 @@ public class BetterModelParser {
 
                     nodeModels.add(taskModel);
                 }
-                break;
+                    break;
                 case WorkFlowConstants.NODE_TYPE_APP: { // 审批节点 此处可能生成若干节点
                     final List<NodeModel> stepNodeList = new ArrayList<NodeModel>();
-                    prevStep = parseAppNode(anWorkFlowBase, flowNode, prevStep, i, stepNodeList, nodeModels, coordinate);
+                    prevStep = parseAppNode(anWorkFlowBase, flowNode, prevStep, i, stepNodeList, nodeModels,
+                            coordinate);
 
                     nodeModels.addAll(stepNodeList);
                 }
-                break;
+                    break;
                 case WorkFlowConstants.NODE_TYPE_SUB: { // 子流程
                     final SubProcessModel subProcessModel = new SubProcessModel();
                     subProcessModel.setName(flowNode.getName());
@@ -232,7 +234,7 @@ public class BetterModelParser {
 
                     nodeModels.add(subProcessModel);
                 }
-                break;
+                    break;
                 default:
                     throw new BytterException(flowNode + "流程定义不正确！");
                 }
@@ -259,13 +261,13 @@ public class BetterModelParser {
         operTaskModel.setWorkFlowBase(anWorkFlowBase);
         operTaskModel.setWorkFlowNode(anFlowNode);
 
-        final WorkFlowApproverService workFlowApproverService = SpringContextHolder.getBean(WorkFlowApproverService.class);
+        final WorkFlowApproverService workFlowApproverService = SpringContextHolder
+                .getBean(WorkFlowApproverService.class);
         final WorkFlowApprover workFlowApprover = workFlowApproverService.findApproverByNode(anFlowNode.getId());
 
         if (workFlowApprover != null) {
             operTaskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(workFlowApprover.getOperId()));
-        }
-        else {
+        } else {
             operTaskModel.setAssignee(WorkFlowConstants.PREFIX_CUST_NO + String.valueOf(anWorkFlowBase.getCustNo()));
         }
         return operTaskModel;
@@ -283,8 +285,9 @@ public class BetterModelParser {
      * @param anCoordinate
      * @return
      */
-    private static TransitionModel parseAppNode(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anFlowNode, final TransitionModel anPrevStep, final int anNodeIndex,
-            final List<NodeModel> anStepNodeList, final List<NodeModel> anNodeModels, final Coordinate anCoordinate) {
+    private static TransitionModel parseAppNode(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anFlowNode,
+            final TransitionModel anPrevStep, final int anNodeIndex, final List<NodeModel> anStepNodeList,
+            final List<NodeModel> anNodeModels, final Coordinate anCoordinate) {
         BTAssert.notNull(anFlowNode, "流程节点不允许为空");
 
         final List<WorkFlowStep> flowSteps = getSteps(anFlowNode.getId());
@@ -296,27 +299,27 @@ public class BetterModelParser {
                 final WorkFlowStep flowStep = flowSteps.get(0);
 
                 anCoordinate.setX(anCoordinate.getX() + X_INC);
-                nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, anNodeIndex, 0, anNodeModels, anCoordinate);
-            }
-            else {
+                nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, anNodeIndex, 0,
+                        anNodeModels, anCoordinate);
+            } else {
                 TransitionModel tempNextStep = null;
                 for (int i = 0; i < flowSteps.size(); i++) {
                     final WorkFlowStep flowStep = flowSteps.get(i);
                     anCoordinate.setX(anCoordinate.getX() + X_INC);
                     if (i == 0) { // 有多步时 第一步
-                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList, anNodeIndex, i, anNodeModels, anCoordinate);
-                    }
-                    else if (i == flowSteps.size() - 1) { // 有多步时 最后一步
-                        nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList, anNodeIndex, i, anNodeModels, anCoordinate);
-                    }
-                    else { // 中间步骤
-                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList, anNodeIndex, i, anNodeModels, anCoordinate);
+                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, anPrevStep, anStepNodeList,
+                                anNodeIndex, i, anNodeModels, anCoordinate);
+                    } else if (i == flowSteps.size() - 1) { // 有多步时 最后一步
+                        nextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList,
+                                anNodeIndex, i, anNodeModels, anCoordinate);
+                    } else { // 中间步骤
+                        tempNextStep = parseStep(anWorkFlowBase, anFlowNode, flowStep, tempNextStep, anStepNodeList,
+                                anNodeIndex, i, anNodeModels, anCoordinate);
                     }
                 }
             }
 
-        }
-        else {
+        } else {
             nextStep = anPrevStep;
         }
 
@@ -330,8 +333,9 @@ public class BetterModelParser {
      * @param anNodeModels
      * @param anCoordinate
      */
-    private static TransitionModel parseStep(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anWorkFlowNode, final WorkFlowStep anWorkFlowStep,
-            final TransitionModel anPrevStep, final List<NodeModel> anStepNodeList, final int anNodeIndex, final int anStepIndex, final List<NodeModel> anNodeModels,
+    private static TransitionModel parseStep(final WorkFlowBase anWorkFlowBase, final WorkFlowNode anWorkFlowNode,
+            final WorkFlowStep anWorkFlowStep, final TransitionModel anPrevStep, final List<NodeModel> anStepNodeList,
+            final int anNodeIndex, final int anStepIndex, final List<NodeModel> anNodeModels,
             final Coordinate anCoordinate) {
         final WorkFlowNodeService workFlowNodeService = SpringContextHolder.getBean(WorkFlowNodeService.class);
         final WorkFlowMoneyService workFlowMoneyService = SpringContextHolder.getBean(WorkFlowMoneyService.class);
@@ -366,15 +370,15 @@ public class BetterModelParser {
             final TransitionModel nextStep = new TransitionModel();
             taskModel.setOutputs(Collections.singletonList(nextStep));
 
-            nextStep.setName(taskModel.getName()  + anNodeIndex + "-" + anStepIndex + "-outputPath");
+            nextStep.setName(taskModel.getName() + anNodeIndex + "-" + anStepIndex + "-outputPath");
             nextStep.setDisplayName("");
             nextStep.setSource(taskModel);
 
             anStepNodeList.add(taskModel);
 
             return nextStep;
-        }
-        else if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType) && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
+        } else if (WorkFlowConstants.AUDIT_TYPE_SERIAL.equals(auditType)
+                && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
             BTAssert.isTrue(flowApprovers.size() > 1, "此节点至少2位审批人");
 
             final DecisionModel decisionModel = new DecisionModel();
@@ -404,20 +408,22 @@ public class BetterModelParser {
                 final TransitionModel enterTrans = new TransitionModel();
                 enterTrans.setSource(decisionModel);
 
-                enterTrans.setName(anWorkFlowStep.getName() + "-money-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-enterPath");
+                enterTrans.setName(anWorkFlowStep.getName() + "-money-" + anNodeIndex + "-" + anStepIndex + "-" + i
+                        + "-enterPath");
                 enterTrans.setDisplayName("");
 
                 String moneyVariable = workFlowNode.getMoneyVariable();
-                if (BetterStringUtils.isBlank(moneyVariable)) {
+                if (StringUtils.isBlank(moneyVariable)) {
                     moneyVariable = anWorkFlowBase.getMoneyVariable();
                 }
 
-                BTAssert.isTrue(BetterStringUtils.isNotBlank(moneyVariable), "金额段变量不允许为空！");
+                BTAssert.isTrue(StringUtils.isNotBlank(moneyVariable), "金额段变量不允许为空！");
                 enterTrans.setExpr(workFlowMoney.getSpelExpr(moneyVariable));
 
                 final TaskModel taskModel = new TaskModel();
 
-                taskModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-" + String.valueOf(i));
+                taskModel.setName(
+                        anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-" + String.valueOf(i));
                 taskModel.setDisplayName(anWorkFlowStep.getNickname());
 
                 setNodeLayout(taskModel, anCoordinate.getX(), anCoordinate.getY() + (Y_INC * (incLevel - i)));
@@ -434,7 +440,8 @@ public class BetterModelParser {
                 final TransitionModel exitTrans = new TransitionModel();
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
                 exitTrans.setSource(taskModel);
-                exitTrans.setName(anWorkFlowStep.getName() + "-money-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-exitPath");
+                exitTrans.setName(
+                        anWorkFlowStep.getName() + "-money-" + anNodeIndex + "-" + anStepIndex + "-" + i + "-exitPath");
                 exitTrans.setDisplayName("");
 
                 joinInputs.add(exitTrans);
@@ -442,24 +449,24 @@ public class BetterModelParser {
                 anStepNodeList.add(taskModel);
                 exitTrans.setTarget(joinModel);
             }
-            decisionModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-decision");
+            decisionModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-decision");
             decisionModel.setOutputs(decisionOutputs);
             final TransitionModel nextStep = new TransitionModel();
 
             anCoordinate.setX(anCoordinate.getX() + X_INC);
             setNodeLayout(joinModel, anCoordinate);
 
-            joinModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-join");
+            joinModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-join");
             joinModel.setInputs(joinInputs);
             joinModel.setOutputs(Collections.singletonList(nextStep));
             nextStep.setSource(joinModel);
-            nextStep.setName(anWorkFlowStep.getName()  + anNodeIndex + "-" + anStepIndex + "-money--exitPath");
+            nextStep.setName(anWorkFlowStep.getName() + anNodeIndex + "-" + anStepIndex + "-money--exitPath");
             nextStep.setDisplayName("");
             anStepNodeList.add(joinModel);
 
             return nextStep;
-        }
-        else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType) && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
+        } else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType)
+                && WorkFlowConstants.IS_MONEY_FALSE.equals(isMoney)) {
             BTAssert.isTrue(flowApprovers.size() > 1, "此节点至少2位审批人");
             final ForkModel forkModel = new ForkModel();
 
@@ -483,13 +490,15 @@ public class BetterModelParser {
 
                 final TransitionModel enterTrans = new TransitionModel();
                 enterTrans.setSource(forkModel);
-                enterTrans.setName(anWorkFlowStep.getName() + "-parallel-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-enterPath");
+                enterTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anNodeIndex + "-" + anStepIndex + "-" + i
+                        + "-enterPath");
                 enterTrans.setDisplayName("");
 
                 final TaskModel taskModel = new TaskModel();
                 taskModel.setHasWeight(true);
                 taskModel.setWeight(workFlowApprover.getWeight());
-                taskModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-" + String.valueOf(i));
+                taskModel.setName(
+                        anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-" + String.valueOf(i));
                 taskModel.setDisplayName(anWorkFlowStep.getNickname());
 
                 setNodeLayout(taskModel, anCoordinate.getX(), anCoordinate.getY() + (Y_INC * (incLevel - i)));
@@ -507,7 +516,8 @@ public class BetterModelParser {
                 taskModel.setOutputs(Collections.singletonList(exitTrans));
                 joinInputs.add(exitTrans);
                 exitTrans.setSource(taskModel);
-                exitTrans.setName(anWorkFlowStep.getName() + "-parallel-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-exitPath");
+                exitTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anNodeIndex + "-" + anStepIndex + "-" + i
+                        + "-exitPath");
                 exitTrans.setDisplayName("");
 
                 anStepNodeList.add(taskModel);
@@ -515,7 +525,7 @@ public class BetterModelParser {
                 exitTrans.setTarget(joinModel);
             }
             forkModel.setOutputs(forkOutputs);
-            forkModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-fork");
+            forkModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-fork");
             final TransitionModel nextStep = new TransitionModel();
             joinModel.setInputs(joinInputs);
             joinModel.setOutputs(Collections.singletonList(nextStep));
@@ -523,16 +533,16 @@ public class BetterModelParser {
             anCoordinate.setX(anCoordinate.getX() + X_INC); // 递进
             setNodeLayout(joinModel, anCoordinate);
 
-            joinModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-join");
+            joinModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-join");
 
             nextStep.setSource(joinModel);
-            nextStep.setName(anWorkFlowStep.getName()  + anNodeIndex + "-" + anStepIndex + "-parallel--exitPath");
+            nextStep.setName(anWorkFlowStep.getName() + anNodeIndex + "-" + anStepIndex + "-parallel--exitPath");
             nextStep.setDisplayName("");
             anStepNodeList.add(joinModel);
 
             return nextStep;
-        }
-        else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType) && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
+        } else if (WorkFlowConstants.AUDIT_TYPE_PARALLEL.equals(auditType)
+                && WorkFlowConstants.IS_MONEY_TRUE.equals(isMoney)) {
             // 先按moneyId 分组
             final DecisionModel decisionModel = new DecisionModel();
             anPrevStep.setTarget(decisionModel);
@@ -557,15 +567,16 @@ public class BetterModelParser {
                 final WorkFlowMoney workFlowMoney = flowMoneys.get(i);
                 final TransitionModel decisionEnterTrans = new TransitionModel();
                 decisionEnterTrans.setSource(decisionModel);
-                decisionEnterTrans.setName(anWorkFlowStep.getName() + "-money-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-enterPath");
+                decisionEnterTrans.setName(anWorkFlowStep.getName() + "-money-" + anNodeIndex + "-" + anStepIndex + "-"
+                        + i + "-enterPath");
                 decisionEnterTrans.setDisplayName("");
 
                 String moneyVariable = workFlowNode.getMoneyVariable();
-                if (BetterStringUtils.isBlank(moneyVariable)) {
+                if (StringUtils.isBlank(moneyVariable)) {
                     moneyVariable = anWorkFlowBase.getMoneyVariable();
                 }
 
-                BTAssert.isTrue(BetterStringUtils.isNotBlank(moneyVariable), "金额段变量不允许为空！");
+                BTAssert.isTrue(StringUtils.isNotBlank(moneyVariable), "金额段变量不允许为空！");
                 decisionEnterTrans.setExpr(workFlowMoney.getSpelExpr(moneyVariable));
 
                 final ForkModel forkModel = new ForkModel();
@@ -587,21 +598,25 @@ public class BetterModelParser {
                     if (workFlowMoney.getId().equals(flowApprover.getMoneyId())) {
                         final TransitionModel enterTrans = new TransitionModel();
                         enterTrans.setSource(forkModel);
-                        enterTrans.setName(anWorkFlowStep.getName() + "-parallel-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-" + j + "-enterPath");
+                        enterTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anNodeIndex + "-" + anStepIndex
+                                + "-" + i + "-" + j + "-enterPath");
                         enterTrans.setDisplayName("");
 
                         final TaskModel taskModel = new TaskModel();
                         taskModel.setHasWeight(true);
                         taskModel.setWeight(flowApprover.getWeight());
-                        taskModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-" + j);
+                        taskModel.setName(
+                                anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-" + i + "-" + j);
                         taskModel.setDisplayName(anWorkFlowStep.getNickname());
 
-                        setNodeLayout(taskModel, anCoordinate.getX() + X_INC, anCoordinate.getY() + (Y_INC * (incLevel - j)));
+                        setNodeLayout(taskModel, anCoordinate.getX() + X_INC,
+                                anCoordinate.getY() + (Y_INC * (incLevel - j)));
                         taskModel.setWorkFlowBase(anWorkFlowBase);
                         taskModel.setWorkFlowNode(anWorkFlowNode);
                         taskModel.setWorkFlowStep(anWorkFlowStep);
 
-                        taskModel.setAssignee(WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowApprover.getOperId()));
+                        taskModel.setAssignee(
+                                WorkFlowConstants.PREFIX_OPER_ID + String.valueOf(flowApprover.getOperId()));
 
                         enterTrans.setTarget(taskModel);
                         forkOutputs.add(enterTrans);
@@ -609,7 +624,8 @@ public class BetterModelParser {
                         final TransitionModel exitTrans = new TransitionModel();
                         taskModel.setOutputs(Collections.singletonList(exitTrans));
                         exitTrans.setSource(taskModel);
-                        exitTrans.setName(anWorkFlowStep.getName() + "-parallel-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-" + j + "-exitPath");
+                        exitTrans.setName(anWorkFlowStep.getName() + "-parallel-" + anNodeIndex + "-" + anStepIndex
+                                + "-" + i + "-" + j + "-exitPath");
                         exitTrans.setDisplayName("");
                         joinInputs.add(exitTrans);
                         anStepNodeList.add(taskModel);
@@ -619,16 +635,18 @@ public class BetterModelParser {
                 }
 
                 forkModel.setOutputs(forkOutputs);
-                forkModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-fork");
+                forkModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-" + i + "-fork");
                 final TransitionModel decisionExitTrans = new TransitionModel();
                 joinModel.setOutputs(Collections.singletonList(decisionExitTrans));
                 joinModel.setInputs(joinInputs);
 
-                setNodeLayout(joinModel, anCoordinate.getX() + X_INC * 2, anCoordinate.getY() + (Y_INC * (incMoneyLevel - i)));
+                setNodeLayout(joinModel, anCoordinate.getX() + X_INC * 2,
+                        anCoordinate.getY() + (Y_INC * (incMoneyLevel - i)));
 
-                joinModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-join");
+                joinModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-" + i + "-join");
                 decisionExitTrans.setSource(joinModel);
-                decisionExitTrans.setName(anWorkFlowStep.getName() + "-money-"  + anNodeIndex + "-" + anStepIndex + "-" + i + "-exitPath");
+                decisionExitTrans.setName(
+                        anWorkFlowStep.getName() + "-money-" + anNodeIndex + "-" + anStepIndex + "-" + i + "-exitPath");
                 decisionExitTrans.setDisplayName("");
 
                 decisionJoinInputs.add(decisionExitTrans);
@@ -638,7 +656,7 @@ public class BetterModelParser {
             }
 
             decisionModel.setOutputs(decisionOutputs);
-            decisionModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-decision");
+            decisionModel.setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-decision");
             final TransitionModel nextStep = new TransitionModel();
             decisionJoinModel.setOutputs(Collections.singletonList(nextStep));
             decisionJoinModel.setInputs(decisionJoinInputs);
@@ -646,15 +664,15 @@ public class BetterModelParser {
             anCoordinate.setX(anCoordinate.getX() + X_INC * 3);
             setNodeLayout(decisionJoinModel, anCoordinate);
 
-            decisionJoinModel.setName(anWorkFlowStep.getName() + "-"  + anNodeIndex + "-" + anStepIndex + "-decisionJoin");
-            nextStep.setName(anWorkFlowStep.getName()  + anNodeIndex + "-" + anStepIndex + "-money--exitPath");
+            decisionJoinModel
+                    .setName(anWorkFlowStep.getName() + "-" + anNodeIndex + "-" + anStepIndex + "-decisionJoin");
+            nextStep.setName(anWorkFlowStep.getName() + anNodeIndex + "-" + anStepIndex + "-money--exitPath");
             nextStep.setDisplayName("");
             nextStep.setSource(decisionJoinModel);
             anStepNodeList.add(decisionJoinModel);
 
             return nextStep;
-        }
-        else {
+        } else {
             throw new BytterException("审批方式和金额段标识不正确！");
         }
 
@@ -673,8 +691,7 @@ public class BetterModelParser {
         default: {
             if (anSize % 2 != 0) {
                 result = anSize / 2;
-            }
-            else {
+            } else {
                 result = (anSize + 1) / 2;
             }
         }
@@ -688,7 +705,8 @@ public class BetterModelParser {
      * @return
      */
     private static List<WorkFlowApprover> getApprovers(final Long anStepId) {
-        final WorkFlowApproverService workFlowApproverService = SpringContextHolder.getBean(WorkFlowApproverService.class);
+        final WorkFlowApproverService workFlowApproverService = SpringContextHolder
+                .getBean(WorkFlowApproverService.class);
         return workFlowApproverService.queryApproverByStep(anStepId);
     }
 
@@ -710,7 +728,8 @@ public class BetterModelParser {
     private static List<WorkFlowNode> getNodes(final Long anBaseId) {
         final WorkFlowNodeService workFlowNodeService = SpringContextHolder.getBean(WorkFlowNodeService.class);
         return workFlowNodeService.queryWorkFlowNode(anBaseId).stream()
-                .filter(node -> BetterStringUtils.equals(node.getIsDisabled(), WorkFlowConstants.NOT_DISABLED)).collect(Collectors.toList());
+                .filter(node -> StringUtils.equals(node.getIsDisabled(), WorkFlowConstants.NOT_DISABLED))
+                .collect(Collectors.toList());
     }
 
     /**

@@ -22,11 +22,12 @@ import org.snaker.engine.SnakerException;
  * @since 1.3
  */
 public class CacheException extends SnakerException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5329674600226403430L;
-	/**
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5329674600226403430L;
+
+    /**
      * 创建cache异常
      */
     public CacheException() {

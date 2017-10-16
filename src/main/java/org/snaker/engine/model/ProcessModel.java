@@ -86,9 +86,9 @@ public class ProcessModel extends BaseModel {
     @Deprecated
     public List<WorkModel> getWorkModels() {
         final List<WorkModel> models = new ArrayList<WorkModel>();
-        for(final NodeModel node : nodes) {
-            if(node instanceof WorkModel) {
-                models.add((WorkModel)node);
+        for (final NodeModel node : nodes) {
+            if (node instanceof WorkModel) {
+                models.add((WorkModel) node);
             }
         }
         return models;
@@ -99,9 +99,9 @@ public class ProcessModel extends BaseModel {
      * @return List<TaskModel> 任务模型集合
      */
     public List<TaskModel> getTaskModels() {
-        if(taskModels.isEmpty()) {
+        if (taskModels.isEmpty()) {
             synchronized (lock) {
-                if(taskModels.isEmpty()) {
+                if (taskModels.isEmpty()) {
                     buildModels(taskModels, getStart().getNextModels(TaskModel.class), TaskModel.class);
                 }
             }
@@ -122,10 +122,10 @@ public class ProcessModel extends BaseModel {
     }
 
     private <T> void buildModels(final List<T> models, final List<T> nextModels, final Class<T> clazz) {
-        for(final T nextModel : nextModels) {
-            if(!models.contains(nextModel)) {
+        for (final T nextModel : nextModels) {
+            if (!models.contains(nextModel)) {
                 models.add(nextModel);
-                buildModels(models, ((NodeModel)nextModel).getNextModels(clazz), clazz);
+                buildModels(models, ((NodeModel) nextModel).getNextModels(clazz), clazz);
             }
         }
     }
@@ -135,9 +135,9 @@ public class ProcessModel extends BaseModel {
      * @return
      */
     public StartModel getStart() {
-        for(final NodeModel node : nodes) {
-            if(node instanceof StartModel) {
-                return (StartModel)node;
+        for (final NodeModel node : nodes) {
+            if (node instanceof StartModel) {
+                return (StartModel) node;
             }
         }
         return null;
@@ -149,8 +149,8 @@ public class ProcessModel extends BaseModel {
      * @return
      */
     public NodeModel getNode(final String nodeName) {
-        for(final NodeModel node : nodes) {
-            if(node.getName().equals(nodeName)) {
+        for (final NodeModel node : nodes) {
+            if (node.getName().equals(nodeName)) {
                 return node;
             }
         }
@@ -163,12 +163,12 @@ public class ProcessModel extends BaseModel {
      * @return
      */
     public <T> boolean containsNodeNames(final Class<T> T, final String... nodeNames) {
-        for(final NodeModel node : nodes) {
-            if(!T.isInstance(node)) {
+        for (final NodeModel node : nodes) {
+            if (!T.isInstance(node)) {
                 continue;
             }
-            for(final String nodeName : nodeNames) {
-                if(node.getName().equals(nodeName)) {
+            for (final String nodeName : nodeNames) {
+                if (node.getName().equals(nodeName)) {
                     return true;
                 }
             }
@@ -179,6 +179,7 @@ public class ProcessModel extends BaseModel {
     public List<NodeModel> getNodes() {
         return nodes;
     }
+
     public void setNodes(final List<NodeModel> nodes) {
         this.nodes = nodes;
     }
@@ -198,14 +199,15 @@ public class ProcessModel extends BaseModel {
     public void setInstanceUrl(final String instanceUrl) {
         this.instanceUrl = instanceUrl;
     }
+
     public String getInstanceNoClass() {
         return instanceNoClass;
     }
 
     public void setInstanceNoClass(final String instanceNoClass) {
         this.instanceNoClass = instanceNoClass;
-        if(StringHelper.isNotEmpty(instanceNoClass)) {
-            generator = (INoGenerator)ClassHelper.newInstance(instanceNoClass);
+        if (StringHelper.isNotEmpty(instanceNoClass)) {
+            generator = (INoGenerator) ClassHelper.newInstance(instanceNoClass);
         }
     }
 

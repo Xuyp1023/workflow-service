@@ -35,58 +35,58 @@ import com.betterjr.modules.customer.ICustMechBaseService;
  * @since 1.4
  */
 public class GeneralAccessStrategy implements TaskAccessStrategy {
-    
-    
+
     @Reference(interfaceClass = ICustMechBaseService.class)
     private ICustMechBaseService custMechBaseService;
-	/**
-	 * 根据操作人id确定所有的组集合
-	 * @param operator 操作人id
-	 * @return List<String> 确定的组集合[如操作人属于多个部门、拥有多个角色]
-	 */
-	protected List<String> ensureGroup(String operator) {
-	    List<String> groupList=new ArrayList<>();
-	    Collection<Long> custNos = getCurrentUserCustNos();
-	    for (Long custNo : custNos) {
-	        groupList.add("CustNo:"+custNo);
+
+    /**
+     * 根据操作人id确定所有的组集合
+     * @param operator 操作人id
+     * @return List<String> 确定的组集合[如操作人属于多个部门、拥有多个角色]
+     */
+    protected List<String> ensureGroup(String operator) {
+        List<String> groupList = new ArrayList<>();
+        Collection<Long> custNos = getCurrentUserCustNos();
+        for (Long custNo : custNos) {
+            groupList.add("CustNo:" + custNo);
         }
-		return groupList;
-	}
-	
-	
-	/**
+        return groupList;
+    }
+
+    /**
      * 获取当前登录用户所在的所有公司id集合
      * @return
      */
-    private Collection<Long> getCurrentUserCustNos(){
-        
+    private Collection<Long> getCurrentUserCustNos() {
+
         CustOperatorInfo operInfo = UserUtils.getOperatorInfo();
         BTAssert.notNull(operInfo, "查询可用资产失败!请先登录");
         Collection<CustInfo> custInfos = custMechBaseService.queryCustInfoByOperId(UserUtils.getOperatorInfo().getId());
         BTAssert.notNull(custInfos, "查询可用资产失败!获取当前企业失败");
-        Collection<Long> custNos=new ArrayList<>();
+        Collection<Long> custNos = new ArrayList<>();
         for (CustInfo custInfo : custInfos) {
             custNos.add(custInfo.getId());
         }
-        return  custNos;
+        return custNos;
     }
-	
-	/**
-	 * 如果操作人id所属的组只要有一项存在于参与者集合中，则表示可访问
-	 */
-	public boolean isAllowed(String operator, List<TaskActor> actors) {
-		List<String> assignees = ensureGroup(operator);
-		if(assignees == null) assignees = new ArrayList<String>();
-		assignees.add(operator);
-		boolean isAllowed = false;
-		for (TaskActor actor : actors) {
-			for (String assignee : assignees) {
-				if (actor.getActorId().equals(assignee)) {
-					isAllowed = true;
-					break;
-				}
-			}
-		}
-		return isAllowed;
-	}
+
+    /**
+     * 如果操作人id所属的组只要有一项存在于参与者集合中，则表示可访问
+     */
+    @Override
+    public boolean isAllowed(String operator, List<TaskActor> actors) {
+        List<String> assignees = ensureGroup(operator);
+        if (assignees == null) assignees = new ArrayList<String>();
+        assignees.add(operator);
+        boolean isAllowed = false;
+        for (TaskActor actor : actors) {
+            for (String assignee : assignees) {
+                if (actor.getActorId().equals(assignee)) {
+                    isAllowed = true;
+                    break;
+                }
+            }
+        }
+        return isAllowed;
+    }
 }

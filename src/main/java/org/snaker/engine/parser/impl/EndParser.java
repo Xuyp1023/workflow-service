@@ -24,10 +24,11 @@ import org.snaker.engine.parser.AbstractNodeParser;
  * @since 1.0
  */
 public class EndParser extends AbstractNodeParser {
-	/**
-	 * 产生EndModel模型对象
-	 */
-	protected NodeModel newModel() {
-		return new EndModel();
-	}
+    /**
+     * 产生EndModel模型对象
+     */
+    @Override
+    protected NodeModel newModel() {
+        return new EndModel();
+    }
 }

@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.workflow.entity.WorkFlowNode;
 
 @BetterjrMapper
-public interface WorkFlowNodeMapper extends Mapper<WorkFlowNode> {
-}
+public interface WorkFlowNodeMapper extends Mapper<WorkFlowNode> {}

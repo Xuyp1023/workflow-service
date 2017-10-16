@@ -10,11 +10,11 @@ package com.betterjr.modules.workflow.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.workflow.dao.WorkFlowBusinessMapper;
 import com.betterjr.modules.workflow.entity.WorkFlowBusiness;
@@ -45,7 +45,7 @@ public class WorkFlowBusinessService extends BaseService<WorkFlowBusinessMapper,
      * @return
      */
     public WorkFlowBusiness findWorkFlowBusinessByOrderId(final String anOrderId) {
-        BTAssert.isTrue(BetterStringUtils.isNotBlank(anOrderId), "流程实例编号不允许为空");
+        BTAssert.isTrue(StringUtils.isNotBlank(anOrderId), "流程实例编号不允许为空");
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("orderId", anOrderId);
@@ -58,7 +58,7 @@ public class WorkFlowBusinessService extends BaseService<WorkFlowBusinessMapper,
      * @param anBusinessId
      */
     public WorkFlowBusiness findWorkFlowBusinessById(final String anBusinessId) {
-        BTAssert.isTrue(BetterStringUtils.isNotBlank(anBusinessId), "流程业务编号不允许为空");
+        BTAssert.isTrue(StringUtils.isNotBlank(anBusinessId), "流程业务编号不允许为空");
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("businessId", anBusinessId);
